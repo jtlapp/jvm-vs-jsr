@@ -24,6 +24,13 @@ spec:
               value: password
           ports:
             - containerPort: 5432
+          volumeMounts:
+            - name: init-db-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: init-db-script
+          configMap:
+            name: init-db-configmap
 ---
 apiVersion: v1
 kind: Service

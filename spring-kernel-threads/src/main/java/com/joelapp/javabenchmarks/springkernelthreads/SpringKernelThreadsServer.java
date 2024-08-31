@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SpringKernelThreadsServer {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApiServer.class, args);
+		SpringApplication.run(SpringKernelThreadsServer.class, args);
 	}
 
 }
