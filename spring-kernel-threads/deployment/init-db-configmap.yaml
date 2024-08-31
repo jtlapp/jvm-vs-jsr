@@ -4,7 +4,7 @@ metadata:
   name: init-db-configmap
 data:
   init-db.sql: |
-    CREATE TABLE messages (
+    CREATE TABLE message (
         id SERIAL PRIMARY KEY,
         text VARCHAR(255) NOT NULL
     );
