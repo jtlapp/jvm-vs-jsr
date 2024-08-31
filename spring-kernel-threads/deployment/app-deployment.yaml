@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-kernel-threads-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-kernel-threads-app
+  template:
+    metadata:
+      labels:
+        app: spring-kernel-threads-app
+    spec:
+      containers:
+        - name: spring-kernel-threads-app
+          image: jtlapp/spring-kernel-threads:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-service:5432/testdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: user
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-api-service
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: spring-kernel-threads-app

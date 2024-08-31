@@ -1,0 +1,5 @@
+com/javabenchmarks/apiserver/controllers/MessageController.class
+com/javabenchmarks/apiserver/models/Message.class
+com/javabenchmarks/apiserver/repositories/MessageRepo.class
+com/javabenchmarks/apiserver/ApiServer.class
+com/javabenchmarks/apiserver/controllers/HomeController.class
