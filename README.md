@@ -4,14 +4,9 @@ Benchmarks for backend Java frameworks
 
 ```bash
 
+mvn clean install
 kind create cluster
 ./bin/deploy common
-
-cd spring-kernel-threads
-docker build -t jtlapp/spring-kernel-threads .
-kind load docker-image jtlapp/spring-kernel-threads:latest
-
-cd ..
 ./bin/deploy spring-kernel-threads
 kubectl port-forward service/backend-api-service 8080:8080
 ```

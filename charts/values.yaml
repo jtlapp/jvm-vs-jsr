@@ -1,8 +1,9 @@
 global:
 
   app:
-    replicaCount: 1
+    dockerImagePrefix: java-benchmarks
     imagePullPolicy: IfNotPresent
+    replicaCount: 1
     port: 8080
 
   database:
