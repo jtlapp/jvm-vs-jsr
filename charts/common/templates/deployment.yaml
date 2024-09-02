@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: postgres
 spec:
-  replicas: 1
+  replicas: {{ .Values.global.database.replicaCount }}
   selector:
     matchLabels:
       app: postgres
@@ -17,20 +17,10 @@ spec:
           image: postgres:15
           env:
             - name: POSTGRES_DB
-              value: testdb
+              value: {{ .Values.global.database.name }}
             - name: POSTGRES_USER
-              value: user
+              value: {{ .Values.global.database.username }}
             - name: POSTGRES_PASSWORD
-              value: password
+              value: {{ .Values.global.database.password }}
           ports:
-            - containerPort: 5432
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres-service
-spec:
-  ports:
-    - port: 5432
-  selector:
-    app: postgres
+            - containerPort: {{ .Values.global.database.port }}

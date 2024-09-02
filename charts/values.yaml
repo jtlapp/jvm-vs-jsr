@@ -1,0 +1,14 @@
+global:
+
+  app:
+    replicaCount: 1
+    imagePullPolicy: IfNotPresent
+    port: 8080
+
+  database:
+    replicaCount: 1
+    host: "jdbc:postgresql://postgres-service:5432/testdb"
+    port: 5432
+    name: testdb
+    username: "user"
+    password: "password"

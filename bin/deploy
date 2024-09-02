@@ -1,0 +1,1 @@
+helm install $1 charts/$1/ -f charts/values.yaml

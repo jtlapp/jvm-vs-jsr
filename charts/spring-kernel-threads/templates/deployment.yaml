@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-app
+spec:
+  replicas: {{ .Values.global.app.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-app
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-app
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-app
+          image: jtlapp/{{ .Chart.Name }}:latest
+          imagePullPolicy: {{ .Values.global.app.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.global.app.port }}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: {{ .Values.global.database.host }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.global.database.username }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.global.database.password }}
