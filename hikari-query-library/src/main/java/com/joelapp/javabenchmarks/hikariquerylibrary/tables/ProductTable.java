@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 public class ProductTable extends Table {
     public static void createTable(Connection connection) throws SQLException {
         String sql = """
-                CREATE TABLE products (
-                    id VARCHAR PRIMARY KEY,
-                    name VARCHAR,
-                    description TEXT,
-                    price NUMERIC,
-                    stock_quantity INTEGER,
-                    created_at TIMESTAMP DEFAULT NOW())
+            CREATE TABLE products (
+                id VARCHAR PRIMARY KEY,
+                name VARCHAR,
+                description TEXT,
+                price NUMERIC,
+                stock_quantity INTEGER,
+                created_at TIMESTAMP DEFAULT NOW())
             """;
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.executeUpdate();
@@ -33,8 +33,10 @@ public class ProductTable extends Table {
             java.math.BigDecimal price,
             int stockQuantity
     ) throws SQLException {
-        String sql = "INSERT INTO products (id, name, description, price, stock_quantity, created_at) "+
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = """
+            INSERT INTO products (id, name, description, price, stock_quantity, created_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """;
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setObject(1, productID);
             statement.setString(2, name);

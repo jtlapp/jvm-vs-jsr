@@ -21,7 +21,7 @@ public class HikariQueries {
     private static final int USER_COUNT = 1000;
     private static final int PRODUCT_COUNT = 700;
     private static final int ORDERS_PER_USER = 3;
-    private static final int ITEMS_PER_ORDER = 3;
+    private static final int ITEMS_PER_ORDER = 4;
 
     private HikariDataSource dataSource;
 
@@ -82,7 +82,7 @@ public class HikariQueries {
         }
     }
 
-    public String readQuery(int userNumber, int orderNumber) throws SQLException {
+    public String selectQuery(int userNumber, int orderNumber) throws SQLException {
         String userID = UserTable.createID(userNumber);
         String orderID = OrderTable.createID(userID, orderNumber);
 
@@ -92,13 +92,13 @@ public class HikariQueries {
         try (Connection conn = dataSource.getConnection()) {
 
             var sql = """
-                    SELECT o.id AS order_id, o.order_date, o.status, u.username, u.email,
-                            p.name, p.description, p.price, oi.quantity
-                        FROM orders o
-                        JOIN users u ON o.user_id = u.id
-                        JOIN order_items oi ON oi.order_id = o.id
-                        JOIN products p ON oi.product_id = p.id
-                        WHERE o.id = ?;
+                SELECT o.id AS order_id, o.order_date, o.status, u.username, u.email,
+                        p.name, p.description, p.price, oi.quantity
+                    FROM orders o
+                    JOIN users u ON o.user_id = u.id
+                    JOIN order_items oi ON oi.order_id = o.id
+                    JOIN products p ON oi.product_id = p.id
+                    WHERE o.id = ?;
                 """;
 
             try (var statement = conn.prepareStatement(sql)) {
@@ -128,6 +128,26 @@ public class HikariQueries {
             return objectMapper.writeValueAsString(arrayNode);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void updateQuery(int userNumber, int orderNumber) throws SQLException {
+        String userID = UserTable.createID(userNumber);
+        String orderID = OrderTable.createID(userID, orderNumber);
+
+        try (Connection conn = dataSource.getConnection()) {
+
+            var sql = """
+                UPDATE order_items oi
+                    SET quantity = quantity + 1
+                    FROM orders o
+                    WHERE oi.order_id = o.id AND o.id = ?;
+                """;
+
+            try (var statement = conn.prepareStatement(sql)) {
+                statement.setString(1, orderID);
+                statement.executeQuery();
+            }
         }
     }
 

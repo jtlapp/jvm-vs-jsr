@@ -22,21 +22,38 @@ public class ApiController {
             return ResponseEntity.ok("Completed setup.");
         }
         catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
         }
     }
 
-    @GetMapping("/read")
-    public ResponseEntity<String> read(
+    @GetMapping("/select")
+    public ResponseEntity<String> select(
             @RequestParam("user") Integer userNumber,
             @RequestParam("order") Integer orderNumber
     ) {
         try {
-            String json = queries.readQuery(userNumber, orderNumber);
+            String json = queries.selectQuery(userNumber, orderNumber);
             return ResponseEntity.ok(json);
         }
         catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/update")
+    public ResponseEntity<String> update(
+            @RequestParam("user") Integer userNumber,
+            @RequestParam("order") Integer orderNumber
+    ) {
+        try {
+            queries.updateQuery(userNumber, orderNumber);
+            return ResponseEntity.ok("Updated.");
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
         }
     }
 }
