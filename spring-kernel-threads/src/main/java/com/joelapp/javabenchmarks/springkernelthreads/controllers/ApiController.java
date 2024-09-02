@@ -19,7 +19,7 @@ public class ApiController {
         try {
             queries.createTables();
             queries.populateDatabase();
-            return ResponseEntity.ok("Completed setup.");
+            return ResponseEntity.ok("Completed setup");
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -48,8 +48,8 @@ public class ApiController {
             @RequestParam("order") Integer orderNumber
     ) {
         try {
-            queries.updateQuery(userNumber, orderNumber);
-            return ResponseEntity.ok("Updated.");
+            int rowsUpdated = queries.updateQuery(userNumber, orderNumber);
+            return ResponseEntity.ok(rowsUpdated == 0 ? "Nothing updated" : "Updated");
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

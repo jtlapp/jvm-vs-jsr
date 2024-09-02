@@ -131,7 +131,7 @@ public class HikariQueries {
         }
     }
 
-    public void updateQuery(int userNumber, int orderNumber) throws SQLException {
+    public int updateQuery(int userNumber, int orderNumber) throws SQLException {
         String userID = UserTable.createID(userNumber);
         String orderID = OrderTable.createID(userID, orderNumber);
 
@@ -146,7 +146,7 @@ public class HikariQueries {
 
             try (var statement = conn.prepareStatement(sql)) {
                 statement.setString(1, orderID);
-                statement.executeQuery();
+                return statement.executeUpdate();
             }
         }
     }
