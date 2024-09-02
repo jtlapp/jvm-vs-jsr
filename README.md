@@ -18,8 +18,7 @@ kubectl port-forward service/backend-api-service 8080:8080
 ```bash
 > curl -X GET localhost:8080/api/setup
 Completed setup.
-> curl -X GET localhost:8080/api/read?user=1&order=1
-
+> curl -X GET "localhost:8080/api/read?user=1&order=1"
 
 ...
 
