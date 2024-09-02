@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-public class TestController {
+public class ApiController {
 
     @Autowired
     private HikariQueries queries;
