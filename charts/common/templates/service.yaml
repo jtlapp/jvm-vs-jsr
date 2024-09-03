@@ -1,9 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-service
+  name: pgbouncer-service
 spec:
-  ports:
-    - port: {{ .Values.global.database.port }}
   selector:
     app: postgres
+  ports:
+    - port: {{ .Values.global.pgbouncer.port }}
+      targetPort: {{ .Values.global.pgbouncer.port }}
+      protocol: TCP

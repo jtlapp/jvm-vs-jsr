@@ -6,7 +6,6 @@ Benchmarks for backend Java frameworks
 
 mvn clean install
 kind create cluster
-./bin/deploy common
 ./bin/deploy spring-kernel-threads
 kubectl port-forward service/backend-api-service 8080:8080
 ```
@@ -22,7 +21,6 @@ Updated.
 
 ```
 ./bin/undeploy spring-kernel-threads
-./bin/undeploy common
 
 curl -X POST localhost:8080/actuator/shutdown
 kind delete cluster

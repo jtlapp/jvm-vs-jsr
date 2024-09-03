@@ -13,6 +13,7 @@ spec:
         app: postgres
     spec:
       containers:
+
         - name: postgres
           image: postgres:15
           env:
@@ -24,3 +25,19 @@ spec:
               value: {{ .Values.global.database.password }}
           ports:
             - containerPort: {{ .Values.global.database.port }}
+
+        - name: pgbouncer
+          image: edoburu/pgbouncer:latest
+          env:
+            - name: DATABASE_URL
+              value: "jdbc:postgresql://localhost:{{ .Values.global.database.port }}/{{ .Values.global.database.name }}"
+          ports:
+            - containerPort: {{ .Values.global.pgbouncer.port }}
+          volumeMounts:
+            - name: pgbouncer-config
+              mountPath: /etc/pgbouncer
+
+      volumes:
+        - name: pgbouncer-config
+          configMap:
+            name: pgbouncer-config

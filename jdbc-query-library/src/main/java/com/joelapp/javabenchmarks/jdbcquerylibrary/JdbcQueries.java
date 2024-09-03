@@ -1,47 +1,45 @@
-package com.joelapp.javabenchmarks.hikariquerylibrary;
+package com.joelapp.javabenchmarks.jdbcquerylibrary;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.joelapp.javabenchmarks.hikariquerylibrary.tables.OrderItemTable;
-import com.joelapp.javabenchmarks.hikariquerylibrary.tables.OrderTable;
-import com.joelapp.javabenchmarks.hikariquerylibrary.tables.ProductTable;
-import com.joelapp.javabenchmarks.hikariquerylibrary.tables.UserTable;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import com.joelapp.javabenchmarks.jdbcquerylibrary.tables.OrderItemTable;
+import com.joelapp.javabenchmarks.jdbcquerylibrary.tables.OrderTable;
+import com.joelapp.javabenchmarks.jdbcquerylibrary.tables.ProductTable;
+import com.joelapp.javabenchmarks.jdbcquerylibrary.tables.UserTable;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Properties;
 
-public class HikariQueries {
+public class JdbcQueries {
 
     private static final int USER_COUNT = 1000;
     private static final int PRODUCT_COUNT = 700;
     private static final int ORDERS_PER_USER = 3;
     private static final int ITEMS_PER_ORDER = 4;
 
-    private HikariDataSource dataSource;
+    private final String jdbcURL;
+    private final Properties jdbcProperties = new Properties();
 
-    public HikariQueries(String jdbcUrl, String username, String password) {
-        HikariConfig config = new HikariConfig();
+    public JdbcQueries(String jdbcURL, String username, String password) {
+        this.jdbcURL = jdbcURL;
 
-        config.setJdbcUrl(jdbcUrl);
-        config.setUsername(username);
-        config.setPassword(password);
-        config.setMaximumPoolSize(10);
+        jdbcProperties.setProperty("user", username);
+        jdbcProperties.setProperty("password", password);
 
-        config.addDataSourceProperty("prepareThreshold", "1");
-        config.addDataSourceProperty("preparedStatementCacheQueries", "25");
-        config.addDataSourceProperty("preparedStatementCacheSizeMiB", "1");
-
-        dataSource = new HikariDataSource(config);
+        // TODO: what caching should I do with pgbouncer?
+        jdbcProperties.setProperty("prepareThreshold", "1");
+        jdbcProperties.setProperty("preparedStatementCacheQueries", "25");
+        jdbcProperties.setProperty("preparedStatementCacheSizeMiB", "1");
     }
 
     public void createTables() throws SQLException {
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = getConnection()) {
             UserTable.createTable(conn);
             ProductTable.createTable(conn);
             OrderTable.createTable(conn);
@@ -50,7 +48,7 @@ public class HikariQueries {
     }
 
     public void populateDatabase() throws SQLException {
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = getConnection()) {
 
             for (int i = 1; i <= USER_COUNT; i++) {
                 UserTable.insertUser(conn, UserTable.createID(i),
@@ -89,7 +87,7 @@ public class HikariQueries {
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode arrayNode = objectMapper.createArrayNode();
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = getConnection()) {
 
             var sql = """
                 SELECT o.id AS order_id, o.order_date, o.status, u.username, u.email,
@@ -135,7 +133,7 @@ public class HikariQueries {
         String userID = UserTable.createID(userNumber);
         String orderID = OrderTable.createID(userID, orderNumber);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = getConnection()) {
 
             var sql = """
                 UPDATE order_items oi
@@ -151,9 +149,7 @@ public class HikariQueries {
         }
     }
 
-    public void close() {
-        if (dataSource != null) {
-            dataSource.close();
-        }
+    private Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(jdbcURL, jdbcProperties);
     }
 }

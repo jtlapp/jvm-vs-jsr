@@ -1,6 +1,6 @@
 package com.joelapp.javabenchmarks.springkernelthreads.controllers;
 
-import com.joelapp.javabenchmarks.hikariquerylibrary.HikariQueries;
+import com.joelapp.javabenchmarks.jdbcquerylibrary.JdbcQueries;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class ApiController {
 
     @Autowired
-    private HikariQueries queries;
+    private JdbcQueries queries;
 
     @GetMapping("/setup")
     public ResponseEntity<String> setup() {

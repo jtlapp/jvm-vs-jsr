@@ -8,8 +8,11 @@ global:
 
   database:
     replicaCount: 1
-    host: "jdbc:postgresql://postgres-service:5432/testdb"
     port: 5432
     name: testdb
     username: "user"
     password: "password"
+
+  pgbouncer:
+    host: "jdbc:postgresql://pgbouncer-service:6432/testdb"
+    port: 6432

@@ -1,4 +1,4 @@
-package com.joelapp.javabenchmarks.hikariquerylibrary.tables;
+package com.joelapp.javabenchmarks.jdbcquerylibrary.tables;
 
 public class Table {
     private static final int ZERO_PADDING_WIDTH = 6;

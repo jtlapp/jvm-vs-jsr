@@ -20,7 +20,7 @@ spec:
             - containerPort: {{ .Values.global.app.port }}
           env:
             - name: SPRING_DATASOURCE_URL
-              value: {{ .Values.global.database.host }}
+              value: {{ .Values.global.pgbouncer.host }}
             - name: SPRING_DATASOURCE_USERNAME
               value: {{ .Values.global.database.username }}
             - name: SPRING_DATASOURCE_PASSWORD

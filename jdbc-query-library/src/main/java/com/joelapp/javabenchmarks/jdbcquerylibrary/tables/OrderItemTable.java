@@ -1,4 +1,4 @@
-package com.joelapp.javabenchmarks.hikariquerylibrary.tables;
+package com.joelapp.javabenchmarks.jdbcquerylibrary.tables;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
