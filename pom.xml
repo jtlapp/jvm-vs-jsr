@@ -73,7 +73,7 @@
                             <arguments>
                                 <argument>build</argument>
                                 <argument>-t</argument>
-                                <argument>wrk:latest</argument>
+                                <argument>${docker.image.prefix}/wrk:latest</argument>
                                 <argument>.</argument>
                             </arguments>
                         </configuration>
