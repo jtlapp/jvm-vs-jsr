@@ -1,8 +1,9 @@
-if [[ $(kubectl config current-context) == *"kind-"* ]]; then
-  kind load docker-image java-benchmarks/$1:latest
-else
-  echo "Don't know how to deploy the image to the present kubectl context."
-  exit 1
+if [ "$1" != "common" ]; then
+    if [[ $(kubectl config current-context) == *"kind-"* ]]; then
+        kind load docker-image java-benchmarks/$1:latest
+    else
+        echo "Don't know how to deploy the image to the present kubectl context."
+        exit 1
+    fi
 fi
-helm install common charts/common/ -f charts/values.yaml
 helm install $1 charts/$1/ -f charts/values.yaml

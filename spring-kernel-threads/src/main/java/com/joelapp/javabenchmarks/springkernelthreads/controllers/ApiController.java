@@ -17,6 +17,7 @@ public class ApiController {
     @GetMapping("/setup")
     public ResponseEntity<String> setup() {
         try {
+            queries.dropTables();
             queries.createTables();
             queries.populateDatabase();
             return ResponseEntity.ok("Completed setup");

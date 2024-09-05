@@ -9,10 +9,7 @@ import com.joelapp.javabenchmarks.jdbcquerylibrary.tables.OrderTable;
 import com.joelapp.javabenchmarks.jdbcquerylibrary.tables.ProductTable;
 import com.joelapp.javabenchmarks.jdbcquerylibrary.tables.UserTable;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
@@ -44,6 +41,19 @@ public class JdbcQueries {
             ProductTable.createTable(conn);
             OrderTable.createTable(conn);
             OrderItemTable.createTable(conn);
+        }
+    }
+
+    public void dropTables() throws SQLException {
+        try (Connection conn = getConnection()) {
+            String sql = "select tablename from pg_tables where schemaname='public'";
+            try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                try (var resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        dropTable(conn, resultSet.getString("tablename"));
+                    }
+                }
+            }
         }
     }
 
@@ -151,5 +161,14 @@ public class JdbcQueries {
 
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(jdbcURL, jdbcProperties);
+    }
+
+    private void dropTable(Connection conn, String tableName)
+        throws SQLException
+    {
+        String sql = "drop table if exists \"" + tableName + "\" cascade";
+        try (var statement = conn.prepareStatement(sql)) {
+            statement.execute();
+        }
     }
 }
