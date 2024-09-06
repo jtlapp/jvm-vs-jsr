@@ -7,6 +7,6 @@ RUN cd /tmp/wrk                           && \
 
 FROM alpine:latest
 COPY --from=build /tmp/wrk/wrk /usr/local/bin/
-RUN apk add --no-cache libgcc
+RUN apk add --no-cache libgcc curl
 WORKDIR /data
 CMD ["/bin/ash", "-c", "exec /bin/ash -c 'trap : TERM INT; sleep 9999999999d & wait'"]
