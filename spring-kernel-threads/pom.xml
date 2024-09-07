@@ -61,7 +61,7 @@
 				<version>${jib.maven.plugin.version}</version>
 				<configuration>
 					<to>
-						<image>${docker.image.prefix}/${project.artifactId}</image>
+						<image>${env.DOCKER_IMAGE_PREFIX}/${project.artifactId}</image>
 					</to>
 					<container>
 						<mainClass>${main.class}</mainClass>

@@ -4,5 +4,6 @@ else
     image=$1
 fi
 
-kind load docker-image "java-benchmarks/$image:latest"
-helm install $1 charts/$1/ -f charts/values.yaml
+# kind load docker-image $DOCKER_IMAGE_PREFIX/$image:latest
+docker push $DOCKER_IMAGE_PREFIX/$image
+helm install $1 charts/$1/ -f charts/values.yaml -f charts/values-secret.yaml

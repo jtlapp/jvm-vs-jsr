@@ -11,7 +11,6 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <docker.image.prefix>java-benchmarks</docker.image.prefix>
 
         <spring.boot.version>3.3.3</spring.boot.version>
         <postgresql.version>42.7.4</postgresql.version>
@@ -19,6 +18,7 @@
 
         <maven.resources.plugin>3.3.1</maven.resources.plugin>
         <jib.maven.plugin.version>3.4.2</jib.maven.plugin.version>
+        <exec.maven.plugin.version>3.1.0</exec.maven.plugin.version>
     </properties>
 
     <modules>
@@ -58,7 +58,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>${exec.maven.plugin.version}</version>
                 <executions>
                     <execution>
                         <inherited>false</inherited>
@@ -71,9 +71,12 @@
                             <workingDirectory>${project.basedir}/docker/wrk</workingDirectory>
                             <executable>docker</executable>
                             <arguments>
+                                <argument>buildx</argument>
                                 <argument>build</argument>
+                                <argument>--platform</argument>
+                                <argument>linux/amd64,linux/arm64</argument>
                                 <argument>-t</argument>
-                                <argument>${docker.image.prefix}/wrk:latest</argument>
+                                <argument>${env.DOCKER_IMAGE_PREFIX}/wrk:latest</argument>
                                 <argument>.</argument>
                             </arguments>
                         </configuration>

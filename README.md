@@ -2,10 +2,35 @@
 
 Benchmarks for backend Java frameworks
 
-```bash
+## Preparation
 
+The root POM uses `docker buildx` to build both amd64 and arm64 images. 
+You'll need to set this up as follows:
+
+```bash
+docker buildx create --use
+```
+
+Set the docker image prefix in an environment variables:
+
+```bash
+export DOCKER_IMAGE_PREFIX=<your-docker-image-prefix>
+```
+
+And set it in `charts/values-secret.yaml` (which is in `.gitignore`):
+
+```bash
+global:
+  app:
+    dockerImagePrefix: <your-docker-image-prefix>
+```
+
+## Installation
+
+Create your cluster and configure `kubectl` to use it. Then:
+
+```bash
 mvn clean install
-kind create cluster
 ./bin/deploy common
 ./bin/deploy spring-kernel-threads
 ```
