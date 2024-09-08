@@ -1,11 +1,11 @@
-FROM alpine:latest as build
+FROM --platform=$BUILDPLATFORM alpine:latest as build
 RUN apk add --update alpine-sdk perl linux-headers
 RUN cd /tmp                               && \
-    git clone -b 4.2.0 https://github.com/wg/wrk
+    git clone https://github.com/wg/wrk.git
 RUN cd /tmp/wrk                           && \
     make
 
-FROM alpine:latest
+FROM --platform=$TARGETPLATFORM alpine:latest
 COPY --from=build /tmp/wrk/wrk /usr/local/bin/
 RUN apk add --no-cache libgcc curl
 WORKDIR /data
