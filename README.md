@@ -39,14 +39,14 @@ Testing:
 
 ```bash
 > kubectl exec -it <pod> -- ash 
-% curl -X GET localhost:8080/api/setup
+% curl -X GET api-service:8080/api/setup
 Completed setup.
-% curl -X GET "localhost:8080/api/select?user=1&order=1"
+% curl -X GET "api-service:8080/api/select?user=1&order=1"
 {...JSON...}
-% curl -X GET "localhost:8080/api/update?user=1&order=1"
+% curl -X GET "api-service:8080/api/update?user=1&order=1"
 Updated.
 % vi test.lua
-% wrk -t1 -c1 -d1s -s test.lua http://backend-api-service:8080
+% wrk -t1 -c1 -d1s -s test.lua http://api-service:8080
 ```
 
 Useful termination commands:
