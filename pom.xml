@@ -71,10 +71,9 @@
                             <workingDirectory>${project.basedir}/docker/wrk</workingDirectory>
                             <executable>docker</executable>
                             <arguments>
-                                <argument>buildx</argument>
                                 <argument>build</argument>
                                 <argument>--platform</argument>
-                                <argument>linux/amd64,linux/arm64</argument>
+                                <argument>linux/amd64</argument>
                                 <argument>-t</argument>
                                 <argument>${env.DOCKER_IMAGE_PREFIX}/wrk:latest</argument>
                                 <argument>.</argument>

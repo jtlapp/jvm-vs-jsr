@@ -4,13 +4,6 @@ Benchmarks for backend Java frameworks
 
 ## Preparation
 
-The root POM uses `docker buildx` to build both amd64 and arm64 images. 
-You'll need to set this up as follows:
-
-```bash
-docker buildx create --use
-```
-
 Set the docker image prefix in an environment variables:
 
 ```bash
@@ -24,6 +17,10 @@ global:
   app:
     dockerImagePrefix: <your-docker-image-prefix>
 ```
+
+Note: I found cross-platform building using `buildx` too unreliable to use, 
+perhaps because of the dependency on calling `docker buildx create --use`. 
+The client image therefore builds only for `amd64`.
 
 ## Installation
 
