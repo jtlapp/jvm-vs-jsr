@@ -1,12 +1,19 @@
-FROM --platform=$BUILDPLATFORM alpine:latest as build
-RUN apk add --update alpine-sdk perl linux-headers
-RUN cd /tmp                               && \
+FROM denoland/deno:debian AS build
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    unzip
+RUN cd /tmp && \
     git clone https://github.com/wg/wrk.git
-RUN cd /tmp/wrk                           && \
+RUN cd /tmp/wrk && \
     make
 
-FROM --platform=$TARGETPLATFORM alpine:latest
+FROM denoland/deno:debian
 COPY --from=build /tmp/wrk/wrk /usr/local/bin/
-RUN apk add --no-cache libgcc curl
-WORKDIR /data
-CMD ["/bin/ash", "-c", "trap : TERM INT; sleep 9999999999d & wait"]
+RUN apt-get update && apt-get install -y \
+    libgcc-s1 \
+    curl
+WORKDIR /scripts
+COPY scripts/ /scripts/
+RUN find /scripts -type f -name ".*" -exec rm {} \;
+CMD ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
