@@ -1,7 +1,10 @@
 package com.joelapp.javabenchmarks.springkernelthreads.controllers;
 
-import com.joelapp.javabenchmarks.jdbcquerylibrary.JdbcQueries;
+import com.joelapp.javabenchmarks.sharedquery.SharedQuery;
 
+import com.joelapp.javabenchmarks.sharedquery.SharedQueryDB;
+import com.joelapp.javabenchmarks.sharedquery.SharedQueryException;
+import com.joelapp.javabenchmarks.sharedquery.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,49 +15,25 @@ import org.springframework.web.bind.annotation.*;
 public class ApiController {
 
     @Autowired
-    private JdbcQueries queries;
+    private SharedQueryDB sharedQueryDB;
+    @Autowired
+    private SharedQueryRepo sharedQueryRepo;
 
-    @GetMapping("/setup")
-    public ResponseEntity<String> setup() {
-        try {
-            queries.dropTables();
-            queries.createTables();
-            queries.populateDatabase();
-            return ResponseEntity.ok("Completed setup");
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/select")
-    public ResponseEntity<String> select(
-            @RequestParam("user") Integer userNumber,
-            @RequestParam("order") Integer orderNumber
+    @PostMapping("/query/{queryName}")
+    public ResponseEntity<String> query(
+            @PathVariable String queryName,
+            @RequestBody String jsonBody
     ) {
         try {
-            String json = queries.selectQuery(userNumber, orderNumber);
-            return ResponseEntity.ok(json);
+            SharedQuery query = sharedQueryRepo.get(sharedQueryDB, queryName);
+            String jsonResponse = query.executeUsingGson(sharedQueryDB, jsonBody);
+            return ResponseEntity.ok(jsonResponse);
         }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/update")
-    public ResponseEntity<String> update(
-            @RequestParam("user") Integer userNumber,
-            @RequestParam("order") Integer orderNumber
-    ) {
-        try {
-            int rowsUpdated = queries.updateQuery(userNumber, orderNumber);
-            return ResponseEntity.ok(rowsUpdated == 0 ? "Nothing updated" : "Updated");
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(e.getMessage());
+        catch (SharedQueryException e) {
+            String jsonResponse = String.format("{\"error\":%s", e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(jsonResponse);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.joelapp.javabenchmarks.springkernelthreads.config;
 
-import com.joelapp.javabenchmarks.jdbcquerylibrary.JdbcQueries;
+import com.joelapp.javabenchmarks.sharedquery.SharedQueryDB;
+import com.joelapp.javabenchmarks.sharedquery.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
     @Value("${database.url}")
-    private String jdbcURL;
+    private String databaseURL;
 
     @Value("${database.username}")
     private String username;
@@ -18,7 +19,12 @@ public class AppConfig {
     private String password;
 
     @Bean
-    public JdbcQueries queries() {
-        return new JdbcQueries(jdbcURL, username, password);
+    public SharedQueryDB getSharedQueryDB() {
+        return new SharedQueryDB(databaseURL, username, password);
+    }
+
+    @Bean
+    public SharedQueryRepo getSharedQueryRepo() {
+        return new SharedQueryRepo();
     }
 }

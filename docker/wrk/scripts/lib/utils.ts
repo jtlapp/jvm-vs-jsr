@@ -12,7 +12,7 @@ export class Utils {
       SELECT tablename FROM pg_tables WHERE schemaname = 'public';
     `;
     for (const row of result) {
-      if (row.tableName != 'queries') {
+      if (row.tableName != 'shared_queries') {
         await sql`DROP TABLE IF EXISTS ${row.tableName} CASCADE`;
       }
     }
