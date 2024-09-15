@@ -74,14 +74,14 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <workingDirectory>${project.basedir}/docker/wrk</workingDirectory>
+                            <workingDirectory>docker/client</workingDirectory>
                             <executable>docker</executable>
                             <arguments>
                                 <argument>build</argument>
                                 <argument>--platform</argument>
                                 <argument>linux/amd64</argument>
                                 <argument>-t</argument>
-                                <argument>${env.DOCKER_IMAGE_PREFIX}/wrk:latest</argument>
+                                <argument>${env.DOCKER_IMAGE_PREFIX}/client:latest</argument>
                                 <argument>.</argument>
                             </arguments>
                         </configuration>

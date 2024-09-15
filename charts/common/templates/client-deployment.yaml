@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wrk
+  name: client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: wrk
+      app: client
   template:
     metadata:
       labels:
-        app: wrk
+        app: client
     spec:
       containers:
-        - name: wrk
-          image: {{ .Values.global.app.dockerImagePrefix }}/wrk:latest
+        - name: client
+          image: {{ .Values.global.app.dockerImagePrefix }}/client:latest
           imagePullPolicy: {{ .Values.global.app.imagePullPolicy }}
