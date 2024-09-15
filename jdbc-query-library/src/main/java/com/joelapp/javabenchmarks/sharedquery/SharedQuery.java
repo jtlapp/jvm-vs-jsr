@@ -48,13 +48,8 @@ public class SharedQuery {
         Matcher m = p.matcher(query);
 
         while (m.find()) {
-            String paramName = m.group(1);
-            int paramNumber = paramNames.indexOf(paramName) + 1;
-            if (paramNumber == 0) {
-                paramNames.add(paramName);
-                paramNumber = paramNames.size();
-            }
-            m.appendReplacement(sb, "$" + paramNumber);
+            paramNames.add(m.group(1));
+            m.appendReplacement(sb, "?");
         }
         m.appendTail(sb);
         this.query = sb.toString();
@@ -110,8 +105,8 @@ public class SharedQuery {
     private void supplyArguments(PreparedStatement statement, JsonObject args)
             throws SQLException
     {
-        for (var i = 0; i < paramNames.size(); ++i) {
-            var paramName = paramNames.get(i);
+        for (var i = 1; i <= paramNames.size(); ++i) {
+            var paramName = paramNames.get(i - 1);
             var argPrimitive = args.getAsJsonPrimitive(paramName);
             if (argPrimitive.isNumber()) {
                 statement.setInt(i, argPrimitive.getAsInt());
@@ -134,7 +129,7 @@ public class SharedQuery {
         while (resultSet.next()) {
             var jsonObject = new JsonObject();
             for (int i = 1; i <= metaData.getColumnCount(); ++i) {
-                var columnName = metaData.getCatalogName(i);
+                var columnName = metaData.getColumnName(i);
                 int columnType = metaData.getColumnType(i);
                 switch (columnType) {
                     case Types.VARCHAR -> jsonObject.addProperty(
@@ -156,6 +151,6 @@ public class SharedQuery {
             }
             jsonArray.add(jsonObject);
         }
-        return String.format("{\"rows\":%s}", jsonArray.toString());
+        return String.format("{\"rows\":%s}", jsonArray);
     }
 }

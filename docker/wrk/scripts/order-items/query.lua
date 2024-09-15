@@ -18,5 +18,5 @@ function getUserID(userNumber)
 end
 
 function getOrderID(userNumber, orderNumber)
-   return string.format("%s_ORDER_%06d", getUserID(userNumber), orderNumber)
+   return string.format("%s_ORDER_%d", getUserID(userNumber), orderNumber)
 end
