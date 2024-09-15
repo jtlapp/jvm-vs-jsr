@@ -93,8 +93,7 @@ public class SharedQuery {
                     int count = statement.executeUpdate();
                     return String.format("{\"rowCount\":%d}", count);
                 default:
-                    throw new SharedQueryException(
-                            "Unrecognized returns type '${this.returns}'");
+                    throw new SharedQueryException("Unhandled ReturnType");
             }
         }
         catch (SQLException e) {
