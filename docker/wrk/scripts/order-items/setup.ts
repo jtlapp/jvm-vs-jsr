@@ -1,5 +1,5 @@
 import { postgres } from '../lib/deps.ts';
-import { SharedQueryRepo } from '../lib/shared-query.ts';
+import { SharedQueryRepo } from '../lib/shared-query-repo.ts';
 import { Utils } from '../lib/utils.ts';
 
 import { OrderItemTable } from './lib/order-item-table.ts';
@@ -29,6 +29,7 @@ export class Setup {
     await this.createTables();
     await this.populateDatabase();
     await this.createSharedQueries();
+    await this.sql.end();
   }
 
   async createTables() {
@@ -90,7 +91,7 @@ export class Setup {
   }
 
   async createSharedQueries() {
-    await SharedQueryRepo.create(this.sql, {
+    await SharedQueryRepo.createQuery(this.sql, {
       name: 'orderitems_getOrder',
       query: `
         SELECT o.id AS order_id, o.order_date, o.status, u.username, u.email,
@@ -104,7 +105,7 @@ export class Setup {
       returns: 'rows',
     });
 
-    await SharedQueryRepo.create(this.sql, {
+    await SharedQueryRepo.createQuery(this.sql, {
       name: 'orderitems_boostOrderItems',
       query: `
         UPDATE order_items oi

@@ -19,7 +19,7 @@ export class SharedQueryRepo {
    * @param sql Postgres client for issuing queries
    * @param queryProps Properties of the shared query to create
    */
-  static async create(
+  static async createQuery(
     sql: ReturnType<typeof postgres>,
     queryProps: SharedQueryProps
   ) {
@@ -28,6 +28,9 @@ export class SharedQueryRepo {
         `Shared query of name '${queryProps.name}' already defined.`
       );
     }
+
+    await sql`DELETE FROM shared_queries WHERE name = ${queryProps.name}`;
+
     const query = new SharedQuery(queryProps);
     await sql`
         INSERT INTO shared_queries (name, query, returns) 
@@ -42,7 +45,7 @@ export class SharedQueryRepo {
    * @param sql Postgres client for issuing queries
    * @param queryName Name uniquely identifying query among all shared queries
    */
-  static async load(
+  static async loadQuery(
     sql: ReturnType<typeof postgres>,
     queryName: string
   ): Promise<SharedQuery> {

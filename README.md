@@ -49,7 +49,7 @@ Updated.
 Useful termination commands:
 
 ```bash
-./bin/undeploy spring-kernel-threads
-./bin/undeploy common
+helm uninstall spring-kernel-threads
+helm uninstall common
 kind delete cluster
 ```

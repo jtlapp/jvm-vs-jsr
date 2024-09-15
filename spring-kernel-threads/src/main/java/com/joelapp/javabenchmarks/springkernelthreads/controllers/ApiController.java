@@ -21,7 +21,7 @@ public class ApiController {
 
     @PostMapping("/query/{queryName}")
     public ResponseEntity<String> query(
-            @PathVariable String queryName,
+            @PathVariable(name = "queryName") String queryName,
             @RequestBody String jsonBody
     ) {
         try {
@@ -30,7 +30,7 @@ public class ApiController {
             return ResponseEntity.ok(jsonResponse);
         }
         catch (SharedQueryException e) {
-            String jsonResponse = String.format("{\"error\":%s", e.getMessage());
+            String jsonResponse = String.format("{\"error\":%s}", e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(jsonResponse);

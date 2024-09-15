@@ -13,5 +13,5 @@ global:
     password: "password"
 
   pgbouncer:
-    host: "jdbc:postgresql://pgbouncer-service:6432/testdb"
+    host: "postgresql://pgbouncer-service:6432/testdb"
     port: 6432
