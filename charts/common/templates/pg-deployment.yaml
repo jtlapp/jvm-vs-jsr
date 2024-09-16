@@ -12,6 +12,9 @@ spec:
       labels:
         app: postgres
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: database
+
       containers:
 
         - name: postgres

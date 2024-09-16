@@ -12,6 +12,8 @@ spec:
       labels:
         app: {{ .Chart.Name }}-app
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: app
       containers:
         - name: {{ .Chart.Name }}-app
           image: {{ .Values.global.app.dockerImagePrefix }}/{{ .Chart.Name }}:latest

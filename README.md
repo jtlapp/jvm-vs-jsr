@@ -22,6 +22,14 @@ Note: I found cross-platform building using `buildx` too unreliable to use,
 perhaps because of the dependency on calling `docker buildx create --use`. 
 The client image therefore builds only for `amd64`.
 
+Label the three nodes as follows:
+
+```bash
+kubectl label nodes <node-1-name> kubernetes.io/hostname=client --overwrite
+kubectl label nodes <node-2-name> kubernetes.io/hostname=app --overwrite
+kubectl label nodes <node-3-name> kubernetes.io/hostname=database --overwrite
+```
+
 ## Installation
 
 Create your cluster and configure `kubectl` to use it. Then:
@@ -34,7 +42,7 @@ mvn clean install
 
 ## Testing
 
-1. Exec into the client pod using bash: `kubectl exec -it <clien-pod> -- bash`.
+1. Exec into the client pod using bash: `kubectl exec -it <client-pod> -- bash`.
 2. Modify `/scripts/setup.ts` to set up the desired queries.
 3. Run the appropriate Lua benchmarking script. E.g.:
 

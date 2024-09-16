@@ -12,6 +12,8 @@ spec:
       labels:
         app: client
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: client
       containers:
         - name: client
           image: {{ .Values.global.app.dockerImagePrefix }}/client:latest
