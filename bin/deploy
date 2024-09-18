@@ -1,3 +1,5 @@
+TIMEOUT=30s
+
 if [ "$1" == "common" ]; then
     image="client"
 else
@@ -5,11 +7,11 @@ else
 fi
 
 docker push $DOCKER_IMAGE_PREFIX/$image
-helm install $1 charts/$1/ -f charts/values.yaml -f charts/values-secret.yaml
+helm install $1 charts/$1/ -f charts/values.yaml -f charts/values-secret.yaml --timeout $TIMEOUT
 
 if [ "$1" == "common" ]; then
-    helm install prometheus prometheus-community/prometheus -f charts/values-prometheus.yaml --timeout 20s
-    helm install grafana grafana/grafana -f charts/values-grafana.yaml --timeout 20s
+    helm install prometheus prometheus-community/prometheus -f charts/values-prometheus.yaml --timeout $TIMEOUT
+    helm install grafana grafana/grafana -f charts/values-grafana.yaml --timeout $TIMEOUT
 
     echo "Waiting for pods to start..."
     sleep 4

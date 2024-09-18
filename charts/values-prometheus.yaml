@@ -8,13 +8,13 @@ server:
     limits:
       memory: 1Gi
       cpu: 1
+  service:
+    servicePort: 9090
   nodeSelector:
     kubernetes.io/hostname: client
 
 alertmanager:
-  nodeSelector:
-    kubernetes.io/hostname: client
+  enabled: false
 
-pushgateway:
-  nodeSelector:
-    kubernetes.io/hostname: client
+prometheus-pushgateway:
+  enabled: false
