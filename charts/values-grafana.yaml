@@ -12,6 +12,7 @@ nodeSelector:
 service:
   type: NodePort
   port: 3000
+  nodePort: 31993
 
 datasources:
   datasources.yaml:
