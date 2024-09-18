@@ -1,0 +1,6 @@
+if [ "$1" == "common" ]; then
+    helm uninstall grafana --timeout 20s
+    helm uninstall prometheus --timeout 20s
+fi
+
+helm uninstall $1

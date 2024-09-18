@@ -4,6 +4,21 @@ else
     image=$1
 fi
 
-# kind load docker-image $DOCKER_IMAGE_PREFIX/$image:latest
 docker push $DOCKER_IMAGE_PREFIX/$image
 helm install $1 charts/$1/ -f charts/values.yaml -f charts/values-secret.yaml
+
+if [ "$1" == "common" ]; then
+    helm install prometheus prometheus-community/prometheus -f charts/values-prometheus.yaml --timeout 20s
+    helm install grafana grafana/grafana -f charts/values-grafana.yaml --timeout 20s
+
+    echo "Waiting for pods to start..."
+    sleep 4
+
+    NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='ExternalIP')].address}")
+    NODE_PORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services grafana)
+    echo
+    echo "Grafana URL: http://$NODE_IP:$NODE_PORT"
+    echo "  Username: admin"
+    printf "  Password: %s\n" "$(kubectl get secret --namespace default grafana -o jsonpath="{.data.admin-password}" | base64 --decode)"
+    echo
+fi

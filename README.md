@@ -30,6 +30,14 @@ kubectl label nodes <node-2-name> kubernetes.io/hostname=app --overwrite
 kubectl label nodes <node-3-name> kubernetes.io/hostname=database --overwrite
 ```
 
+Add the Helm repos for Prometheus and Grafana:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+```
+
 ## Installation
 
 Create your cluster and configure `kubectl` to use it. Then:
@@ -53,7 +61,6 @@ mvn clean install
 Useful termination commands:
 
 ```bash
-helm uninstall spring-kernel-threads
-helm uninstall common
-kind delete cluster
+./bin/undeploy common
+./bin/undeploy spring-kernel-threads
 ```
