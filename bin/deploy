@@ -11,6 +11,8 @@ helm install $1 charts/$1/ -f charts/values.yaml -f charts/values-secret.yaml --
 
 if [ "$1" == "common" ]; then
     helm install prometheus prometheus-community/prometheus -f charts/values-prometheus.yaml --timeout $TIMEOUT
+    # kube-state-metrics is needed to present nodes by hostname in Grafana dashboards
+    # helm install kube-state-metrics prometheus-community/kube-state-metrics -f charts/values-kube-state-metrics.yaml --timeout $TIMEOUT
     kubectl create configmap node-metrics-dashboard --from-file=charts/common/dashboards/node-metrics-dashboard.json
     helm install grafana grafana/grafana -f charts/values-grafana.yaml --timeout $TIMEOUT
 

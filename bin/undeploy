@@ -1,7 +1,8 @@
 TIMEOUT=30s
 
 if [ "$1" == "common" ]; then
-    kubectl delete configmap node-metrics-dashboard
+    # kubectl delete configmap node-metrics-dashboard
+    helm uninstall kube-state-metrics --timeout $TIMEOUT
     helm uninstall grafana --timeout $TIMEOUT
     helm uninstall prometheus --timeout $TIMEOUT
 fi
