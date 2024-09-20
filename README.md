@@ -52,7 +52,8 @@ mvn clean install
 
 1. Exec into the client pod using bash: `kubectl exec -it <client-pod> -- bash`.
 2. Modify `/scripts/setup.ts` to set up the desired queries.
-3. Run the appropriate Lua benchmarking script. E.g.:
+3. Run `deno -A setup.ts`.
+4. Run the appropriate Lua benchmarking script. E.g.:
 
 ```bash
 % wrk -t1 -c1 -d1s -s order-items/query.lua http://api-service:8080
