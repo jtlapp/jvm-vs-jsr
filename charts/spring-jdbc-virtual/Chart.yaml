@@ -1,0 +1,11 @@
+apiVersion: v2
+name: spring-jdbc-virtual
+description: Spring Boot using virtual threads and JDBC
+type: application
+version: 0.1.0
+appVersion: "0.1.0-SNAPSHOT"
+
+dependencies:
+  - name: spring-jdbc
+    version: 0.1.0
+    repository: file://../spring-jdbc

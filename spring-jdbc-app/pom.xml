@@ -9,10 +9,10 @@
 		<version>0.1.0-SNAPSHOT</version>
 	</parent>
 	
-	<artifactId>spring-kernel-threads</artifactId>
+	<artifactId>spring-jdbc-app</artifactId>
 
 	<properties>
-		<main.class>com.joelapp.javabenchmarks.springkernelthreads.SpringKernelThreadsServer</main.class>
+		<main.class>com.joelapp.javabenchmarks.springjdbcapp.SpringKernelThreadsServer</main.class>
 	</properties>
 
 	<dependencies>

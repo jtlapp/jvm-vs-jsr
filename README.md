@@ -45,7 +45,7 @@ Create your cluster and configure `kubectl` to use it. Then:
 ```bash
 mvn clean install
 ./bin/deploy common
-./bin/deploy spring-kernel-threads
+./bin/deploy spring-jdbc-kernel
 ```
 
 ## Testing
@@ -63,5 +63,5 @@ Useful termination commands:
 
 ```bash
 ./bin/undeploy common
-./bin/undeploy spring-kernel-threads
+./bin/undeploy spring-jdbc-kernel
 ```

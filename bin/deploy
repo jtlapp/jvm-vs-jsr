@@ -1,10 +1,16 @@
 TIMEOUT=30s
 
-if [ "$1" == "common" ]; then
-    image="client"
-else
-    image=$1
-fi
+case "$1" in
+    "common")
+        image="client"
+        ;;
+    "spring-jdbc-kernel" | "spring-jdbc-virtual")
+        image="spring-jdbc-app"
+        ;;
+    *)
+        image="$1"
+        ;;
+esac
 
 docker push $DOCKER_IMAGE_PREFIX/$image
 helm install $1 charts/$1/ -f charts/values.yaml -f charts/values-secret.yaml --timeout $TIMEOUT

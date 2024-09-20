@@ -1,4 +1,4 @@
-package com.joelapp.javabenchmarks.springkernelthreads;
+package com.joelapp.javabenchmarks.springjdbcapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

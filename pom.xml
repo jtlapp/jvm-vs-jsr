@@ -24,7 +24,7 @@
 
     <modules>
         <module>jdbc-query-library</module>
-        <module>spring-kernel-threads</module>
+        <module>spring-jdbc-app</module>
     </modules>
 
     <dependencyManagement>

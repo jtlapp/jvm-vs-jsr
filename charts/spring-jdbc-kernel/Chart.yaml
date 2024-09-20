@@ -1,0 +1,11 @@
+apiVersion: v2
+name: spring-jdbc-kernel
+description: Spring Boot using kernel threads and JDBC
+type: application
+version: 0.1.0
+appVersion: "0.1.0-SNAPSHOT"
+
+dependencies:
+  - name: spring-jdbc
+    version: 0.1.0
+    repository: file://../spring-jdbc

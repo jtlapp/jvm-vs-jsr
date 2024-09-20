@@ -1,4 +1,4 @@
-package com.joelapp.javabenchmarks.springkernelthreads.config;
+package com.joelapp.javabenchmarks.springjdbcapp.config;
 
 import com.joelapp.javabenchmarks.sharedquery.SharedQueryDB;
 import com.joelapp.javabenchmarks.sharedquery.SharedQueryRepo;

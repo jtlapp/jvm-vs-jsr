@@ -16,14 +16,16 @@ spec:
         kubernetes.io/hostname: app
       containers:
         - name: {{ .Chart.Name }}-app
-          image: {{ .Values.global.app.dockerImagePrefix }}/{{ .Chart.Name }}:latest
+          image: {{ .Values.global.app.dockerImagePrefix }}/spring-jdbc-app:latest
           imagePullPolicy: {{ .Values.global.app.imagePullPolicy }}
           ports:
             - containerPort: {{ .Values.global.app.port }}
           env:
+            - name: SPRING_THREADS_VIRTUAL_ENABLED
+              value: "{{ .Values.spring.threads.virtual.enabled }}"
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:{{ .Values.global.pgbouncer.host }}
+              value: "jdbc:{{ .Values.global.pgbouncer.host }}"
             - name: SPRING_DATASOURCE_USERNAME
-              value: {{ .Values.global.database.username }}
+              value: "{{ .Values.global.database.username }}"
             - name: SPRING_DATASOURCE_PASSWORD
-              value: {{ .Values.global.database.password }}
+              value: "{{ .Values.global.database.password }}"
