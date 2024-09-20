@@ -1,4 +1,4 @@
-spring-jdbc-kernel:
+spring-jdbc:
   isBaseChart: false
   spring:
     threads:
