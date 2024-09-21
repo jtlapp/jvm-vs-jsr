@@ -1,35 +1,65 @@
+# Deploys the chart of the provided name and its associated artifacts.
+
+CHART_NAME=$1
 TIMEOUT=30s
 
-case "$1" in
-    "common")
-        image="client"
-        ;;
-    "spring-jdbc-kernel" | "spring-jdbc-virtual")
-        image="spring-jdbc-app"
-        ;;
-    *)
-        image="$1"
-        ;;
-esac
+## Library
 
-docker push $DOCKER_IMAGE_PREFIX/$image
-helm install $1 charts/$1/ -f charts/values.yaml -f charts/values-secret.yaml --timeout $TIMEOUT
+push_image() {
+    local image=$1
+    docker push $DOCKER_IMAGE_PREFIX/$image
+}
 
-if [ "$1" == "common" ]; then
-    helm install prometheus prometheus-community/prometheus -f charts/values-prometheus.yaml --timeout $TIMEOUT
-    # kube-state-metrics is needed to present nodes by hostname in Grafana dashboards
-    # helm install kube-state-metrics prometheus-community/kube-state-metrics -f charts/values-kube-state-metrics.yaml --timeout $TIMEOUT
-    kubectl create configmap node-metrics-dashboard --from-file=charts/common/dashboards/node-metrics-dashboard.json
-    helm install grafana grafana/grafana -f charts/values-grafana.yaml --timeout $TIMEOUT
+deploy_local_chart() {
+    local chart_name=$1
+    helm install $chart_name charts/$chart_name/ -f charts/values.yaml -f charts/values-secret.yaml --timeout $TIMEOUT
+}
+
+deploy_remote_chart() {
+    local release=$1
+    local chart_ref=$2
+    helm install $release $chart_ref -f charts/values-$release.yaml --timeout $TIMEOUT
+}
+
+create_configmap_from() {
+    local chart_subdir=$1
+    local configmap_name=$2
+    local file_ext=$3
+    kubectl create configmap $configmap_name --from-file=charts/$chart_subdir/$configmap_name$file_ext
+}
+
+## Deployment
+
+if [ "$CHART_NAME" == "common" ]; then
+
+    push_image "client"
+    deploy_local_chart "common"
+
+    deploy_remote_chart "prometheus" "prometheus-community/prometheus"
+    create_configmap_from "common/dashboards" "node-metrics-dashboard" ".json"
+    deploy_remote_chart "grafana" "grafana/grafana"
 
     echo "Waiting for pods to start..."
     sleep 4
 
     NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='ExternalIP')].address}")
     NODE_PORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services grafana)
+    PASSWORD=$(kubectl get secret --namespace default grafana -o jsonpath="{.data.admin-password}" | base64 --decode)
+
     echo
     echo "Grafana URL: http://$NODE_IP:$NODE_PORT"
     echo "  Username: admin"
-    printf "  Password: %s\n" "$(kubectl get secret --namespace default grafana -o jsonpath="{.data.admin-password}" | base64 --decode)"
+    echo "  Password: $PASSWORD"
     echo
+
+elif [ "$CHART_NAME" == "spring-jdbc-kernel" ] || [ "$CHART_NAME" == "spring-jdbc-virtual" ]; then
+
+    push_image "spring-jdbc-app"
+    deploy_local_chart "$CHART_NAME"
+
+else
+
+    push_image "$CHART_NAME"
+    deploy_local_chart "$CHART_NAME"
+
 fi

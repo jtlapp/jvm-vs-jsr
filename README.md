@@ -4,6 +4,8 @@ Benchmarks for backend Java frameworks
 
 ## Preparation
 
+Install kubectl and helm, and configure kubectl for your cluster.
+
 Set the docker image prefix in an environment variables:
 
 ```bash

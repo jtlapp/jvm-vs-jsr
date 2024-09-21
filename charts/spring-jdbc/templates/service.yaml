@@ -6,4 +6,4 @@ spec:
   ports:
     - port: {{ .Values.global.app.port }}
   selector:
-    app: {{ .Chart.Name }}-app
+    app: {{ .Release.Name }}-app

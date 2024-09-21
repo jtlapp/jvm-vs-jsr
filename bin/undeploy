@@ -1,10 +1,12 @@
+# Removes deployment of the chart of the provided name and its associated artifacts.
+
+CHART_NAME=$1
 TIMEOUT=30s
 
-if [ "$1" == "common" ]; then
-    # kubectl delete configmap node-metrics-dashboard
-    helm uninstall kube-state-metrics --timeout $TIMEOUT
+if [ "$CHART_NAME" == "common" ]; then
+    kubectl delete configmap node-metrics-dashboard
     helm uninstall grafana --timeout $TIMEOUT
     helm uninstall prometheus --timeout $TIMEOUT
 fi
 
-helm uninstall $1 --timeout $TIMEOUT
+helm uninstall $CHART_NAME --timeout $TIMEOUT
