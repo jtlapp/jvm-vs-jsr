@@ -1,5 +1,5 @@
 server:
-  retention: 24h
+  retention: 3d
   scrape_interval: 2s
   resources:
     requests:
