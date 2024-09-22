@@ -26,7 +26,7 @@
     <modules>
         <module>jdbc-query-library</module>
         <module>spring-jdbc-app</module>
-        <module>jooby-jdbc-app</module>
+        <module>jooby-nomvc-jdbc-app</module>
     </modules>
 
     <dependencyManagement>

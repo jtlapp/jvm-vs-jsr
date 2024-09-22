@@ -59,7 +59,7 @@ elif [ "$CHART_NAME" == "spring-jdbc-kernel" ] || [ "$CHART_NAME" == "spring-jdb
 
 else
 
-    push_image "$CHART_NAME"
+    push_image "$CHART_NAME-app"
     deploy_local_chart "$CHART_NAME"
 
 fi

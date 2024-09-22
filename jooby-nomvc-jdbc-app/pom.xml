@@ -14,7 +14,7 @@
   <artifactId>jooby-nomvc-jdbc-app</artifactId>
 
   <properties>
-    <application.class>app.App</application.class>
+    <application.class>app.JoobyNoMVCJdbcApp</application.class>
     <jooby.version>3.4.0</jooby.version>
     <jooby.hikari.version>3.3.1</jooby.hikari.version>
   </properties>
@@ -26,12 +26,12 @@
     </dependency>
     <dependency>
       <groupId>io.jooby</groupId>
-      <artifactId>jooby-logback</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.jooby</groupId>
       <artifactId>jooby-hikari</artifactId>
       <version>${jooby.hikari.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.joelapp.javabenchmarks</groupId>
+      <artifactId>jdbc-query-library</artifactId>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
@@ -58,32 +58,59 @@
         <groupId>io.jooby</groupId>
         <artifactId>jooby-maven-plugin</artifactId>
         <version>${jooby.version}</version>
+        <configuration>
+          <mainClass>${application.class}</mainClass>
+          <port>8080</port>
+        </configuration>
       </plugin>
       <!-- Build uber jar -->
+<!--      <plugin>-->
+<!--        <artifactId>maven-shade-plugin</artifactId>-->
+<!--        <version>${maven-shade-plugin.version}</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>uber-jar</id>-->
+<!--            <phase>package</phase>-->
+<!--            <goals>-->
+<!--              <goal>shade</goal>-->
+<!--            </goals>-->
+<!--            <configuration>-->
+<!--              <createDependencyReducedPom>false</createDependencyReducedPom>-->
+<!--              <transformers>-->
+<!--                <transformer-->
+<!--                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>-->
+<!--                <transformer-->
+<!--                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
+<!--                  <mainClass>${application.class}</mainClass>-->
+<!--                </transformer>-->
+<!--              </transformers>-->
+<!--            </configuration>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
       <plugin>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>${maven-shade-plugin.version}</version>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>${jib.maven.plugin.version}</version>
+        <configuration>
+          <to>
+            <image>${env.DOCKER_IMAGE_PREFIX}/${project.artifactId}</image>
+          </to>
+          <container>
+            <mainClass>${application.class}</mainClass>
+          </container>
+        </configuration>
         <executions>
           <execution>
-            <id>uber-jar</id>
-            <phase>package</phase>
+            <id>docker-build</id>
             <goals>
-              <goal>shade</goal>
+              <goal>dockerBuild</goal>
             </goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <transformers>
-                <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>${application.class}</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
+            <phase>install</phase>
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
 
