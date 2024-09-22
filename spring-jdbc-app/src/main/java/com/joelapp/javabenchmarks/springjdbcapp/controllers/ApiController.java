@@ -30,7 +30,7 @@ public class ApiController {
             return ResponseEntity.ok(jsonResponse);
         }
         catch (SharedQueryException e) {
-            String jsonResponse = String.format("{\"error\":%s}", e.getMessage());
+            String jsonResponse = String.format("{\"error\": \"%s\"}", e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(jsonResponse);
