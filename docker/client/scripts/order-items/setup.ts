@@ -1,6 +1,5 @@
-import { postgres } from '../lib/deps.ts';
+import { AbstractSetup } from '../lib/abstract-setup.ts';
 import { SharedQueryRepo } from '../lib/shared-query-repo.ts';
-import { Utils } from '../lib/utils.ts';
 
 import { OrderItemTable } from './lib/order-item-table.ts';
 import { OrderTable } from './lib/order-table.ts';
@@ -12,34 +11,19 @@ const PRODUCT_COUNT = 700;
 const ORDERS_PER_USER = 3;
 const ITEMS_PER_ORDER = 4;
 
-export class Setup {
-  private sql: ReturnType<typeof postgres>;
-
+export class Setup extends AbstractSetup {
   constructor(dbURL: string, username: string, password: string) {
-    this.sql = postgres(dbURL, {
-      username: username,
-      password: password,
-    });
-
-    // TBD: Configure additional options if needed
+    super('order-items', dbURL, username, password);
   }
 
-  async run() {
-    await Utils.dropTables(this.sql);
-    await this.createTables();
-    await this.populateDatabase();
-    await this.createSharedQueries();
-    await this.sql.end();
-  }
-
-  async createTables() {
+  protected async createTables() {
     await UserTable.createTable(this.sql);
     await ProductTable.createTable(this.sql);
     await OrderTable.createTable(this.sql);
     await OrderItemTable.createTable(this.sql);
   }
 
-  async populateDatabase() {
+  protected async populateDatabase() {
     for (let i = 1; i <= USER_COUNT; i++) {
       await UserTable.insertUser(
         this.sql,
@@ -90,7 +74,7 @@ export class Setup {
     }
   }
 
-  async createSharedQueries() {
+  protected async createSharedQueries() {
     await SharedQueryRepo.createQuery(this.sql, {
       name: 'orderitems_getOrder',
       query: `
