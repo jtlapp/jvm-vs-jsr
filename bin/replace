@@ -1,0 +1,2 @@
+./bin/undeploy $1
+./bin/deploy $2
