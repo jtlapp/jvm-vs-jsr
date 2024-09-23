@@ -24,7 +24,7 @@
     </properties>
 
     <modules>
-        <module>jdbc-shared-queries</module>
+        <module>jdbc-shared-queries-lib</module>
         <module>spring-jdbc-app</module>
         <module>jooby-nomvc-jdbc-app</module>
     </modules>
@@ -55,7 +55,7 @@
             </dependency>
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>
-                <artifactId>jdbc-shared-queries</artifactId>
+                <artifactId>jdbc-shared-queries-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
