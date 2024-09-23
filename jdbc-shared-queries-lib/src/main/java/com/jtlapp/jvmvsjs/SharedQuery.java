@@ -146,7 +146,7 @@ public class SharedQuery {
                     case Types.TIMESTAMP -> jsonObject.addProperty(
                             columnName, resultSet.getTimestamp(i).toString());
                     default -> throw new RuntimeException(String.format(
-                            "Column '%s' has unrecognized type name %s",
+                            "Column '%s' has unrecognized type name '%s'",
                             columnName, metaData.getColumnTypeName(i)));
                 }
             }
