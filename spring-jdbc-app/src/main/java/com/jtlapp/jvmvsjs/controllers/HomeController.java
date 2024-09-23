@@ -1,4 +1,4 @@
-package com.joelapp.javabenchmarks.springjdbcapp.controllers;
+package com.jtlapp.jvmvsjs.controllers;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;

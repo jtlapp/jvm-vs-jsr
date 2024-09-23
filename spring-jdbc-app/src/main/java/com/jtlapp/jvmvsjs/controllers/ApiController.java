@@ -1,10 +1,9 @@
-package com.joelapp.javabenchmarks.springjdbcapp.controllers;
+package com.jtlapp.jvmvsjs.controllers;
 
-import com.joelapp.javabenchmarks.sharedquery.SharedQuery;
-
-import com.joelapp.javabenchmarks.sharedquery.SharedQueryDB;
-import com.joelapp.javabenchmarks.sharedquery.SharedQueryException;
-import com.joelapp.javabenchmarks.sharedquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.SharedQuery;
+import com.jtlapp.jvmvsjs.SharedQueryDB;
+import com.jtlapp.jvmvsjs.SharedQueryException;
+import com.jtlapp.jvmvsjs.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

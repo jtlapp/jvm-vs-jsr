@@ -1,4 +1,4 @@
-package com.joelapp.javabenchmarks.sharedquery;
+package com.jtlapp.jvmvsjs;
 
 import java.sql.Connection;
 import java.sql.SQLException;

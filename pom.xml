@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.joelapp.javabenchmarks</groupId>
-    <artifactId>javabenchmarks-parent</artifactId>
+    <groupId>com.jtlapp.jvmvsjs</groupId>
+    <artifactId>jvmvsjs-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -24,7 +24,7 @@
     </properties>
 
     <modules>
-        <module>jdbc-query-library</module>
+        <module>jdbc-shared-queries</module>
         <module>spring-jdbc-app</module>
         <module>jooby-nomvc-jdbc-app</module>
     </modules>
@@ -54,8 +54,8 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.joelapp.javabenchmarks</groupId>
-                <artifactId>jdbc-query-library</artifactId>
+                <groupId>com.jtlapp.jvmvsjs</groupId>
+                <artifactId>jdbc-shared-queries</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

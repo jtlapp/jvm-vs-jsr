@@ -1,6 +1,6 @@
-# java-benchmarks
+# jvm-vs-js
 
-Benchmarks for backend Java frameworks
+Benchmarks comparing JVM and JS Runtime concurrency frameworks.
 
 ## Preparation
 

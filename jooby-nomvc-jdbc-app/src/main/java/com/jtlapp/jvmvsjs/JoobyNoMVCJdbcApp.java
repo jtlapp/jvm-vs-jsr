@@ -1,9 +1,5 @@
-package app;
+package com.jtlapp.jvmvsjs;
 
-import com.joelapp.javabenchmarks.sharedquery.SharedQueryDB;
-import com.joelapp.javabenchmarks.sharedquery.SharedQuery;
-import com.joelapp.javabenchmarks.sharedquery.SharedQueryException;
-import com.joelapp.javabenchmarks.sharedquery.SharedQueryRepo;
 import io.jooby.Jooby;
 import io.jooby.exception.BadRequestException;
 import io.jooby.netty.NettyServer;

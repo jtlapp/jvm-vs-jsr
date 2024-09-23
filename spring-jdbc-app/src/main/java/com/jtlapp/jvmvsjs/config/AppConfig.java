@@ -1,7 +1,7 @@
-package com.joelapp.javabenchmarks.springjdbcapp.config;
+package com.jtlapp.jvmvsjs.config;
 
-import com.joelapp.javabenchmarks.sharedquery.SharedQueryDB;
-import com.joelapp.javabenchmarks.sharedquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.SharedQueryDB;
+import com.jtlapp.jvmvsjs.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

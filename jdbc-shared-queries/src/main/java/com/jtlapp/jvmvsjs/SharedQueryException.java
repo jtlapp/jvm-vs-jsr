@@ -1,4 +1,4 @@
-package com.joelapp.javabenchmarks.sharedquery;
+package com.jtlapp.jvmvsjs;
 
 public class SharedQueryException extends RuntimeException {
     public SharedQueryException(String message) {

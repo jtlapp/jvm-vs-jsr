@@ -1,4 +1,4 @@
-package com.joelapp.javabenchmarks.sharedquery;
+package com.jtlapp.jvmvsjs;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
