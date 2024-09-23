@@ -135,6 +135,8 @@ public class SharedQuery {
                             columnName, resultSet.getString(i));
                     case Types.INTEGER -> jsonObject.addProperty(
                             columnName, resultSet.getInt(i));
+                    case Types.BIGINT -> jsonObject.addProperty(
+                            columnName, resultSet.getLong(i));
                     case Types.BOOLEAN -> jsonObject.addProperty(
                             columnName, resultSet.getBoolean(i));
                     case Types.DATE -> jsonObject.addProperty(
