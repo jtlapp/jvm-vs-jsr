@@ -34,7 +34,7 @@ public class JoobyNoMVCJdbcApp extends Jooby {
       int millis = ctx.path("millis").intValue();
       try {
         Thread.sleep(millis);
-        return ctx.send();
+        return ctx.send(StatusCode.OK);
       } catch (InterruptedException e) {
         return ctx.send(StatusCode.SERVER_ERROR);
       }
