@@ -35,4 +35,16 @@ public class ApiController {
                     .body(jsonResponse);
         }
     }
+
+    @GetMapping("/sleep/{millis}")
+    public ResponseEntity<Void> sleep(@PathVariable(name = "millis") int millis) {
+        try {
+            Thread.sleep(millis);
+            return ResponseEntity.ok().build();
+        } catch (InterruptedException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build();
+        }
+    }
 }
