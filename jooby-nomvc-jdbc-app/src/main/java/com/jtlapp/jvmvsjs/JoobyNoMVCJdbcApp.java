@@ -1,20 +1,30 @@
 package com.jtlapp.jvmvsjs;
 
+import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
+import io.jooby.ReactiveSupport;
 import io.jooby.StatusCode;
 import io.jooby.exception.BadRequestException;
 import io.jooby.netty.NettyServer;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class JoobyNoMVCJdbcApp extends Jooby {
 
   {
-    install(new NettyServer());
-
+    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     SharedQueryDB sharedQueryDB = new SharedQueryDB(
             System.getenv("DATABASE_URL"),
             System.getenv("DATABASE_USERNAME"),
             System.getenv("DATABASE_PASSWORD"));
     SharedQueryRepo sharedQueryRepo = new SharedQueryRepo();
+
+    install(new NettyServer());
+
+    use(ReactiveSupport.concurrent());
 
     get("/", ctx -> "Running Jooby without MVC, with JDBC\n");
 
@@ -32,16 +42,19 @@ public class JoobyNoMVCJdbcApp extends Jooby {
 
     get("/api/sleep/{millis}", ctx -> {
       int millis = ctx.path("millis").intValue();
-      try {
-        Thread.sleep(millis);
-        return ctx.send(StatusCode.OK);
-      } catch (InterruptedException e) {
-        return ctx.send(StatusCode.SERVER_ERROR);
-      }
+      var future = new CompletableFuture<String>();
+
+      scheduler.schedule(() -> {
+        future.complete("");
+      }, millis, TimeUnit.MILLISECONDS);
+
+      return future;
     });
+
+    onStop(scheduler::shutdown);
   }
 
   public static void main(final String[] args) {
-    runApp(args, JoobyNoMVCJdbcApp::new);
+    runApp(args, ExecutionMode.EVENT_LOOP, JoobyNoMVCJdbcApp::new);
   }
 }
