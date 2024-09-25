@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class JoobyNoMVC extends Jooby {
+public class JoobyNoMVCApp extends Jooby {
 
   {
     var scheduler = Executors.newScheduledThreadPool(1);
@@ -40,6 +40,6 @@ public class JoobyNoMVC extends Jooby {
   }
 
   public static void main(final String[] args) {
-    runApp(args, ExecutionMode.EVENT_LOOP, JoobyNoMVC::new);
+    runApp(args, ExecutionMode.EVENT_LOOP, JoobyNoMVCApp::new);
   }
 }
