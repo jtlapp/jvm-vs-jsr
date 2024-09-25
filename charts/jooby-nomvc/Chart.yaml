@@ -1,6 +1,6 @@
 apiVersion: v2
-name: jooby-nomvc-jdbc
-description: Chart for Jooby apps not using MVC and using JDBC
+name: jooby-nomvc
+description: Chart for Jooby apps not using MVC
 
 # A chart can be either an 'application' or a 'library' chart.
 #

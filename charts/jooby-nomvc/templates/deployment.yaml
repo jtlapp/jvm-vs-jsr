@@ -16,7 +16,7 @@ spec:
         kubernetes.io/hostname: app
       containers:
         - name: {{ .Release.Name }}-app
-          image: {{ .Values.global.app.dockerImagePrefix }}/jooby-nomvc-jdbc-app:latest
+          image: {{ .Values.global.app.dockerImagePrefix }}/jooby-nomvc-app:latest
           imagePullPolicy: {{ .Values.global.app.imagePullPolicy }}
           ports:
             - containerPort: {{ .Values.global.app.port }}
