@@ -13,7 +13,7 @@
 
 	<properties>
 		<spring.boot.maven.plugin.version>3.3.1</spring.boot.maven.plugin.version>
-		<main.class>com.jtlapp.jvmvsjs.SpringJdbcApp</main.class>
+		<main.class>com.jtlapp.jvmvsjs.springjdbc.SpringJdbcApp</main.class>
 	</properties>
 
 	<dependencies>

@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.controllers;
+package com.jtlapp.jvmvsjs.springjdbc.controllers;
 
 import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQuery;
 import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQueryDB;

@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs;
+package com.jtlapp.jvmvsjs.springjdbc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

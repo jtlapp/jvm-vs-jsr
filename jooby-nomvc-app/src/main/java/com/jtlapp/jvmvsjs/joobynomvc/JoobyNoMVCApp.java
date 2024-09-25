@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs;
+package com.jtlapp.jvmvsjs.joobynomvc;
 
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;

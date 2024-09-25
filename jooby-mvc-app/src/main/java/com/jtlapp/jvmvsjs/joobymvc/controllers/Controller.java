@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.controllers;
+package com.jtlapp.jvmvsjs.joobymvc.controllers;
 
 import io.jooby.annotation.*;
 

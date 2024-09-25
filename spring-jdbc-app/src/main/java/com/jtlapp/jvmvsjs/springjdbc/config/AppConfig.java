@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.config;
+package com.jtlapp.jvmvsjs.springjdbc.config;
 
 import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQueryDB;
 import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQueryRepo;
