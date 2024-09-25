@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs;
+package com.jtlapp.jvmvsjs.jdbcsharedquery;
 
 import java.sql.Connection;
 import java.sql.SQLException;

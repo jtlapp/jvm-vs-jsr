@@ -1,7 +1,7 @@
 package com.jtlapp.jvmvsjs.config;
 
-import com.jtlapp.jvmvsjs.SharedQueryDB;
-import com.jtlapp.jvmvsjs.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQueryDB;
+import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

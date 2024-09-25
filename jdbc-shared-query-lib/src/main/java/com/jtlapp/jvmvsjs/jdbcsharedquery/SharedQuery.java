@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs;
+package com.jtlapp.jvmvsjs.jdbcsharedquery;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

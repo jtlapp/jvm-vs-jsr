@@ -31,7 +31,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.jtlapp.jvmvsjs</groupId>
-			<artifactId>jdbc-shared-queries-lib</artifactId>
+			<artifactId>jdbc-shared-query-lib</artifactId>
 		</dependency>
 	</dependencies>
 
