@@ -3,10 +3,10 @@ package com.jtlapp.jvmvsjs.joobymvc.controllers;
 import io.jooby.annotation.*;
 
 @Path("/")
-public class Controller {
+public class HomeController {
 
   @GET
-  public String sayHi() {
-    return "Welcome to Jooby!";
+  public String home() {
+    return "Running Jooby with MVC";
   }
 }

@@ -14,7 +14,7 @@
   <artifactId>jooby-mvc-app</artifactId>
 
   <properties>
-    <application.class>com.jtlapp.jvmvsjs.JoobyMVC</application.class>
+    <application.class>com.jtlapp.jvmvsjs.joobymvc.JoobyMvcApp</application.class>
     <jooby.version>3.4.1</jooby.version>
   </properties>
 
@@ -38,6 +38,23 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven.compiler.plugin.version}</version>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>io.jooby</groupId>
+              <artifactId>jooby-apt</artifactId>
+              <version>${jooby.version}</version>
+            </path>
+          </annotationProcessorPaths>
+          <compilerArgs>
+            <compilerArg>
+              -Ajooby.debug=false
+            </compilerArg>
+            <compilerArg>
+              -Ajooby.services=true
+            </compilerArg>
+          </compilerArgs>
+        </configuration>
       </plugin>
       <!-- jooby:run -->
       <plugin>
