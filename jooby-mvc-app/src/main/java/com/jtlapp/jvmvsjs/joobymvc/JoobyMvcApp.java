@@ -1,34 +1,44 @@
 package com.jtlapp.jvmvsjs.joobymvc;
 
-import com.jtlapp.jvmvsjs.joobymvc.controllers.ApiController_;
-import com.jtlapp.jvmvsjs.joobymvc.controllers.HomeController_;
+import com.jtlapp.jvmvsjs.joobymvc.controllers.ApiController;
+import com.jtlapp.jvmvsjs.joobymvc.controllers.HomeController;
+import io.avaje.inject.PreDestroy;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
 import io.jooby.ReactiveSupport;
 import io.jooby.ServerOptions;
+import io.jooby.avaje.inject.AvajeInjectModule;
 import io.jooby.netty.NettyServer;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
+@Singleton
 public class JoobyMvcApp extends Jooby {
 
-  {
-    var scheduler = Executors.newScheduledThreadPool(1);
+    @Inject
+    ScheduledExecutorService scheduler;
 
-    install(new NettyServer().setOptions(
-            new ServerOptions()
-                    .setIoThreads(Runtime.getRuntime().availableProcessors() + 1)
-                    .setWorkerThreads(Runtime.getRuntime().availableProcessors() + 1)
-    ));
-    use(ReactiveSupport.concurrent());
+    {
+        install(AvajeInjectModule.of());
+        install(new NettyServer().setOptions(
+                new ServerOptions()
+                        .setIoThreads(Runtime.getRuntime().availableProcessors() + 1)
+                        .setWorkerThreads(Runtime.getRuntime().availableProcessors() + 1)
+        ));
+        use(ReactiveSupport.concurrent());
 
-    mvc(new HomeController_());
-    mvc(new ApiController_(scheduler));
+        mvc(HomeController.class);
+        mvc(ApiController.class);
+    }
 
-    onStop(scheduler::shutdown);
-  }
+    @PreDestroy
+    public void shutdown() {
+        scheduler.shutdown();
+    }
 
-  public static void main(final String[] args) {
-    runApp(args, ExecutionMode.EVENT_LOOP, JoobyMvcApp::new);
-  }
+    public static void main(final String[] args) {
+        runApp(args, ExecutionMode.EVENT_LOOP, JoobyMvcApp::new);
+    }
 }

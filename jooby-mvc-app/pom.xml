@@ -16,12 +16,19 @@
   <properties>
     <application.class>com.jtlapp.jvmvsjs.joobymvc.JoobyMvcApp</application.class>
     <jooby.version>3.4.1</jooby.version>
+    <jooby.avaje.inject.version>3.3.1</jooby.avaje.inject.version>
+    <ajave.inject.generator.version>10.3</ajave.inject.generator.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>io.jooby</groupId>
       <artifactId>jooby-netty</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jooby</groupId>
+      <artifactId>jooby-avaje-inject</artifactId>
+      <version>${jooby.avaje.inject.version}</version>
     </dependency>
   </dependencies>
 
@@ -44,6 +51,11 @@
               <groupId>io.jooby</groupId>
               <artifactId>jooby-apt</artifactId>
               <version>${jooby.version}</version>
+            </path>
+            <path>
+              <groupId>io.avaje</groupId>
+              <artifactId>avaje-inject-generator</artifactId>
+              <version>${ajave.inject.generator.version}</version>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>
