@@ -1,7 +1,7 @@
 package com.jtlapp.jvmvsjs.joobymvc;
 
-import com.jtlapp.jvmvsjs.joobymvc.controllers.ApiController;
-import com.jtlapp.jvmvsjs.joobymvc.controllers.HomeController;
+import com.jtlapp.jvmvsjs.joobymvc.controllers.ApiController_;
+import com.jtlapp.jvmvsjs.joobymvc.controllers.HomeController_;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
 import io.jooby.ReactiveSupport;
@@ -22,8 +22,8 @@ public class JoobyMvcApp extends Jooby {
     ));
     use(ReactiveSupport.concurrent());
 
-    mvc(new HomeController());
-    mvc(new ApiController(scheduler));
+    mvc(new HomeController_());
+    mvc(new ApiController_(scheduler));
 
     onStop(scheduler::shutdown);
   }
