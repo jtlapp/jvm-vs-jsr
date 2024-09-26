@@ -25,6 +25,7 @@
 
     <modules>
         <module>jdbc-shared-query-lib</module>
+        <module>spring-async-app</module>
         <module>spring-jdbc-app</module>
         <module>jooby-mvc-app</module>
         <module>jooby-nomvc-app</module>
