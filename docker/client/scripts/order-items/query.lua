@@ -1,3 +1,6 @@
+package.path = package.path .. ";../?.lua"
+require("lib.response-log")
+
 local MAX_USER = 1000
 local MAX_ORDER = 4
 local PERCENT_UPDATES = 50
@@ -29,6 +32,10 @@ request = function()
   else
     return selectRequest()
   end
+end
+
+response = function(status, headers, body)
+  logResponse(status, body)
 end
 
 function getUserID(userNumber)

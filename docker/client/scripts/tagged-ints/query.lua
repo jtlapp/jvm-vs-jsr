@@ -1,5 +1,4 @@
 package.path = package.path .. ";../?.lua"
-
 require("lib.response-log")
 
 local SEED = 12345
