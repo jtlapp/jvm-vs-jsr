@@ -91,7 +91,7 @@ public class SharedQuery {
                     }
                 case ROW_COUNT:
                     int count = statement.executeUpdate();
-                    return String.format("{\"rowCount\":%d}", count);
+                    return String.format("{\"rowCount\": %d}", count);
                 default:
                     throw new SharedQueryException("Unhandled ReturnType");
             }
@@ -152,6 +152,6 @@ public class SharedQuery {
             }
             jsonArray.add(jsonObject);
         }
-        return String.format("{\"rows\":%s}", jsonArray);
+        return String.format("{\"query\": \"%s\", \"rows\": %s}", name, jsonArray);
     }
 }

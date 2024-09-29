@@ -47,7 +47,7 @@ Create your cluster and configure `kubectl` to use it. Then:
 ```bash
 mvn clean install
 ./bin/deploy common
-./bin/deploy spring-jdbc-kernel
+./bin/deploy spring-jdbc-kernel # or another app
 ```
 
 ## Testing
@@ -61,9 +61,12 @@ mvn clean install
 % wrk -t1 -c1 -d1s -s order-items/query.lua http://api-service:8080
 ```
 
-Useful termination commands:
+Useful commands:
 
 ```bash
+./bin/redeploy <release-name>
+./bin/replace <deployed-release> <replacement-release>
+
 ./bin/undeploy common
-./bin/undeploy spring-jdbc-kernel
+./bin/undeploy spring-jdbc-kernel # or another app
 ```

@@ -29,10 +29,9 @@ public class ApiController {
             return ResponseEntity.ok(jsonResponse);
         }
         catch (SharedQueryException e) {
-            String jsonResponse = String.format("{\"error\": \"%s\"}", e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(jsonResponse);
+                    .body(toErrorJson(queryName, e));
         }
     }
 
@@ -46,5 +45,10 @@ public class ApiController {
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .build();
         }
+    }
+
+    private String toErrorJson(String queryName, Throwable e) {
+        return String.format("{\"query\": \"%s\", \"error\": \"%s\"}",
+                queryName, e.getMessage());
     }
 }

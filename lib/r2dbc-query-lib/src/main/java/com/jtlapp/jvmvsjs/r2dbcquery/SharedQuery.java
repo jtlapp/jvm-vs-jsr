@@ -91,7 +91,7 @@ public class SharedQuery {
                         .flatMap(this::convertRowsToJson);
             case ROW_COUNT:
                 return sql.fetch().rowsUpdated().map(count ->
-                        String.format("{\"rowCount\":%d}", count));
+                        String.format("{\"rowCount\": %d}", count));
             default:
                 throw new SharedQueryException("Unhandled ReturnType");
         }
@@ -121,7 +121,7 @@ public class SharedQuery {
         try {
             String jsonArray = objectMapper.writeValueAsString(rows);
             return Mono.just(String.format(
-                    "{\"query\": \"%s\", \"rows\":%s}", name, jsonArray));
+                    "{\"query\": \"%s\", \"rows\": %s}", name, jsonArray));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
