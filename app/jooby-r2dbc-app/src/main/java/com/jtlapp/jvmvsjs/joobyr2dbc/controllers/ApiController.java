@@ -9,8 +9,6 @@ import io.jooby.annotation.Path;
 import io.jooby.annotation.PathParam;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;
 
@@ -32,26 +30,28 @@ public class ApiController {
     DatabaseClient db;
 
     @POST("/query/{queryName}")
-    public Mono<ResponseEntity<String>> query(
-            String queryName, String jsonBody, Context ctx
+    public Mono<String> query(
+            @PathParam String queryName, String jsonBody, Context ctx
     ) {
         return sharedQueryRepo.get(queryName)
                 .flatMap(sq -> sq.executeUsingGson(db, jsonBody))
-                .map(json -> ResponseEntity.ok().body(json));
+                .onErrorResume(e -> {
+                    ctx.setResponseCode(StatusCode.SERVER_ERROR);
+                    return Mono.just(toErrorJson(queryName, e));
+                });
+    }
+
+//    public Mono<ResponseEntity<String>> query(
+//            String queryName, String jsonBody, Context ctx
+//    ) {
+//        return sharedQueryRepo.get(queryName)
+//                .flatMap(sq -> sq.executeUsingGson(db, jsonBody))
+//                .map(json -> ResponseEntity.ok().body(json));
 //                .onErrorResume(e -> Mono.just(ResponseEntity
 //                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
 //                        .body(toErrorJson(queryName, e))));
-    }
-
-//    public Mono<String> query(String queryName, String jsonBody, Context ctx) {
-//        return sharedQueryRepo.get(queryName)
-//                .flatMap(sq -> sq.executeUsingGson(db, jsonBody))
-//                .onErrorResume(e -> {
-//                    ctx.setResponseCode(StatusCode.SERVER_ERROR);
-//                    return Mono.just(toErrorJson(queryName, e));
-//                });
 //    }
-    
+
     @GET("/sleep/{millis}")
     public CompletableFuture<String> sleep(@PathParam int millis) {
         var future = new CompletableFuture<String>();

@@ -10,6 +10,7 @@ import io.jooby.ReactiveSupport;
 import io.jooby.ServerOptions;
 import io.jooby.avaje.inject.AvajeInjectModule;
 import io.jooby.netty.NettyServer;
+import io.jooby.reactor.Reactor;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -18,20 +19,19 @@ import java.util.concurrent.ScheduledExecutorService;
 @Singleton
 public class JoobyR2dbcApp extends Jooby {
 
-    public static Config config;
-
     @Inject
     ScheduledExecutorService scheduler;
 
     {
-        config = getConfig();
         install(AvajeInjectModule.of());
         install(new NettyServer().setOptions(
                 new ServerOptions()
                         .setIoThreads(Runtime.getRuntime().availableProcessors() + 1)
                         .setWorkerThreads(Runtime.getRuntime().availableProcessors() + 1)
         ));
+
         use(ReactiveSupport.concurrent());
+        use(Reactor.reactor());
 
         mvc(HomeController.class);
         mvc(ApiController.class);
