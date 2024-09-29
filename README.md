@@ -60,7 +60,7 @@ mvn clean install
 4. Run the appropriate Lua benchmarking script. E.g.:
 
 ```bash
-% wrk -t1 -c1 -d1s -s order-items/query.lua http://api-service:8080
+% wrk -t1 -c1 -d1s -s tests/order-items/query.lua http://api-service:8080
 ```
 
 Useful commands:
