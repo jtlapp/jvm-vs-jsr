@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.springwebflux.sharedquery;
+package com.jtlapp.jvmvsjs.r2dbcquery;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

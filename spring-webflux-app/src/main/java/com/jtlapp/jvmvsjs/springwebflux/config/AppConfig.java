@@ -1,6 +1,6 @@
 package com.jtlapp.jvmvsjs.springwebflux.config;
 
-import com.jtlapp.jvmvsjs.springwebflux.sharedquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.r2dbcquery.SharedQueryRepo;
 import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -26,6 +26,7 @@
 
     <modules>
         <module>jdbc-query-lib</module>
+        <module>r2dbc-query-lib</module>
         <module>spring-async-app</module>
         <module>spring-jdbc-app</module>
         <module>spring-webflux-app</module>
@@ -80,6 +81,11 @@
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>
                 <artifactId>jdbc-query-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jtlapp.jvmvsjs</groupId>
+                <artifactId>r2dbc-query-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

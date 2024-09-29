@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.springwebflux.sharedquery;
+package com.jtlapp.jvmvsjs.r2dbcquery;
 
 import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;
