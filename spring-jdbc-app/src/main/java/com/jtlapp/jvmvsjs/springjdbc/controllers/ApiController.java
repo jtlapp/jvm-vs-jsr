@@ -1,9 +1,9 @@
 package com.jtlapp.jvmvsjs.springjdbc.controllers;
 
-import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQuery;
-import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQueryDB;
-import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQueryException;
-import com.jtlapp.jvmvsjs.jdbcsharedquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.jdbcquery.SharedQuery;
+import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryDB;
+import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryException;
+import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

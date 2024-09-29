@@ -25,7 +25,7 @@
     </properties>
 
     <modules>
-        <module>jdbc-shared-query-lib</module>
+        <module>jdbc-query-lib</module>
         <module>spring-async-app</module>
         <module>spring-jdbc-app</module>
         <module>spring-webflux-app</module>
@@ -79,7 +79,7 @@
             </dependency>
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>
-                <artifactId>jdbc-shared-query-lib</artifactId>
+                <artifactId>jdbc-query-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
