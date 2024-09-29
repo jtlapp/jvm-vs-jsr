@@ -1,5 +1,5 @@
 package.path = package.path .. ";../?.lua"
-require("lib.response-log")
+require("_lib.response-log")
 
 local MAX_USER = 1000
 local MAX_ORDER = 4

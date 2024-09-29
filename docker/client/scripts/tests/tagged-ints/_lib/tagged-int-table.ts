@@ -1,4 +1,4 @@
-import { postgres } from '../../lib/deps.ts';
+import { postgres } from '../../../_lib/deps.ts';
 
 export class TaggedIntTable {
   static async createTable(sql: ReturnType<typeof postgres>) {

@@ -1,5 +1,5 @@
-import { postgres } from '../../lib/deps.ts';
-import { Utils } from '../../lib/utils.ts';
+import { postgres } from '../../../_lib/deps.ts';
+import { TestUtils } from '../../_lib/test-utils.ts';
 
 export class UserTable {
   static async createTable(sql: ReturnType<typeof postgres>) {
@@ -14,7 +14,7 @@ export class UserTable {
   }
 
   static createID(userNumber: number): string {
-    return Utils.createPaddedID('USER_', userNumber);
+    return TestUtils.createPaddedID('USER_', userNumber);
   }
 
   static async insertUser(

@@ -1,6 +1,6 @@
-import { postgres } from '../lib/deps.ts';
+import { postgres } from '../../_lib/deps.ts';
 
-import { Utils } from '../lib/utils.ts';
+import { DatabaseUtils } from '../../_lib/database-utils.ts';
 
 export abstract class AbstractSetup {
   protected setupName: string;
@@ -24,14 +24,14 @@ export abstract class AbstractSetup {
   }
 
   async run(): Promise<void> {
-    await Utils.dropTables(this.sql);
+    await DatabaseUtils.dropTables(this.sql);
     await this.createTables();
     await this.populateDatabase();
     await this.createSharedQueries();
   }
 
   async recreateSharedQueries(): Promise<void> {
-    await Utils.emptyTable(this.sql, 'shared_queries');
+    await DatabaseUtils.emptyTable(this.sql, 'shared_queries');
     await this.createSharedQueries();
   }
 

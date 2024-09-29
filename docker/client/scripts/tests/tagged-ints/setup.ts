@@ -1,8 +1,8 @@
-import { SharedQueryRepo } from '../lib/shared-query-repo.ts';
+import { SharedQueryRepo } from '../_lib/shared-query-repo.ts';
 
-import { TaggedIntTable } from './lib/tagged-int-table.ts';
-import { Utils } from '../lib/utils.ts';
-import { AbstractSetup } from '../lib/abstract-setup.ts';
+import { TaggedIntTable } from './_lib/tagged-int-table.ts';
+import { TestUtils } from '../_lib/test-utils.ts';
+import { AbstractSetup } from '../_lib/abstract-setup.ts';
 
 const ROW_COUNT = 1000000;
 const MAX_INT = 1000;
@@ -21,7 +21,7 @@ export class Setup extends AbstractSetup {
   }
 
   protected async populateDatabase() {
-    const random = Utils.createRandomNumberGenerator(RANDOM_SEEDS);
+    const random = TestUtils.createRandomNumberGenerator(RANDOM_SEEDS);
 
     for (let i = 1; i <= ROW_COUNT; i++) {
       await TaggedIntTable.insertTaggedInt(

@@ -1,4 +1,4 @@
-import { Setup } from './tagged-ints/setup.ts';
+import { Setup } from './tests/tagged-ints/setup.ts';
 
 const DATABASE_URL = 'postgres://pgbouncer-service:6432/testdb';
 const USERNAME = 'user';

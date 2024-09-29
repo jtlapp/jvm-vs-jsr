@@ -1,10 +1,10 @@
-import { AbstractSetup } from '../lib/abstract-setup.ts';
-import { SharedQueryRepo } from '../lib/shared-query-repo.ts';
+import { AbstractSetup } from '../_lib/abstract-setup.ts';
+import { SharedQueryRepo } from '../_lib/shared-query-repo.ts';
 
-import { OrderItemTable } from './lib/order-item-table.ts';
-import { OrderTable } from './lib/order-table.ts';
-import { ProductTable } from './lib/product-table.ts';
-import { UserTable } from './lib/user-table.ts';
+import { OrderItemTable } from './_lib/order-item-table.ts';
+import { OrderTable } from './_lib/order-table.ts';
+import { ProductTable } from './_lib/product-table.ts';
+import { UserTable } from './_lib/user-table.ts';
 
 const USER_COUNT = 1000;
 const PRODUCT_COUNT = 700;
