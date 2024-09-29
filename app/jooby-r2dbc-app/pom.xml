@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.jtlapp.jvmvsjs</groupId>
+    <artifactId>jvmvsjs-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>jooby-r2dbc-app</artifactId>
+
+  <properties>
+    <application.class>com.jtlapp.jvmvsjs.joobyr2dbc.JoobyR2dbcApp</application.class>
+    <jooby.version>3.4.1</jooby.version>
+    <jooby.avaje.inject.version>3.3.1</jooby.avaje.inject.version>
+    <ajave.inject.generator.version>10.3</ajave.inject.generator.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.jooby</groupId>
+      <artifactId>jooby-netty</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jooby</groupId>
+      <artifactId>jooby-avaje-inject</artifactId>
+      <version>${jooby.avaje.inject.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.jtlapp.jvmvsjs</groupId>
+      <artifactId>r2dbc-query-lib</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>conf</directory>
+      </resource>
+      <resource>
+        <directory>src${file.separator}main${file.separator}resources</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven.compiler.plugin.version}</version>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>io.jooby</groupId>
+              <artifactId>jooby-apt</artifactId>
+              <version>${jooby.version}</version>
+            </path>
+            <path>
+              <groupId>io.avaje</groupId>
+              <artifactId>avaje-inject-generator</artifactId>
+              <version>${ajave.inject.generator.version}</version>
+            </path>
+          </annotationProcessorPaths>
+          <compilerArgs>
+            <compilerArg>
+              -Ajooby.debug=false
+            </compilerArg>
+            <compilerArg>
+              -Ajooby.services=true
+            </compilerArg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+      <!-- jooby:run -->
+      <plugin>
+        <groupId>io.jooby</groupId>
+        <artifactId>jooby-maven-plugin</artifactId>
+        <version>${jooby.version}</version>
+        <configuration>
+          <mainClass>${application.class}</mainClass>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>${jib.maven.plugin.version}</version>
+        <configuration>
+          <to>
+            <image>${env.DOCKER_IMAGE_PREFIX}/${project.artifactId}</image>
+          </to>
+          <container>
+            <mainClass>${application.class}</mainClass>
+          </container>
+        </configuration>
+        <executions>
+          <execution>
+            <id>docker-build</id>
+            <goals>
+              <goal>dockerBuild</goal>
+            </goals>
+            <phase>install</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.jooby</groupId>
+        <artifactId>jooby-bom</artifactId>
+        <version>${jooby.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

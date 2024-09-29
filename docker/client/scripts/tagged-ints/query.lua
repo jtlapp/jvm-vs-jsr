@@ -1,3 +1,7 @@
+package.path = package.path .. ";../?.lua"
+
+require("lib.response-log")
+
 local SEED = 12345
 local MAX_ROWS = 1000000
 local PERCENT_LONG_REQUESTS = 10
@@ -27,6 +31,10 @@ request = function()
   else
     return short_request()
   end
+end
+
+response = function(status, headers, body)
+  logResponse(status, body)
 end
 
 function getRandomTag()

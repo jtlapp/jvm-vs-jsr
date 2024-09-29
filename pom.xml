@@ -25,13 +25,13 @@
     </properties>
 
     <modules>
-        <module>jdbc-query-lib</module>
-        <module>r2dbc-query-lib</module>
-        <module>spring-async-app</module>
-        <module>spring-jdbc-app</module>
-        <module>spring-webflux-app</module>
-        <module>jooby-mvc-app</module>
-        <module>jooby-nomvc-app</module>
+        <module>lib/jdbc-query-lib</module>
+        <module>lib/r2dbc-query-lib</module>
+        <module>app/spring-async-app</module>
+        <module>app/spring-jdbc-app</module>
+        <module>app/spring-webflux-app</module>
+        <module>app/jooby-r2dbc-app</module>
+        <module>app/jooby-nomvc-app</module>
     </modules>
 
     <dependencyManagement>
