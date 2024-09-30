@@ -60,10 +60,20 @@ mvn clean install
 4. Run the appropriate Lua benchmarking script. E.g.:
 
 ```bash
-% wrk -t1 -c1 -d1s -s tests/order-items/query.lua http://api-service:8080
+% wrk -c200 -t4 -R1000 -d1s -s tests/order-items/query.lua http://api-service:8080
 ```
 
-Useful commands:
+- `-c200` &ndash; 200 connections
+- `-t4` &ndash; over 4 threads
+- `-R1000` &ndash; at a rate of 1000 requests per second
+- `-s <script>` &ndash; running the test in this script
+- `<host>` &ndash; hitting this host and port
+
+`query.lua` scripts print the first response for each unique combination of status code, shared 
+query name, and error message. For queries erroneously returning non-JSON, also prints each 
+unique combination of status code and response body.
+
+## Useful commands:
 
 ```bash
 ./bin/redeploy <release-name>
