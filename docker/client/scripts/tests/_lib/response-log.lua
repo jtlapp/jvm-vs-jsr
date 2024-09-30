@@ -5,7 +5,7 @@ function logResponse(statusCode, jsonStr)
 
     if jsonStr and jsonStr ~= "" then
         local success, jsonObj = pcall(
-            function() return require("lib.dkjson").decode(jsonStr) end
+            function() return require("_lib.dkjson").decode(jsonStr) end
         )
 
         if success and jsonObj ~= nil then

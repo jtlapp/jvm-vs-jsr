@@ -1,5 +1,5 @@
 package.path = package.path .. ";../?.lua"
-require("lib.response-log")
+require("_lib.response-log")
 
 local SEED = 12345
 local MAX_ROWS = 1000000

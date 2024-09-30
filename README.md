@@ -60,7 +60,8 @@ mvn clean install
 4. Run the appropriate Lua benchmarking script. E.g.:
 
 ```bash
-% wrk -c200 -t4 -R1000 -d1s -s tests/order-items/query.lua http://api-service:8080
+cd tests/tagged-ints
+wrk -c200 -t4 -R1000 -d1s -s query.lua http://api-service:8080
 ```
 
 - `-c200` &ndash; 200 connections
@@ -69,9 +70,10 @@ mvn clean install
 - `-s <script>` &ndash; running the test in this script
 - `<host>` &ndash; hitting this host and port
 
-`query.lua` scripts print the first response for each unique combination of status code, shared 
-query name, and error message. For queries erroneously returning non-JSON, also prints each 
-unique combination of status code and response body.
+`query.lua` scripts print the some of the first response for each unique combination of
+status code, shared query name, and error message. For queries erroneously returning
+non-JSON, also prints each unique combination of status code and response body. Several
+messages may appear for each combination when running in mulitple threads.
 
 ## Useful commands:
 
