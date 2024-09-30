@@ -1,4 +1,4 @@
-import { postgres } from './deps.ts';
+import { postgres } from '../../_lib/deps.ts';
 
 /**
  * Properties of a query that is shared across the various benchmarked

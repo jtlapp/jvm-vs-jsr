@@ -1,5 +1,4 @@
-# deno:latest sometimes does not work (e.g. ubuntu-2.0.0-rc.7)
-FROM denoland/deno:ubuntu-2.0.0-rc.5 AS build
+FROM denoland/deno:ubuntu AS build
 RUN apt-get update && apt-get install -y \
     build-essential \
     libssl-dev \

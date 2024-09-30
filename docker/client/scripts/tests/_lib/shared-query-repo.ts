@@ -1,4 +1,4 @@
-import { postgres } from './deps.ts';
+import { postgres } from '../../_lib/deps.ts';
 
 import {
   SharedQuery,
