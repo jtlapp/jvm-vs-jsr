@@ -9,6 +9,7 @@
     <groupId>com.jtlapp.jvmvsjs</groupId>
     <artifactId>jvmvsjs-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>jooby-nomvc-app</artifactId>
