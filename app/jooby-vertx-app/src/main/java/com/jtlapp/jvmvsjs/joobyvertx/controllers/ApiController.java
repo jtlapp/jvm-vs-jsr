@@ -1,16 +1,17 @@
-package com.jtlapp.jvmvsjs.joobyr2dbc.controllers;
+package com.jtlapp.jvmvsjs.joobyvertx.controllers;
 
-import com.jtlapp.jvmvsjs.r2dbcquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.vertxquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.vertxquery.VertxUtil;
 import io.jooby.Context;
 import io.jooby.StatusCode;
 import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import io.jooby.annotation.PathParam;
+import io.vertx.core.Future;
+import io.vertx.pgclient.PgPool;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.springframework.r2dbc.core.DatabaseClient;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,38 +28,27 @@ public class ApiController {
     SharedQueryRepo sharedQueryRepo;
 
     @Inject
-    DatabaseClient db;
+    PgPool pgPool;
 
     @POST("/query/{queryName}")
-    public Mono<String> query(
+    public CompletableFuture<String> query(
             @PathParam String queryName, String jsonBody, Context ctx
     ) {
-        return sharedQueryRepo.get(queryName)
-                .flatMap(sq -> sq.executeUsingGson(db, jsonBody))
-                .onErrorResume(e -> {
+        var vertxFuture = sharedQueryRepo.get(queryName)
+                .flatMap(sq -> sq.executeUsingGson(pgPool, jsonBody))
+                .recover(e -> {
                     ctx.setResponseCode(StatusCode.SERVER_ERROR);
-                    return Mono.just(toErrorJson(queryName, e));
+                    return Future.succeededFuture(toErrorJson(queryName, e));
                 });
+        return VertxUtil.toCompletableFuture(vertxFuture);
     }
-
-//    public Mono<ResponseEntity<String>> query(
-//            String queryName, String jsonBody, Context ctx
-//    ) {
-//        return sharedQueryRepo.get(queryName)
-//                .flatMap(sq -> sq.executeUsingGson(db, jsonBody))
-//                .map(json -> ResponseEntity.ok().body(json));
-//                .onErrorResume(e -> Mono.just(ResponseEntity
-//                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                        .body(toErrorJson(queryName, e))));
-//    }
 
     @GET("/sleep/{millis}")
     public CompletableFuture<String> sleep(@PathParam int millis) {
         var future = new CompletableFuture<String>();
 
-        scheduler.schedule(() -> {
-            future.complete("");
-        }, millis, TimeUnit.MILLISECONDS);
+        scheduler.schedule(() ->
+                future.complete(""), millis, TimeUnit.MILLISECONDS);
 
         return future;
     }

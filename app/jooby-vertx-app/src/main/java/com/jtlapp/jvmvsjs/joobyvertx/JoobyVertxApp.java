@@ -1,7 +1,7 @@
-package com.jtlapp.jvmvsjs.joobyr2dbc;
+package com.jtlapp.jvmvsjs.joobyvertx;
 
-import com.jtlapp.jvmvsjs.joobyr2dbc.controllers.ApiController;
-import com.jtlapp.jvmvsjs.joobyr2dbc.controllers.HomeController;
+import com.jtlapp.jvmvsjs.joobyvertx.controllers.ApiController;
+import com.jtlapp.jvmvsjs.joobyvertx.controllers.HomeController;
 import io.avaje.inject.PreDestroy;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
@@ -9,14 +9,13 @@ import io.jooby.ReactiveSupport;
 import io.jooby.ServerOptions;
 import io.jooby.avaje.inject.AvajeInjectModule;
 import io.jooby.netty.NettyServer;
-import io.jooby.reactor.Reactor;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import java.util.concurrent.ScheduledExecutorService;
 
 @Singleton
-public class JoobyR2dbcApp extends Jooby {
+public class JoobyVertxApp extends Jooby {
 
     @Inject
     ScheduledExecutorService scheduler;
@@ -30,7 +29,6 @@ public class JoobyR2dbcApp extends Jooby {
         ));
 
         use(ReactiveSupport.concurrent());
-        use(Reactor.reactor());
 
         mvc(HomeController.class);
         mvc(ApiController.class);
@@ -42,6 +40,6 @@ public class JoobyR2dbcApp extends Jooby {
     }
 
     public static void main(final String[] args) {
-        runApp(args, ExecutionMode.EVENT_LOOP, JoobyR2dbcApp::new);
+        runApp(args, ExecutionMode.EVENT_LOOP, JoobyVertxApp::new);
     }
 }

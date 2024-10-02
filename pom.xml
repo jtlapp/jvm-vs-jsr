@@ -12,8 +12,13 @@
         <maven.compiler.target>21</maven.compiler.target>
 
         <spring.boot.version>3.3.4</spring.boot.version>
+        <jooby.version>3.4.1</jooby.version>
+        <jooby.avaje.inject.version>3.3.1</jooby.avaje.inject.version>
+
         <postgresql.version>42.7.4</postgresql.version>
         <r2dbc.postgresql.version>1.0.5.RELEASE</r2dbc.postgresql.version>
+        <vertx.pg.client.version>4.5.10</vertx.pg.client.version>
+
         <gson.version>2.11.0</gson.version>
         <jackson.version>2.17.0</jackson.version>
 
@@ -27,10 +32,12 @@
     <modules>
         <module>lib/jdbc-query-lib</module>
         <module>lib/r2dbc-query-lib</module>
+        <module>lib/vertx-query-lib</module>
         <module>app/spring-async-app</module>
         <module>app/spring-jdbc-app</module>
         <module>app/spring-webflux-app</module>
         <module>app/jooby-r2dbc-app</module>
+        <module>app/jooby-vertx-app</module>
         <module>app/jooby-nomvc-app</module>
     </modules>
 
@@ -59,9 +66,24 @@
                 <version>${spring.boot.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.jooby</groupId>
+                <artifactId>jooby-reactor</artifactId>
+                <version>${jooby.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jooby</groupId>
+                <artifactId>jooby-avaje-inject</artifactId>
+                <version>${jooby.avaje.inject.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>r2dbc-postgresql</artifactId>
                 <version>${r2dbc.postgresql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-pg-client</artifactId>
+                <version>${vertx.pg.client.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>
@@ -86,6 +108,11 @@
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>
                 <artifactId>r2dbc-query-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jtlapp.jvmvsjs</groupId>
+                <artifactId>vertx-query-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

@@ -48,7 +48,7 @@ public class ApiController {
     }
 
     private String toErrorJson(String queryName, Throwable e) {
-        return String.format("{\"query\": \"%s\", \"error\": \"%s\"}",
-                queryName, e.getMessage());
+        return String.format("{\"query\": \"%s\", \"error\": \"%s: %s\"}",
+                queryName, e.getClass().getSimpleName(), e.getMessage());
     }
 }

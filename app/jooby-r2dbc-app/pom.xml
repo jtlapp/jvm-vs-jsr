@@ -16,8 +16,6 @@
 
   <properties>
     <application.class>com.jtlapp.jvmvsjs.joobyr2dbc.JoobyR2dbcApp</application.class>
-    <jooby.version>3.4.1</jooby.version>
-    <jooby.avaje.inject.version>3.3.1</jooby.avaje.inject.version>
     <ajave.inject.generator.version>10.3</ajave.inject.generator.version>
   </properties>
 
@@ -34,7 +32,6 @@
     <dependency>
       <groupId>io.jooby</groupId>
       <artifactId>jooby-reactor</artifactId>
-      <version>${jooby.version}</version>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>

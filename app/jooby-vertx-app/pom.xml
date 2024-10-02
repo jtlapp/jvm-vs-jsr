@@ -12,10 +12,11 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>jooby-nomvc-app</artifactId>
+  <artifactId>jooby-vertx-app</artifactId>
 
   <properties>
-    <application.class>com.jtlapp.jvmvsjs.joobynomvc.JoobyNoMVCApp</application.class>
+    <application.class>com.jtlapp.jvmvsjs.joobyvertx.JoobyVertxApp</application.class>
+    <ajave.inject.generator.version>10.3</ajave.inject.generator.version>
   </properties>
 
   <dependencies>
@@ -24,12 +25,13 @@
       <artifactId>jooby-netty</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
+      <groupId>io.jooby</groupId>
+      <artifactId>jooby-avaje-inject</artifactId>
+      <version>${jooby.avaje.inject.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
+      <groupId>com.jtlapp.jvmvsjs</groupId>
+      <artifactId>vertx-query-lib</artifactId>
     </dependency>
   </dependencies>
 
@@ -46,6 +48,28 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven.compiler.plugin.version}</version>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>io.jooby</groupId>
+              <artifactId>jooby-apt</artifactId>
+              <version>${jooby.version}</version>
+            </path>
+            <path>
+              <groupId>io.avaje</groupId>
+              <artifactId>avaje-inject-generator</artifactId>
+              <version>${ajave.inject.generator.version}</version>
+            </path>
+          </annotationProcessorPaths>
+          <compilerArgs>
+            <compilerArg>
+              -Ajooby.debug=false
+            </compilerArg>
+            <compilerArg>
+              -Ajooby.services=true
+            </compilerArg>
+          </compilerArgs>
+        </configuration>
       </plugin>
       <!-- jooby:run -->
       <plugin>
@@ -78,7 +102,6 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
   </build>
 
