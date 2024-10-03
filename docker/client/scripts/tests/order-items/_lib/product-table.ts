@@ -1,5 +1,5 @@
-import { postgres } from '../../../_lib/deps.ts';
-import { TestUtils } from '../../_lib/test-utils.ts';
+import postgres from 'postgresjs';
+import { TestUtils } from 'test-utils';
 
 export class ProductTable {
   static async createTable(sql: ReturnType<typeof postgres>) {

@@ -1,5 +1,6 @@
 package.path = package.path .. ";../?.lua"
-require("_lib.response-log")
+require("_lua_lib.response-log")
+require("_lua_lib.stats-json")
 
 local SEED = 12345
 local MAX_ROWS = 1000000
@@ -34,6 +35,10 @@ end
 
 response = function(status, headers, body)
   logResponse(status, body)
+end
+
+done = function(summary, latency, requests)
+  printStatsJson(summary, latency, requests)
 end
 
 function getRandomTag()

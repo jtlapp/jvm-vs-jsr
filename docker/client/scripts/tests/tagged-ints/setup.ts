@@ -1,8 +1,8 @@
-import { SharedQueryRepo } from '../_lib/shared-query-repo.ts';
+import { SharedQueryRepo } from 'shared-query-repo';
 
+import { TestUtils } from 'test-utils';
+import { AbstractSetup } from 'abstract-setup';
 import { TaggedIntTable } from './_lib/tagged-int-table.ts';
-import { TestUtils } from '../_lib/test-utils.ts';
-import { AbstractSetup } from '../_lib/abstract-setup.ts';
 
 const ROW_COUNT = 1000000;
 const MAX_INT = 1000;

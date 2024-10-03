@@ -1,6 +1,5 @@
-import { postgres } from '../../_lib/deps.ts';
-
-import { DatabaseUtils } from '../../_lib/database-utils.ts';
+import postgres from 'postgresjs';
+import { DatabaseUtils } from './database-utils.ts';
 
 export abstract class AbstractSetup {
   protected setupName: string;

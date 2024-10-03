@@ -1,5 +1,5 @@
-import { AbstractSetup } from '../_lib/abstract-setup.ts';
-import { SharedQueryRepo } from '../_lib/shared-query-repo.ts';
+import { AbstractSetup } from 'abstract-setup';
+import { SharedQueryRepo } from 'shared-query-repo';
 
 import { OrderItemTable } from './_lib/order-item-table.ts';
 import { OrderTable } from './_lib/order-table.ts';

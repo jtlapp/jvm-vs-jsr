@@ -1,0 +1,11 @@
+{
+  "imports": {
+    "postgresjs": "https://deno.land/x/postgresjs@v3.4.4/mod.js",
+
+    "abstract-setup": "./_ts_lib/abstract-setup.ts",
+    "database-utils": "./_ts_lib/database-utils.ts",
+    "shared-query-repo": "./_ts_lib/shared-query-repo.ts",
+    "shared-query": "./_ts_lib/shared-query.ts",
+    "test-utils": "./_ts_lib/test-utils.ts"
+  }
+}

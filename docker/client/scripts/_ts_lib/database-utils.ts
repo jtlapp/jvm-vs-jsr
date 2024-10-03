@@ -1,4 +1,4 @@
-import { postgres } from './deps.ts';
+import postgres from 'postgresjs';
 
 export class DatabaseUtils {
   static async dropTables(sql: ReturnType<typeof postgres>) {
