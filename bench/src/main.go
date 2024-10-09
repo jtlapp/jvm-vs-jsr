@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"os"
-	"time"
 
 	// Import test suites
 
-	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-js.jtlapp.com/benchmark/suites/sleep"
 	"jvm-vs-js.jtlapp.com/benchmark/suites/suite2"
 )
@@ -19,11 +16,11 @@ const (
 )
 
 type Config struct {
-	baseUrl   string
-	suiteName string
-	mode      string
-	rate      int
-	durationSeconds  int
+	baseUrl         string
+	suiteName       string
+	mode            string
+	rate            int
+	durationSeconds int
 }
 
 type TestSuite interface {
@@ -83,27 +80,27 @@ func parseArgs() Config {
 	return Config{baseUrl, suiteName, mode, *rate, *duration}
 }
 
-func runBenchmark(config Config, suite TestSuite) {
-	url := fmt.Sprintf("%s/api/sleep/%d", config.baseUrl, sleepDuration)
+// func runBenchmark(config Config, suite TestSuite) {
+// 	url := fmt.Sprintf("%s/api/sleep/%d", config.baseUrl, sleepDuration)
 
-	rateLimiter := vegeta.Rate{Freq: config.rate, Per: time.Second}
+// 	rateLimiter := vegeta.Rate{Freq: config.rate, Per: time.Second}
 
-	targeter := vegeta.NewStaticTargeter(vegeta.Target{
-		Method: "GET",
-		URL:    url,
-		Body:   bytes.NewBuffer(nil).Bytes(),
-	})
+// 	targeter := vegeta.NewStaticTargeter(vegeta.Target{
+// 		Method: "GET",
+// 		URL:    url,
+// 		Body:   bytes.NewBuffer(nil).Bytes(),
+// 	})
 
-	attacker := vegeta.NewAttacker()
+// 	attacker := vegeta.NewAttacker()
 
-	durationInSeconds := time.Duration(config.durationSeconds) * time.Second
-	var metrics vegeta.Metrics
-	for res := range attacker.Attack(targeter, rateLimiter, durationInSeconds, "Benchmark sleep API") {
-		metrics.Add(res)
-	}
+// 	durationInSeconds := time.Duration(config.durationSeconds) * time.Second
+// 	var metrics vegeta.Metrics
+// 	for res := range attacker.Attack(targeter, rateLimiter, durationInSeconds, "Benchmark sleep API") {
+// 		metrics.Add(res)
+// 	}
 
-	metrics.Close()
-}
+// 	metrics.Close()
+// }
 
 func fail(format string, a ...interface{}) {
 	fmt.Printf(format+"\n", a...)
