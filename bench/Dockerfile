@@ -3,6 +3,7 @@ FROM ubuntu:latest
 ENV GO_VERSION=1.23.2
 ENV GOPATH=/go
 ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
+ENV BASE_APP_URL=http://api-service:8080
 
 RUN apt-get update && \
     apt-get install -y \

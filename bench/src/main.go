@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	baseUrlEnvVar = "BASE_URL"
+	baseUrlEnvVar = "BASE_APP_URL"
 )
 
 type Config struct {
@@ -70,9 +70,10 @@ func parseArgs() Config {
 	suiteName := os.Args[1]
 	mode := os.Args[2]
 
-	rate := flag.Int("rate", 10, "Requests per second")
-	duration := flag.Int("duration", 5, "Duration of the benchmark in seconds")
-	flag.Parse()
+	flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	rate := flagSet.Int("rate", 10, "Requests per second")
+	duration := flagSet.Int("duration", 5, "Duration of the benchmark in seconds")
+	flagSet.Parse(os.Args[3:])
 
 	baseUrl := os.Getenv(baseUrlEnvVar)
 	if baseUrl == "" {
@@ -97,6 +98,13 @@ func runBenchmark(config Config, suite TestSuite) {
 	}
 
 	metrics.Close()
+
+	fmt.Printf("Requests: %d\n", metrics.Requests)
+	fmt.Printf("Success Rate: %.2f%%\n", metrics.Success*100)
+	fmt.Printf("Average Latency: %s\n", metrics.Latencies.Mean)
+	fmt.Printf("99th Percentile Latency: %s\n", metrics.Latencies.P99)
+	fmt.Printf("Max Latency: %s\n", metrics.Latencies.Max)
+	fmt.Printf("Status Codes: %v\n", metrics.StatusCodes)
 }
 
 func fail(format string, a ...interface{}) {
