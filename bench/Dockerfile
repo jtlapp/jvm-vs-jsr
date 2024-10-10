@@ -22,8 +22,7 @@ COPY root/ /root/
 COPY src/ /src/
 
 # remove builds made on my development machine
-RUN find /src -type f -name "setup" -exec rm {} \;
-RUN find /src -type f -name "bench" -exec rm {} \;
+RUN find /src -type f -name "benchmark" -exec rm {} \;
 
 WORKDIR /src
 
