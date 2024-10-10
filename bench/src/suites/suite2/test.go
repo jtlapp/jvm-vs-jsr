@@ -1,9 +1,7 @@
 package suite2
 
-import (
-	"fmt"
-)
+import vegeta "github.com/tsenart/vegeta/lib"
 
-func (s *Suite) Test() {
-	fmt.Println("Testing Suite 2...")
+func (s *Suite) GetTargeter(baseUrl string) vegeta.Targeter {
+	return nil
 }

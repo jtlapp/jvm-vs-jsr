@@ -1,6 +1,0 @@
-spring-jdbc:
-  isBaseChart: false
-  spring:
-    threads:
-      virtual:
-        enabled: "false"

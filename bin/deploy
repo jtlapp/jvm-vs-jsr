@@ -30,13 +30,13 @@ create_configmap_from() {
 
 ## Deployment
 
-if [ "$CHART_NAME" == "common" ]; then
+if [ "$CHART_NAME" == "client" ]; then
 
-    push_image "client"
-    deploy_local_chart "common"
+    push_image "bench"
+    deploy_local_chart "client"
 
     deploy_remote_chart "prometheus" "prometheus-community/prometheus"
-    create_configmap_from "common/dashboards" "node-metrics-dashboard" ".json"
+    create_configmap_from "client/dashboards" "node-metrics-dashboard" ".json"
     deploy_remote_chart "grafana" "grafana/grafana"
 
     echo "Waiting for pods to start..."
@@ -52,14 +52,14 @@ if [ "$CHART_NAME" == "common" ]; then
     echo "  Password: $PASSWORD"
     echo
 
-elif [ "$CHART_NAME" == "spring-jdbc-kernel" ] || [ "$CHART_NAME" == "spring-jdbc-virtual" ]; then
-
-    push_image "spring-jdbc-app"
-    deploy_local_chart "$CHART_NAME"
-
 else
 
-    push_image "$CHART_NAME-app"
+    if [[ "$CHART_NAME" =~ "spring-jdbc" ]]; then
+        push_image "spring-jdbc-app"
+    elif [ "$CHART_NAME" != "database" ]; then
+        push_image "$CHART_NAME"
+    fi
+
     deploy_local_chart "$CHART_NAME"
 
 fi

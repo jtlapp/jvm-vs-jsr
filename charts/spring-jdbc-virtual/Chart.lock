@@ -1,6 +1,0 @@
-dependencies:
-- name: spring-jdbc
-  repository: file://../spring-jdbc
-  version: 0.1.0
-digest: sha256:dc45194887feb82b1a03e69390ad717236f4a35c9d753953ac155d7a2ed36777
-generated: "2024-09-19T23:36:12.490689-04:00"

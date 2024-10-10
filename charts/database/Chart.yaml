@@ -1,6 +1,6 @@
 apiVersion: v2
-name: jooby-nomvc
-description: Chart for Jooby apps not using MVC
+name: common
+description: Helm chart for the Postgres database
 
 # A chart can be either an 'application' or a 'library' chart.
 #

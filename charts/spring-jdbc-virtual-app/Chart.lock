@@ -1,0 +1,6 @@
+dependencies:
+- name: spring-jdbc-app
+  repository: file://../spring-jdbc-app
+  version: 0.1.0
+digest: sha256:4bf8edb7ecafc6fba33385457db61628844cd494942401ff330c352a2058d667
+generated: "2024-10-09T21:08:29.654241-04:00"

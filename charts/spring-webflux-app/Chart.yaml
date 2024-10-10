@@ -1,6 +1,6 @@
 apiVersion: v2
-name: spring-jdbc
-description: Base chart for Spring Boot and JDBC apps
+name: spring-webfllux-app
+description: Chart for Spring Boot Webflux
 
 # A chart can be either an 'application' or a 'library' chart.
 #

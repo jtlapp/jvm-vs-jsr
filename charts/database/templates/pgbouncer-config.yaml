@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgbouncer-config
+data:
+  pgbouncer.ini: |
+    [databases]
+    
+    {{ .Values.global.database.name }} = host=localhost port={{ .Values.global.database.port }} user={{ .Values.global.database.username }} password={{ .Values.global.database.password }}
+
+    [pgbouncer]
+    
+    listen_addr = 0.0.0.0
+    listen_port = {{ .Values.global.pgbouncer.port }}
+    auth_type = md5
+    auth_file = /etc/pgbouncer/userlist.txt
+
+    pool_mode = transaction
+    max_client_conn = 2000
+    default_pool_size = 200
+    max_prepared_statements = 100
+    
+    ignore_startup_parameters = extra_float_digits
+
+  userlist.txt: |
+    "user" "md54d45974e13472b5a0be3533de4666414"

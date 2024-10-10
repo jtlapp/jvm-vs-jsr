@@ -1,6 +1,6 @@
 apiVersion: v2
-name: jooby-r2dbc
-description: Chart for Jooby/MVC using R2DBC
+name: jooby-vertx-app
+description: Chart for Jooby/MVC using Vert.x Postgres
 
 # A chart can be either an 'application' or a 'library' chart.
 #

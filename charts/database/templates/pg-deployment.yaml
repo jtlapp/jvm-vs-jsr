@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: {{ .Values.global.database.replicaCount }}
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: database
+
+      containers:
+
+        - name: postgres
+          image: postgres:15
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.global.database.name }}
+            - name: POSTGRES_USER
+              value: {{ .Values.global.database.username }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.global.database.password }}
+          ports:
+            - containerPort: {{ .Values.global.database.port }}
+          volumeMounts:
+            - name: setup-sql
+              mountPath: /docker-entrypoint-initdb.d/
+
+        - name: pgbouncer
+          image: edoburu/pgbouncer:latest
+          env:
+            - name: DATABASE_URL
+              value: "jdbc:postgresql://localhost:{{ .Values.global.database.port }}/{{ .Values.global.database.name }}"
+          ports:
+            - containerPort: {{ .Values.global.pgbouncer.port }}
+          volumeMounts:
+            - name: pgbouncer-config
+              mountPath: /etc/pgbouncer
+
+      volumes:
+
+        - name: setup-sql
+          configMap:
+            name: setup-sql-config
+
+        - name: pgbouncer-config
+          configMap:
+            name: pgbouncer-config

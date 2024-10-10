@@ -1,0 +1,5 @@
+isBaseChart: false
+spring:
+  threads:
+    virtual:
+      enabled: "true"
