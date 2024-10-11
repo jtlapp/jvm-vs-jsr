@@ -10,7 +10,7 @@ import (
 
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-js.jtlapp.com/benchmark/suites/sleep"
-	"jvm-vs-js.jtlapp.com/benchmark/suites/suite2"
+	"jvm-vs-js.jtlapp.com/benchmark/suites/taggedints"
 )
 
 const (
@@ -27,13 +27,13 @@ type Config struct {
 
 type TestSuite interface {
 	Name() string
-	Setup()
+	PerformSetup() error
 	GetTargeter(baseUrl string) vegeta.Targeter
 }
 
 var testSuitesSlice = []TestSuite{
 	&sleep.Suite{},
-	&suite2.Suite{},
+	&taggedints.Suite{},
 }
 
 func getTestSuite(name string) (TestSuite, bool) {
@@ -54,7 +54,10 @@ func main() {
 	}
 
 	if config.mode == "setup" {
-		suite.Setup()
+		err := suite.PerformSetup()
+		if err != nil {
+			fail("Setup failed: %v", err)
+		}
 	} else if config.mode == "test" {
 		runBenchmark(config, suite)
 	} else {

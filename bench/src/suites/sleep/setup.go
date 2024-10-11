@@ -1,5 +1,6 @@
 package sleep
 
-func (s *Suite) Setup() {
+func (s *Suite) PerformSetup() error {
 	// nothing to do
+	return nil
 }

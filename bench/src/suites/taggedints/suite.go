@@ -1,7 +1,7 @@
-package suite2
+package taggedints
 
 type Suite struct{}
 
 func (s *Suite) Name() string {
-	return "suite2"
+	return "taggedints"
 }

@@ -1,4 +1,4 @@
-package suite2
+package taggedints
 
 import vegeta "github.com/tsenart/vegeta/lib"
 
