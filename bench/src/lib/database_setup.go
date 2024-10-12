@@ -14,19 +14,19 @@ const (
 	password = "password"
 )
 
-type DatabaseSetupActions interface {
-	CreateTables() error
-	PopulateDatabase() error
-	CreateSharedQueries() error
+type DatabaseSetupImpl interface {
+	CreateTables(conn *pgx.Conn) error
+	PopulateDatabase(conn *pgx.Conn) error
+	CreateSharedQueries(conn *pgx.Conn) error
 }
 
 type DatabaseSetup struct {
 	setupName string
-	Conn      *pgx.Conn
-	actions   DatabaseSetupActions
+	conn      *pgx.Conn
+	impl      DatabaseSetupImpl
 }
 
-func CreateDatabaseSetup(setupName string) (*DatabaseSetup, error) {
+func CreateDatabaseSetup(setupName string, impl DatabaseSetupImpl) (*DatabaseSetup, error) {
 	connConfig, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
 		return nil, err
@@ -39,12 +39,7 @@ func CreateDatabaseSetup(setupName string) (*DatabaseSetup, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return &DatabaseSetup{setupName: setupName, Conn: conn}, nil
-}
-
-func (bs *DatabaseSetup) SetActions(actions DatabaseSetupActions) {
-	bs.actions = actions
+	return &DatabaseSetup{setupName, conn, impl}, nil
 }
 
 func (bs *DatabaseSetup) GetName() string {
@@ -52,25 +47,25 @@ func (bs *DatabaseSetup) GetName() string {
 }
 
 func (bs *DatabaseSetup) Run() error {
-	if err := DropTables(bs.Conn); err != nil {
+	if err := DropTables(bs.conn); err != nil {
 		return err
 	}
-	if err := bs.actions.CreateTables(); err != nil {
+	if err := bs.impl.CreateTables(bs.conn); err != nil {
 		return err
 	}
-	if err := bs.actions.PopulateDatabase(); err != nil {
+	if err := bs.impl.PopulateDatabase(bs.conn); err != nil {
 		return err
 	}
-	return bs.actions.CreateSharedQueries()
+	return bs.impl.CreateSharedQueries(bs.conn)
 }
 
 func (bs *DatabaseSetup) RecreateSharedQueries() error {
-	if err := EmptyTable(bs.Conn, "shared_queries"); err != nil {
+	if err := EmptyTable(bs.conn, "shared_queries"); err != nil {
 		return err
 	}
-	return bs.actions.CreateSharedQueries()
+	return bs.impl.CreateSharedQueries(bs.conn)
 }
 
 func (bs *DatabaseSetup) Release() error {
-	return bs.Conn.Close(context.Background())
+	return bs.conn.Close(context.Background())
 }

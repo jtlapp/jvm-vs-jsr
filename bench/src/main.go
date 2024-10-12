@@ -26,7 +26,7 @@ type Config struct {
 }
 
 type TestSuite interface {
-	Name() string
+	GetName() string
 	PerformSetup() error
 	GetTargeter(baseUrl string) vegeta.Targeter
 }
@@ -38,7 +38,7 @@ var testSuitesSlice = []TestSuite{
 
 func getTestSuite(name string) (TestSuite, bool) {
 	for _, suite := range testSuitesSlice {
-		if suite.Name() == name {
+		if suite.GetName() == name {
 			return suite, true
 		}
 	}

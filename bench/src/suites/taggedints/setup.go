@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/rand"
 
+	"github.com/jackc/pgx/v5"
 	"jvm-vs-js.jtlapp.com/benchmark/lib"
 )
 
@@ -15,24 +16,22 @@ const (
 	SEED       = 12345
 )
 
-type Setup struct {
-	lib.DatabaseSetup
-	randGen *rand.Rand
-}
-
 func (s *Suite) PerformSetup() error {
-	baseSetup, err := lib.CreateDatabaseSetup("tagged-ints")
+	impl := &SetupImpl{rand.New(rand.NewSource(SEED))}
+
+	databaseSetup, err := lib.CreateDatabaseSetup("tagged-ints", impl)
 	if err != nil {
 		return err
 	}
-	randGen := rand.New(rand.NewSource(SEED))
-
-	setup := &Setup{*baseSetup, randGen}
-	setup.SetActions(setup)
-	return setup.Run()
+	databaseSetup.Run()
+	return nil
 }
 
-func (s *Setup) CreateTables() error {
+type SetupImpl struct {
+	randGen *rand.Rand
+}
+
+func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
 	query := `
         CREATE TABLE IF NOT EXISTS tagged_ints (
           id BIGSERIAL PRIMARY KEY,
@@ -41,31 +40,31 @@ func (s *Setup) CreateTables() error {
           int INTEGER NOT NULL,
           created_at TIMESTAMP DEFAULT NOW()
         )`
-	_, err := s.Conn.Exec(context.Background(), query)
+	_, err := conn.Exec(context.Background(), query)
 	return err
 }
 
-func (s *Setup) PopulateDatabase() error {
+func (s *SetupImpl) PopulateDatabase(conn *pgx.Conn) error {
 	for i := 1; i <= ROW_COUNT; i++ {
 		tag1 := s.createTag()
 		tag2 := s.createTag()
 		intVal := s.randGen.Intn(MAX_INT)
 
 		query := `INSERT INTO tagged_ints (tag1, tag2, int, created_at) VALUES ($1, $2, $3, NOW())`
-		_, err := s.Conn.Exec(context.Background(), query, tag1, tag2, intVal)
+		_, err := conn.Exec(context.Background(), query, tag1, tag2, intVal)
 		if err != nil {
-			return err 
+			return err
 		}
 	}
 	return nil
 }
 
-func (s *Setup) CreateSharedQueries() error {
+func (s *SetupImpl) CreateSharedQueries(conn *pgx.Conn) error {
 	// Replace this with actual shared query implementation.
 	return nil
 }
 
 // Use the local random generator for tag creation
-func (s *Setup) createTag() string {
+func (s *SetupImpl) createTag() string {
 	return string(TAG_CHARS[s.randGen.Intn(TAG_LENGTH)]) + string(TAG_CHARS[s.randGen.Intn(TAG_LENGTH)])
 }
