@@ -1,6 +1,7 @@
 global:
 
   app:
+    baseUrl: http://api-service:8080
     imagePullPolicy: Always
     replicaCount: 1
     port: 8080

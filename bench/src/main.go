@@ -61,7 +61,7 @@ func main() {
 		}
 	case "set-queries":
 		if err := suite.SetSharedQueries(); err != nil {
-			fail("Failed to set up queries: %v", err)
+			fail("Failed to set queries: %v", err)
 		}
 	case "test":
 		runBenchmark(config, suite)

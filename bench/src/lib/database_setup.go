@@ -2,16 +2,16 @@ package lib
 
 import (
 	"context"
+	"os"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 const (
-	// TODO: load via env vars from helm chart; remove env from Dockerfile
-	dbURL    = "postgres://pgbouncer-service:6432/testdb"
-	username = "user"
-	password = "password"
+	dbUrlEnvVar = "DATABASE_URL"
+	dbUsernameEnvVar = "DATABASE_USERNAME"
+	dbPasswordEnvVar = "DATABASE_PASSWORD"
 )
 
 type SharedQuery struct {
@@ -32,13 +32,13 @@ type DatabaseSetup struct {
 }
 
 func CreateDatabaseSetup(impl DatabaseSetupImpl) (*DatabaseSetup, error) {
-	connConfig, err := pgxpool.ParseConfig(dbURL)
+	connConfig, err := pgxpool.ParseConfig(os.Getenv(dbUrlEnvVar))
 	if err != nil {
 		return nil, err
 	}
 
-	connConfig.ConnConfig.User = username
-	connConfig.ConnConfig.Password = password
+	connConfig.ConnConfig.User = os.Getenv(dbUsernameEnvVar)
+	connConfig.ConnConfig.Password = os.Getenv(dbPasswordEnvVar)
 
 	conn, err := pgx.ConnectConfig(context.Background(), connConfig.ConnConfig)
 	if err != nil {

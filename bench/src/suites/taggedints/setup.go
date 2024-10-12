@@ -52,12 +52,12 @@ func (s *SetupImpl) GetSharedQueries(conn *pgx.Conn) []lib.SharedQuery {
 	return []lib.SharedQuery{
 		{
 			Name:    "taggedints_sumInts",
-			Query:   `SELECT SUM(int) AS sum FROM tagged_ints WHERE tag1=\${tag1} AND tag2=\${tag2}`,
+			Query:   `SELECT SUM(int) AS sum FROM tagged_ints WHERE tag1=${tag1} AND tag2=${tag2}`,
 			Returns: "rows",
 		},
 		{
 			Name:    "taggedints_getInt",
-			Query:   `SELECT int FROM tagged_ints WHERE id = \${id}`,
+			Query:   `SELECT int FROM tagged_ints WHERE id=${id}`,
 			Returns: "rows",
 		},
 	}

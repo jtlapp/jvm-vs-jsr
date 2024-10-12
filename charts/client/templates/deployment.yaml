@@ -18,3 +18,13 @@ spec:
         - name: client
           image: {{ .Values.global.app.dockerImagePrefix }}/bench:latest
           imagePullPolicy: {{ .Values.global.app.imagePullPolicy }}
+          env:
+            - name: BASE_APP_URL
+              value: "{{ .Values.global.app.baseUrl }}"
+            - name: DATABASE_URL
+              value: "{{ .Values.global.pgbouncer.host }}"
+            - name: DATABASE_USERNAME
+              value: "{{ .Values.global.database.username }}"
+            - name: DATABASE_PASSWORD
+              value: "{{ .Values.global.database.password }}"
+
