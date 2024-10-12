@@ -16,17 +16,6 @@ const (
 	SEED       = 12345
 )
 
-func (s *Suite) PerformSetup() error {
-	impl := &SetupImpl{rand.New(rand.NewSource(SEED))}
-
-	databaseSetup, err := lib.CreateDatabaseSetup("tagged-ints", impl)
-	if err != nil {
-		return err
-	}
-	databaseSetup.Run()
-	return nil
-}
-
 type SetupImpl struct {
 	randGen *rand.Rand
 }
@@ -44,7 +33,7 @@ func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
 	return err
 }
 
-func (s *SetupImpl) PopulateDatabase(conn *pgx.Conn) error {
+func (s *SetupImpl) PopulateTables(conn *pgx.Conn) error {
 	for i := 1; i <= ROW_COUNT; i++ {
 		tag1 := s.createTag()
 		tag2 := s.createTag()
@@ -59,9 +48,19 @@ func (s *SetupImpl) PopulateDatabase(conn *pgx.Conn) error {
 	return nil
 }
 
-func (s *SetupImpl) CreateSharedQueries(conn *pgx.Conn) error {
-	// Replace this with actual shared query implementation.
-	return nil
+func (s *SetupImpl) GetSharedQueries(conn *pgx.Conn) []lib.SharedQuery {
+	return []lib.SharedQuery{
+		{
+			Name:    "taggedints_sumInts",
+			Query:   `SELECT SUM(int) AS sum FROM tagged_ints WHERE tag1=\${tag1} AND tag2=\${tag2}`,
+			Returns: "rows",
+		},
+		{
+			Name:    "taggedints_getInt",
+			Query:   `SELECT int FROM tagged_ints WHERE id = \${id}`,
+			Returns: "rows",
+		},
+	}
 }
 
 // Use the local random generator for tag creation

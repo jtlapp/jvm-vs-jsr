@@ -7,8 +7,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-type DatabaseUtils struct{}
-
 func DropTables(conn *pgx.Conn) error {
 	rows, err := conn.Query(context.Background(), "SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
 	if err != nil {

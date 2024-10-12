@@ -14,19 +14,24 @@ const (
 	password = "password"
 )
 
+type SharedQuery struct {
+	Name    string
+	Query   string
+	Returns string
+}
+
 type DatabaseSetupImpl interface {
 	CreateTables(conn *pgx.Conn) error
-	PopulateDatabase(conn *pgx.Conn) error
-	CreateSharedQueries(conn *pgx.Conn) error
+	PopulateTables(conn *pgx.Conn) error
+	GetSharedQueries(conn *pgx.Conn) []SharedQuery
 }
 
 type DatabaseSetup struct {
-	setupName string
-	conn      *pgx.Conn
-	impl      DatabaseSetupImpl
+	conn *pgx.Conn
+	impl DatabaseSetupImpl
 }
 
-func CreateDatabaseSetup(setupName string, impl DatabaseSetupImpl) (*DatabaseSetup, error) {
+func CreateDatabaseSetup(impl DatabaseSetupImpl) (*DatabaseSetup, error) {
 	connConfig, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
 		return nil, err
@@ -39,31 +44,34 @@ func CreateDatabaseSetup(setupName string, impl DatabaseSetupImpl) (*DatabaseSet
 	if err != nil {
 		return nil, err
 	}
-	return &DatabaseSetup{setupName, conn, impl}, nil
+	return &DatabaseSetup{conn, impl}, nil
 }
 
-func (bs *DatabaseSetup) GetName() string {
-	return bs.setupName
-}
-
-func (bs *DatabaseSetup) Run() error {
+func (bs *DatabaseSetup) PopulateDatabase() error {
 	if err := DropTables(bs.conn); err != nil {
 		return err
 	}
 	if err := bs.impl.CreateTables(bs.conn); err != nil {
 		return err
 	}
-	if err := bs.impl.PopulateDatabase(bs.conn); err != nil {
-		return err
-	}
-	return bs.impl.CreateSharedQueries(bs.conn)
+	return bs.impl.PopulateTables(bs.conn)
 }
 
-func (bs *DatabaseSetup) RecreateSharedQueries() error {
+func (bs *DatabaseSetup) CreateSharedQueries() error {
 	if err := EmptyTable(bs.conn, "shared_queries"); err != nil {
 		return err
 	}
-	return bs.impl.CreateSharedQueries(bs.conn)
+
+	sql := `INSERT INTO shared_queries (name, query, returns) VALUES ($1, $2, $3)`
+
+	sharedQueries := bs.impl.GetSharedQueries(bs.conn)
+	for _, sharedQuery := range sharedQueries {
+		_, err := bs.conn.Exec(context.Background(), sql, sharedQuery.Name, sharedQuery.Query, sharedQuery.Returns)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (bs *DatabaseSetup) Release() error {

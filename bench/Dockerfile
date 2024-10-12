@@ -26,5 +26,6 @@ COPY src/ /src/
 RUN find /src -type f -name "benchmark" -exec rm {} \;
 
 WORKDIR /src
+RUN make
 
 CMD ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
