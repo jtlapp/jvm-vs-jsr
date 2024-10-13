@@ -56,7 +56,7 @@ else
 
     if [[ "$CHART_NAME" =~ "spring-jdbc" ]]; then
         push_image "spring-jdbc-app"
-    elif [ "$CHART_NAME" != "database" ]; then
+    elif [ "$CHART_NAME" != "backend-database" ]; then
         push_image "$CHART_NAME"
     fi
 
