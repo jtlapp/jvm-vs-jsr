@@ -1,5 +1,5 @@
 apiVersion: v2
-name: backend-database
+name: backend-postgres
 description: Helm chart for the Postgres database
 
 # A chart can be either an 'application' or a 'library' chart.

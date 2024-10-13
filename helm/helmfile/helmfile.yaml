@@ -4,11 +4,10 @@ helmDefaults:
 releases:
   # backend database
 
-  - name: backend-database
-    chart: charts/backend-database
+  - name: backend-postgres
+    chart: charts/backend-postgres
     values:
       - charts/global-values.yaml
-      - charts/values-secret.yaml
 
   # client group
 
@@ -16,6 +15,9 @@ releases:
     chart: charts/client
     labels:
       clientGroup: "true"
+    values:
+      - charts/global-values.yaml
+      - charts/values-secret.yaml
 
   - name: prometheus
     chart: prometheus-community/prometheus

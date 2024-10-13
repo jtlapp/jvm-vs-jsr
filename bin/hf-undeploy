@@ -7,8 +7,8 @@ cd helm/helmfile
 
 if [ "$CHART_NAME" == "client" ]; then
     helmfile --selector clientGroup=true destroy
-elif [ "$CHART_NAME" == "backend-database" ]; then
-    helmfile -l name=backend-database destroy -q
+elif [ "$CHART_NAME" == "backend-postgres" ]; then
+    helmfile -l name=backend-postgres destroy -q
 else
     helmfile --selector appGroup=true destroy
 fi

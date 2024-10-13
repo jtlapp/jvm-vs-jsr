@@ -26,11 +26,11 @@ else
 
     if [[ "$CHART_NAME" =~ "spring-jdbc" ]]; then
         push_image "spring-jdbc-app"
-    elif [ "$CHART_NAME" != "backend-database" ]; then
+    elif [ "$CHART_NAME" != "backend-postgres" ]; then
         push_image "$CHART_NAME"
     fi
 
-    if [ "$CHART_NAME" == "backend-database" ]; then
+    if [ "$CHART_NAME" == "backend-postgres" ]; then
         helmfile -l name=$CHART_NAME apply --suppress-diff -q
     else
         helmfile apply --selector appGroup=true
