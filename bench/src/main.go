@@ -95,15 +95,17 @@ func parseArgs() Config {
 
 func runBenchmark(config Config, suite lib.TestSuite) {
 
-	targeter := suite.GetTargeter(config.baseUrl)
+	targetProvider := suite.GetTargetProvider(config.baseUrl)
+	logger := lib.NewResponseLogger()
 
 	attacker := vegeta.NewAttacker()
 	rateLimiter := vegeta.Rate{Freq: config.rate, Per: time.Second}
 	duration := time.Duration(config.durationSeconds) * time.Second
 
 	var metrics vegeta.Metrics
-	for res := range attacker.Attack(targeter, rateLimiter, duration,
+	for res := range attacker.Attack(targetProvider, rateLimiter, duration,
 		"Benchmark sleep API") {
+		logger.Log(res.Code, string(res.Body))
 		metrics.Add(res)
 	}
 

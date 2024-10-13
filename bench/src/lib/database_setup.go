@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	dbUrlEnvVar = "DATABASE_URL"
+	dbUrlEnvVar      = "DATABASE_URL"
 	dbUsernameEnvVar = "DATABASE_USERNAME"
 	dbPasswordEnvVar = "DATABASE_PASSWORD"
 )
@@ -31,7 +31,7 @@ type DatabaseSetup struct {
 	impl DatabaseSetupImpl
 }
 
-func CreateDatabaseSetup(impl DatabaseSetupImpl) (*DatabaseSetup, error) {
+func NewDatabaseSetup(impl DatabaseSetupImpl) (*DatabaseSetup, error) {
 	connConfig, err := pgxpool.ParseConfig(os.Getenv(dbUrlEnvVar))
 	if err != nil {
 		return nil, err

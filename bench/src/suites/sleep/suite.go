@@ -32,12 +32,13 @@ func (s *Suite) SetSharedQueries() error {
 	return nil
 }
 
-func (s *Suite) GetTargeter(baseUrl string) vegeta.Targeter {
-	url := fmt.Sprintf("%s/api/sleep/%d", baseUrl, sleepDuration)
-
-	return vegeta.NewStaticTargeter(vegeta.Target{
-		Method: "GET",
-		URL:    url,
-		Body:   bytes.NewBuffer(nil).Bytes(),
-	})
+func (s *Suite) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {
+	return func(target *vegeta.Target) error {
+		*target = vegeta.Target{
+			Method: "GET",
+			URL:    fmt.Sprintf("%s/api/sleep/%d", baseUrl, sleepDuration),
+			Body:   bytes.NewBuffer(nil).Bytes(),
+		}
+		return nil
+	}
 }

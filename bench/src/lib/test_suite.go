@@ -7,7 +7,7 @@ type TestSuite interface {
 	Init() error
 	SetUpDatabase() error
 	SetSharedQueries() error
-	GetTargeter(baseUrl string) vegeta.Targeter
+	GetTargetProvider(baseUrl string) func(*vegeta.Target) error
 }
 
 type TestSuiteFactory func() (TestSuite, error)

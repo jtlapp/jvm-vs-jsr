@@ -18,7 +18,7 @@ func (s *Suite) GetName() string {
 func (s *Suite) Init() error {
 	impl := &SetupImpl{rand.New(rand.NewSource(SEED))}
 
-	databaseSetup, err := lib.CreateDatabaseSetup(impl)
+	databaseSetup, err := lib.NewDatabaseSetup(impl)
 	if err != nil {
 		return err
 	}
@@ -34,6 +34,10 @@ func (s *Suite) SetSharedQueries() error {
 	return s.databaseSetup.CreateSharedQueries()
 }
 
-func (s *Suite) GetTargeter(baseUrl string) vegeta.Targeter {
-	return nil
+func (s *Suite) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {
+	test := NewBenchmarkTest(baseUrl)
+	return func(target *vegeta.Target) error {
+		*target = *test.getRequest()
+		return nil
+	}
 }
