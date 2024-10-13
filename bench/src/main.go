@@ -10,6 +10,7 @@ import (
 
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-js.jtlapp.com/benchmark/lib"
+	"jvm-vs-js.jtlapp.com/benchmark/suites/orderitems"
 	"jvm-vs-js.jtlapp.com/benchmark/suites/sleep"
 	"jvm-vs-js.jtlapp.com/benchmark/suites/taggedints"
 )
@@ -29,6 +30,7 @@ type Config struct {
 var testSuitesSlice = []lib.TestSuite{
 	&sleep.Suite{},
 	&taggedints.Suite{},
+	&orderitems.Suite{},
 }
 
 func getTestSuite(name string) (lib.TestSuite, bool) {
@@ -44,6 +46,8 @@ func main() {
 	config := parseArgs()
 
 	suite, valid := getTestSuite(config.suiteName)
+	defer suite.Close()
+	
 	if !valid {
 		fail("Unknown test suite: %s", config.suiteName)
 	}

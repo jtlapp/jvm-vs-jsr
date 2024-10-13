@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	seed                = 12345
 	maxRows             = 1000000
 	percentLongRequests = 10
 	tagChars            = "0123456789ABCDEF"
@@ -23,7 +22,7 @@ type BenchmarkTest struct {
 func NewBenchmarkTest(baseUrl string) *BenchmarkTest {
 	return &BenchmarkTest{
 		baseUrl: baseUrl,
-		randGen: rand.New(rand.NewSource(seed)),
+		randGen: rand.New(rand.NewSource(randomSeed)),
 	}
 }
 

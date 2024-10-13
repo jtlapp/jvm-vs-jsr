@@ -8,6 +8,7 @@ type TestSuite interface {
 	SetUpDatabase() error
 	SetSharedQueries() error
 	GetTargetProvider(baseUrl string) func(*vegeta.Target) error
+	Close() error
 }
 
 type TestSuiteFactory func() (TestSuite, error)

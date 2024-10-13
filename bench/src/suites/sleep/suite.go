@@ -42,3 +42,7 @@ func (s *Suite) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {
 		return nil
 	}
 }
+
+func (s *Suite) Close() error {
+	return nil
+}

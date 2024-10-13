@@ -1,8 +1,6 @@
-package taggedints
+package orderitems
 
 import (
-	"math/rand"
-
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-js.jtlapp.com/benchmark/lib"
 )
@@ -12,11 +10,11 @@ type Suite struct {
 }
 
 func (s *Suite) GetName() string {
-	return "taggedints"
+	return "orderitems"
 }
 
 func (s *Suite) Init() error {
-	impl := &SetupImpl{rand.New(rand.NewSource(randomSeed))}
+	impl := &SetupImpl{}
 
 	databaseSetup, err := lib.NewDatabaseSetup(impl)
 	if err != nil {

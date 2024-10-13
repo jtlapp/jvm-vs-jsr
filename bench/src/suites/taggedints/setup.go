@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	ROW_COUNT  = 1000000
-	MAX_INT    = 1000
-	TAG_CHARS  = "0123456789ABCDEF"
-	TAG_LENGTH = len(TAG_CHARS)
-	SEED       = 12345
+	totalRows         = 1000000
+	maxRandomInt      = 1000
+	availableTagChars = "0123456789ABCDEF"
+	tagLength         = len(availableTagChars)
+	randomSeed        = 12345
 )
 
 type SetupImpl struct {
@@ -34,10 +34,10 @@ func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
 }
 
 func (s *SetupImpl) PopulateTables(conn *pgx.Conn) error {
-	for i := 1; i <= ROW_COUNT; i++ {
+	for i := 1; i <= totalRows; i++ {
 		tag1 := s.createTag()
 		tag2 := s.createTag()
-		intVal := s.randGen.Intn(MAX_INT)
+		intVal := s.randGen.Intn(maxRandomInt)
 
 		query := `INSERT INTO tagged_ints (tag1, tag2, int, created_at) VALUES ($1, $2, $3, NOW())`
 		_, err := conn.Exec(context.Background(), query, tag1, tag2, intVal)
@@ -65,5 +65,5 @@ func (s *SetupImpl) GetSharedQueries(conn *pgx.Conn) []lib.SharedQuery {
 
 // Use the local random generator for tag creation
 func (s *SetupImpl) createTag() string {
-	return string(TAG_CHARS[s.randGen.Intn(TAG_LENGTH)]) + string(TAG_CHARS[s.randGen.Intn(TAG_LENGTH)])
+	return string(availableTagChars[s.randGen.Intn(tagLength)]) + string(availableTagChars[s.randGen.Intn(tagLength)])
 }

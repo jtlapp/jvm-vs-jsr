@@ -47,26 +47,26 @@ func NewDatabaseSetup(impl DatabaseSetupImpl) (*DatabaseSetup, error) {
 	return &DatabaseSetup{conn, impl}, nil
 }
 
-func (bs *DatabaseSetup) PopulateDatabase() error {
-	if err := DropTables(bs.conn); err != nil {
+func (ds *DatabaseSetup) PopulateDatabase() error {
+	if err := DropTables(ds.conn); err != nil {
 		return err
 	}
-	if err := bs.impl.CreateTables(bs.conn); err != nil {
+	if err := ds.impl.CreateTables(ds.conn); err != nil {
 		return err
 	}
-	return bs.impl.PopulateTables(bs.conn)
+	return ds.impl.PopulateTables(ds.conn)
 }
 
-func (bs *DatabaseSetup) CreateSharedQueries() error {
-	if err := EmptyTable(bs.conn, "shared_queries"); err != nil {
+func (ds *DatabaseSetup) CreateSharedQueries() error {
+	if err := EmptyTable(ds.conn, "shared_queries"); err != nil {
 		return err
 	}
 
 	sql := `INSERT INTO shared_queries (name, query, returns) VALUES ($1, $2, $3)`
 
-	sharedQueries := bs.impl.GetSharedQueries(bs.conn)
+	sharedQueries := ds.impl.GetSharedQueries(ds.conn)
 	for _, sharedQuery := range sharedQueries {
-		_, err := bs.conn.Exec(context.Background(), sql, sharedQuery.Name, sharedQuery.Query, sharedQuery.Returns)
+		_, err := ds.conn.Exec(context.Background(), sql, sharedQuery.Name, sharedQuery.Query, sharedQuery.Returns)
 		if err != nil {
 			return err
 		}
@@ -74,6 +74,6 @@ func (bs *DatabaseSetup) CreateSharedQueries() error {
 	return nil
 }
 
-func (bs *DatabaseSetup) Release() error {
-	return bs.conn.Close(context.Background())
+func (ds *DatabaseSetup) Release() error {
+	return ds.conn.Close(context.Background())
 }
