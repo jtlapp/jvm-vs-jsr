@@ -7,14 +7,14 @@ TIMEOUT=30s
 cd helm/helmfile
 
 if [ "$CHART_NAME" == "client" ]; then
-    helmfile apply --selector clientGroup=true
+    helmfile apply --selector clientGroup=true --suppress-diff -q
 
     echo "Waiting for pods to start..."
     sleep 4
 
     NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='ExternalIP')].address}")
     NODE_PORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services grafana)
-    PASSWORD=$(kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode)
+    PASSWORD=$(kubectl get secret grafana -o jsonpath="{.data.admin-password}" | base64 --decode)
 
     echo
     echo "Grafana URL: http://$NODE_IP:$NODE_PORT"
@@ -33,7 +33,7 @@ else
     if [ "$CHART_NAME" == "backend-postgres" ]; then
         helmfile -l name=$CHART_NAME apply --suppress-diff -q
     else
-        helmfile apply --selector appGroup=true
+        helmfile apply --selector appGroup=true --suppress-diff -q
     fi
 
 fi

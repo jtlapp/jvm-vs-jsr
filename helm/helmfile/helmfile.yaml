@@ -22,14 +22,14 @@ releases:
   - name: prometheus
     chart: prometheus-community/prometheus
     values:
-      - helm/charts/values-prometheus.yaml
+      - charts/values-prometheus.yaml
     labels:
       clientGroup: "true"
 
   - name: grafana
     chart: grafana/grafana
     values:
-      - helm/charts/values-grafana.yaml
+      - charts/values-grafana.yaml
     labels:
       clientGroup: "true"
 

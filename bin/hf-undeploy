@@ -6,9 +6,9 @@ TIMEOUT=30s
 cd helm/helmfile
 
 if [ "$CHART_NAME" == "client" ]; then
-    helmfile --selector clientGroup=true destroy
+    helmfile --selector clientGroup=true destroy -q
 elif [ "$CHART_NAME" == "backend-postgres" ]; then
     helmfile -l name=backend-postgres destroy -q
 else
-    helmfile --selector appGroup=true destroy
+    helmfile --selector appGroup=true destroy -q
 fi
