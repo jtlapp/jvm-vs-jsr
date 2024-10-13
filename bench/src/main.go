@@ -76,7 +76,10 @@ func main() {
 }
 
 func parseArgs() Config {
-	if len(os.Args) < 3 {
+	if len(os.Args) == 1 {
+		showUsage()
+		os.Exit(0)
+	} else if len(os.Args) < 3 {
 		failWithUsage("Too few arguments")
 	}
 
@@ -131,9 +134,18 @@ func fail(format string, a ...interface{}) {
 
 func failWithUsage(format string, a ...interface{}) {
 	fmt.Printf(format+"\n", a...)
-	fmt.Printf("Usage: %s <test-suite-name> setup-all|set-queries|test\n", os.Args[0])
-	fmt.Println("'test' options:")
-	fmt.Println("  -rate <requests-per-second>")
-	fmt.Println("  -duration <seconds>")
+	showUsage()
 	os.Exit(1)
+}
+
+func showUsage() {
+	fmt.Printf("\nUsage: %s <test-suite-name> setup-all | set-queries | test\n", os.Args[0])
+	fmt.Println("\nTest suites:")
+	for _, suite := range testSuitesSlice {
+		fmt.Printf("    %s\n", suite.GetName())
+	}
+	fmt.Println("\n'test' options:")
+	fmt.Println("    -rate <requests-per-second>")
+	fmt.Println("    -duration <seconds>")
+	fmt.Println()
 }

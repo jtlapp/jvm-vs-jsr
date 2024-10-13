@@ -48,32 +48,22 @@ Create your cluster and configure `kubectl` to use it. Then:
 
 ```bash
 mvn clean install
-./bin/deploy common
+./bin/deploy database
+./bin/deploy client
 ./bin/deploy spring-jdbc-kernel # or another app
 ```
 
 ## Testing
 
 1. Exec into the client pod using bash: `kubectl exec -it <client-pod> -- bash`.
-2. Modify `/scripts/setup.ts` to set up the desired queries.
-3. Run `deno run -A setup.ts`.
-4. Run the appropriate Lua benchmarking script. E.g.:
+2. Run `./benchmark <test-suite> setup-all` to set up the test suite of the given name.
+3. Run `./benchmark <test-suite> test -rate <requests-per-sec> -duration <seconds>`.
 
-```bash
-cd tests/tagged-ints
-wrk -c200 -t4 -R1000 -d1s -s query.lua http://api-service:8080
-```
+Run `./benchmark` to get usage help.
 
-- `-c200` &ndash; 200 connections
-- `-t4` &ndash; over 4 threads
-- `-R1000` &ndash; at a rate of 1000 requests per second
-- `-s <script>` &ndash; running the test in this script
-- `<host>` &ndash; hitting this host and port
-
-`query.lua` scripts print the some of the first response for each unique combination of
+When running a test, the test outputs the first response for each unique combination of
 status code, shared query name, and error message. For queries erroneously returning
-non-JSON, also prints each unique combination of status code and response body. Several
-messages may appear for each combination when running in mulitple threads.
+non-JSON, it also prints each unique combination of status code and response body.
 
 ## Useful commands:
 
@@ -81,6 +71,7 @@ messages may appear for each combination when running in mulitple threads.
 ./bin/redeploy <release-name>
 ./bin/replace <deployed-release> <replacement-release>
 
-./bin/undeploy common
+./bin/undeploy database
+./bin/undeploy client
 ./bin/undeploy spring-jdbc-kernel # or another app
 ```
