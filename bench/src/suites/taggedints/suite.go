@@ -8,25 +8,26 @@ import (
 )
 
 type Suite struct {
-	databaseSetup lib.DatabaseSetup
+	databaseSetup *lib.DatabaseSetup
 }
 
 func (s *Suite) GetName() string {
 	return "taggedints"
 }
 
-func (s *Suite) Init() error {
-	impl := &SetupImpl{rand.New(rand.NewSource(randomSeed))}
-
-	databaseSetup, err := lib.NewDatabaseSetup(impl)
+func (s *Suite) Init(backendDB *lib.BackendDB) error {
+	dbPool, err := backendDB.GetPool()
 	if err != nil {
 		return err
 	}
-	s.databaseSetup = *databaseSetup
+	randGen := rand.New(rand.NewSource(randomSeed))
+	impl := &SetupImpl{dbPool, randGen}
+
+	s.databaseSetup = lib.NewDatabaseSetup(dbPool, impl)
 	return nil
 }
 
-func (s *Suite) SetUpDatabase() error {
+func (s *Suite) SetUpTestTables() error {
 	return s.databaseSetup.PopulateDatabase()
 }
 
@@ -40,8 +41,4 @@ func (s *Suite) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {
 		*target = *test.getRequest()
 		return nil
 	}
-}
-
-func (s *Suite) Close() error {
-	return s.databaseSetup.Release()
 }

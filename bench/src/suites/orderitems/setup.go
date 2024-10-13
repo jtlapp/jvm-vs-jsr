@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"jvm-vs-js.jtlapp.com/benchmark/lib"
 )
 
@@ -15,9 +15,11 @@ const (
 	itemsPerOrder = 4
 )
 
-type SetupImpl struct{}
+type SetupImpl struct {
+	dbPool *pgxpool.Pool
+}
 
-func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
+func (s *SetupImpl) CreateTables() error {
 	query := `
         CREATE TABLE IF NOT EXISTS users (
           id VARCHAR PRIMARY KEY,
@@ -25,7 +27,7 @@ func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
           email VARCHAR UNIQUE NOT NULL,
           created_at TIMESTAMP DEFAULT NOW()
         )`
-	_, err := conn.Exec(context.Background(), query)
+	_, err := s.dbPool.Exec(context.Background(), query)
 	if err != nil {
 		return err
 	}
@@ -39,7 +41,7 @@ func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
           stock_quantity INTEGER,
           created_at TIMESTAMP DEFAULT NOW()
         )`
-	_, err = conn.Exec(context.Background(), query)
+	_, err = s.dbPool.Exec(context.Background(), query)
 	if err != nil {
 		return err
 	}
@@ -51,7 +53,7 @@ func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
           order_date TIMESTAMP,
           status VARCHAR
         )`
-	_, err = conn.Exec(context.Background(), query)
+	_, err = s.dbPool.Exec(context.Background(), query)
 	if err != nil {
 		return err
 	}
@@ -62,17 +64,16 @@ func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
           order_id VARCHAR REFERENCES orders(id),
           product_id VARCHAR REFERENCES products(id),
           quantity INTEGER
-        ) status VARCHAR
         )`
-	_, err = conn.Exec(context.Background(), query)
+	_, err = s.dbPool.Exec(context.Background(), query)
 	return err
 }
 
-func (s *SetupImpl) PopulateTables(conn *pgx.Conn) error {
+func (s *SetupImpl) PopulateTables() error {
 	for i := 1; i <= totalUsers; i++ {
 		query := `INSERT INTO users (id, username, email, created_at) VALUES ($1, $2, $3, NOW())`
 		username := fmt.Sprintf("user%d", i)
-		_, err := conn.Exec(context.Background(), query, toUserID(i), username, username+"@example.com")
+		_, err := s.dbPool.Exec(context.Background(), query, toUserID(i), username, username+"@example.com")
 		if err != nil {
 			return err
 		}
@@ -82,7 +83,7 @@ func (s *SetupImpl) PopulateTables(conn *pgx.Conn) error {
 		query := `INSERT INTO products (id, name, description, price, stock_quantity, created_at)
 					VALUES ($1, $2, $3, $4, $5, NOW())`
 		productName := fmt.Sprintf("product-%d", i)
-		_, err := conn.Exec(context.Background(), query, toProductID(i), productName,
+		_, err := s.dbPool.Exec(context.Background(), query, toProductID(i), productName,
 			productName+" description", float64(i%50)+0.99, 100)
 		if err != nil {
 			return err
@@ -98,7 +99,7 @@ func (s *SetupImpl) PopulateTables(conn *pgx.Conn) error {
 
 			query := `INSERT INTO orders (id, user_id, order_date, status)
 						VALUES ($1, $2, NOW(), 'shipped')`
-			_, err := conn.Exec(context.Background(), query, toOrderID(userID, j))
+			_, err := s.dbPool.Exec(context.Background(), query, toOrderID(userID, j), userID)
 			if err != nil {
 				return err
 			}
@@ -109,7 +110,7 @@ func (s *SetupImpl) PopulateTables(conn *pgx.Conn) error {
 				orderItemID := toOrderItemID(orderID, k)
 				productNumber := (orderedItemCount % totalProducts) + 1
 				productID := toProductID(productNumber)
-				_, err := conn.Exec(context.Background(), query, orderItemID, orderID, productID, 1)
+				_, err := s.dbPool.Exec(context.Background(), query, orderItemID, orderID, productID, 1)
 				if err != nil {
 					return err
 				}
@@ -120,7 +121,7 @@ func (s *SetupImpl) PopulateTables(conn *pgx.Conn) error {
 	return nil
 }
 
-func (s *SetupImpl) GetSharedQueries(conn *pgx.Conn) []lib.SharedQuery {
+func (s *SetupImpl) GetSharedQueries() []lib.SharedQuery {
 	return []lib.SharedQuery{
 		{
 			Name: "orderitems_getOrder",

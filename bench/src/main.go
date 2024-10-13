@@ -45,19 +45,20 @@ func getTestSuite(name string) (lib.TestSuite, bool) {
 func main() {
 	config := parseArgs()
 
+	backendDB := lib.NewBackendDatabase()
+	defer backendDB.ClosePool()
+
 	suite, valid := getTestSuite(config.suiteName)
-	defer suite.Close()
-	
 	if !valid {
 		fail("Unknown test suite: %s", config.suiteName)
 	}
-	if err := suite.Init(); err != nil {
+	if err := suite.Init(backendDB); err != nil {
 		fail("Initialization failed: %v", err)
 	}
 
 	switch config.mode {
 	case "setup-all":
-		if err := suite.SetUpDatabase(); err != nil {
+		if err := suite.SetUpTestTables(); err != nil {
 			fail("Failed to set up DB: %v", err)
 		}
 		if err := suite.SetSharedQueries(); err != nil {

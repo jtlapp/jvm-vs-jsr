@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	vegeta "github.com/tsenart/vegeta/lib"
+	"jvm-vs-js.jtlapp.com/benchmark/lib"
 )
 
 const (
@@ -17,12 +18,12 @@ func (s *Suite) GetName() string {
 	return "sleep"
 }
 
-func (s *Suite) Init() error {
+func (s *Suite) Init(backendDB *lib.BackendDB) error {
 	// nothing to do
 	return nil
 }
 
-func (s *Suite) SetUpDatabase() error {
+func (s *Suite) SetUpTestTables() error {
 	// nothing to do
 	return nil
 }
@@ -41,8 +42,4 @@ func (s *Suite) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {
 		}
 		return nil
 	}
-}
-
-func (s *Suite) Close() error {
-	return nil
 }

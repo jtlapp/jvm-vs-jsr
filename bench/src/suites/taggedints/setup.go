@@ -4,7 +4,7 @@ import (
 	"context"
 	"math/rand"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"jvm-vs-js.jtlapp.com/benchmark/lib"
 )
 
@@ -17,10 +17,11 @@ const (
 )
 
 type SetupImpl struct {
+	dbPool  *pgxpool.Pool
 	randGen *rand.Rand
 }
 
-func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
+func (s *SetupImpl) CreateTables() error {
 	query := `
         CREATE TABLE IF NOT EXISTS tagged_ints (
           id BIGSERIAL PRIMARY KEY,
@@ -29,18 +30,18 @@ func (s *SetupImpl) CreateTables(conn *pgx.Conn) error {
           int INTEGER NOT NULL,
           created_at TIMESTAMP DEFAULT NOW()
         )`
-	_, err := conn.Exec(context.Background(), query)
+	_, err := s.dbPool.Exec(context.Background(), query)
 	return err
 }
 
-func (s *SetupImpl) PopulateTables(conn *pgx.Conn) error {
+func (s *SetupImpl) PopulateTables() error {
 	for i := 1; i <= totalRows; i++ {
 		tag1 := s.createTag()
 		tag2 := s.createTag()
 		intVal := s.randGen.Intn(maxRandomInt)
 
 		query := `INSERT INTO tagged_ints (tag1, tag2, int, created_at) VALUES ($1, $2, $3, NOW())`
-		_, err := conn.Exec(context.Background(), query, tag1, tag2, intVal)
+		_, err := s.dbPool.Exec(context.Background(), query, tag1, tag2, intVal)
 		if err != nil {
 			return err
 		}
@@ -48,7 +49,7 @@ func (s *SetupImpl) PopulateTables(conn *pgx.Conn) error {
 	return nil
 }
 
-func (s *SetupImpl) GetSharedQueries(conn *pgx.Conn) []lib.SharedQuery {
+func (s *SetupImpl) GetSharedQueries() []lib.SharedQuery {
 	return []lib.SharedQuery{
 		{
 			Name:    "taggedints_sumInts",

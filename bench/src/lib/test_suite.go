@@ -4,11 +4,10 @@ import vegeta "github.com/tsenart/vegeta/lib"
 
 type TestSuite interface {
 	GetName() string
-	Init() error
-	SetUpDatabase() error
+	Init(backendDB *BackendDB) error
+	SetUpTestTables() error
 	SetSharedQueries() error
 	GetTargetProvider(baseUrl string) func(*vegeta.Target) error
-	Close() error
 }
 
 type TestSuiteFactory func() (TestSuite, error)

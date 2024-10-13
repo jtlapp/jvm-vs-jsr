@@ -2,16 +2,8 @@ package lib
 
 import (
 	"context"
-	"os"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-)
-
-const (
-	dbUrlEnvVar      = "DATABASE_URL"
-	dbUsernameEnvVar = "DATABASE_USERNAME"
-	dbPasswordEnvVar = "DATABASE_PASSWORD"
 )
 
 type SharedQuery struct {
@@ -21,59 +13,43 @@ type SharedQuery struct {
 }
 
 type DatabaseSetupImpl interface {
-	CreateTables(conn *pgx.Conn) error
-	PopulateTables(conn *pgx.Conn) error
-	GetSharedQueries(conn *pgx.Conn) []SharedQuery
+	CreateTables() error
+	PopulateTables() error
+	GetSharedQueries() []SharedQuery
 }
 
 type DatabaseSetup struct {
-	conn *pgx.Conn
+	pool *pgxpool.Pool
 	impl DatabaseSetupImpl
 }
 
-func NewDatabaseSetup(impl DatabaseSetupImpl) (*DatabaseSetup, error) {
-	connConfig, err := pgxpool.ParseConfig(os.Getenv(dbUrlEnvVar))
-	if err != nil {
-		return nil, err
-	}
-
-	connConfig.ConnConfig.User = os.Getenv(dbUsernameEnvVar)
-	connConfig.ConnConfig.Password = os.Getenv(dbPasswordEnvVar)
-
-	conn, err := pgx.ConnectConfig(context.Background(), connConfig.ConnConfig)
-	if err != nil {
-		return nil, err
-	}
-	return &DatabaseSetup{conn, impl}, nil
+func NewDatabaseSetup(pool *pgxpool.Pool, impl DatabaseSetupImpl) *DatabaseSetup {
+	return &DatabaseSetup{pool, impl}
 }
 
 func (ds *DatabaseSetup) PopulateDatabase() error {
-	if err := DropTables(ds.conn); err != nil {
+	if err := DropTables(ds.pool); err != nil {
 		return err
 	}
-	if err := ds.impl.CreateTables(ds.conn); err != nil {
+	if err := ds.impl.CreateTables(); err != nil {
 		return err
 	}
-	return ds.impl.PopulateTables(ds.conn)
+	return ds.impl.PopulateTables()
 }
 
 func (ds *DatabaseSetup) CreateSharedQueries() error {
-	if err := EmptyTable(ds.conn, "shared_queries"); err != nil {
+	if err := EmptyTable(ds.pool, "shared_queries"); err != nil {
 		return err
 	}
 
 	sql := `INSERT INTO shared_queries (name, query, returns) VALUES ($1, $2, $3)`
 
-	sharedQueries := ds.impl.GetSharedQueries(ds.conn)
+	sharedQueries := ds.impl.GetSharedQueries()
 	for _, sharedQuery := range sharedQueries {
-		_, err := ds.conn.Exec(context.Background(), sql, sharedQuery.Name, sharedQuery.Query, sharedQuery.Returns)
+		_, err := ds.pool.Exec(context.Background(), sql, sharedQuery.Name, sharedQuery.Query, sharedQuery.Returns)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func (ds *DatabaseSetup) Release() error {
-	return ds.conn.Close(context.Background())
 }
