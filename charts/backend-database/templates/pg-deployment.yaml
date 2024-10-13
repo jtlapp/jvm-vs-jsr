@@ -29,7 +29,7 @@ spec:
           ports:
             - containerPort: {{ .Values.global.database.port }}
           volumeMounts:
-            - name: setup-backend-sql
+            - name: backend-sql-config
               mountPath: /docker-entrypoint-initdb.d/
 
         - name: pgbouncer
@@ -45,7 +45,7 @@ spec:
 
       volumes:
 
-        - name: setup-backend-sql
+        - name: backend-sql-config
           configMap:
             name: backend-sql-config
 
