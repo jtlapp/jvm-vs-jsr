@@ -1,0 +1,76 @@
+helmDefaults:
+  timeout: 30
+
+releases:
+  # backend database
+
+  - name: backend-database
+    chart: charts/backend-database
+    values:
+      - charts/global-values.yaml
+      - charts/values-secret.yaml
+
+  # client group
+
+  - name: client
+    chart: charts/client
+    labels:
+      clientGroup: "true"
+
+  - name: prometheus
+    chart: prometheus-community/prometheus
+    values:
+      - helm/charts/values-prometheus.yaml
+    labels:
+      clientGroup: "true"
+
+  - name: grafana
+    chart: grafana/grafana
+    values:
+      - helm/charts/values-grafana.yaml
+    labels:
+      clientGroup: "true"
+
+  # application group
+
+  - name: jooby-nomvc-app
+    chart: charts/app1
+    installed: false
+    labels:
+      appGroup: "true"
+
+  - name: jooby-r2dbc-app
+    chart: charts/app2
+    installed: false
+    labels:
+      appGroup: "true"
+
+  - name: jooby-vertx-app
+    chart: charts/app2
+    installed: false
+    labels:
+      appGroup: "true"
+
+  - name: spring-async-app
+    chart: charts/app2
+    installed: false
+    labels:
+      appGroup: "true"
+
+  - name: spring-jdbc-kernel-app
+    chart: charts/app2
+    installed: false
+    labels:
+      appGroup: "true"
+
+  - name: spring-jdbc-virtual-app
+    chart: charts/app2
+    installed: false
+    labels:
+      appGroup: "true"
+
+  - name: spring-webflux-app
+    chart: charts/app2
+    installed: false
+    labels:
+      appGroup: "true"

@@ -1,0 +1,39 @@
+#!/bin/bash
+# Deploys the Helm chart of the provided name along with associated components.
+
+CHART_NAME=$1
+TIMEOUT=30s
+
+cd helm/helmfile
+
+if [ "$CHART_NAME" == "client" ]; then
+    helmfile apply --selector clientGroup=true
+
+    echo "Waiting for pods to start..."
+    sleep 4
+
+    NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='ExternalIP')].address}")
+    NODE_PORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services grafana)
+    PASSWORD=$(kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode)
+
+    echo
+    echo "Grafana URL: http://$NODE_IP:$NODE_PORT"
+    echo "  Username: admin"
+    echo "  Password: $PASSWORD"
+    echo
+
+else
+
+    if [[ "$CHART_NAME" =~ "spring-jdbc" ]]; then
+        push_image "spring-jdbc-app"
+    elif [ "$CHART_NAME" != "backend-database" ]; then
+        push_image "$CHART_NAME"
+    fi
+
+    if [ "$CHART_NAME" == "backend-database" ]; then
+        helmfile -l name=$CHART_NAME apply --suppress-diff -q
+    else
+        helmfile apply --selector appGroup=true
+    fi
+
+fi

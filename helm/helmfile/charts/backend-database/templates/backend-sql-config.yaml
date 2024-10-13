@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-sql-config
+data:
+  init-query.sql: |
+    CREATE TABLE shared_queries (
+      name VARCHAR PRIMARY KEY,
+      query VARCHAR NOT NULL,
+      returns VARCHAR NOT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT NOW()
+    )

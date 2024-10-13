@@ -1,0 +1,45 @@
+resources:
+  requests:
+    memory: 500Mi
+    cpu: 200m
+  limits:
+    memory: 1Gi
+    cpu: 500m
+
+nodeSelector:
+  kubernetes.io/hostname: client
+
+service:
+  type: NodePort
+  port: 3000
+  nodePort: 31993
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-server:9090
+        isDefault: true
+        jsonData:
+          timeInterval: "2s"
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        options:
+          path: /var/lib/grafana/dashboards
+
+extraConfigmapMounts:
+  - name: node-metrics-dashboard
+    mountPath: /var/lib/grafana/dashboards
+    configMap: node-metrics-dashboard

@@ -89,6 +89,9 @@ This approach deploys everything using only Helm charts and the `bin/` scripts p
 
 Planned, but not yet supported.
 
+Requires installing `helmfile` and running `helmfile init` to further install the Helm "diff" 
+and "secrets" plugins. 
+
 ### Timoni
 
 PLanned, but not yet supported. [See here.](https://timoni.sh/)

@@ -1,0 +1,14 @@
+# Removes deployment of the chart of the provided name and its associated artifacts.
+
+CHART_NAME=$1
+TIMEOUT=30s
+
+cd helm/helmfile
+
+if [ "$CHART_NAME" == "client" ]; then
+    helmfile --selector clientGroup=true destroy
+elif [ "$CHART_NAME" == "backend-database" ]; then
+    helmfile -l name=backend-database destroy -q
+else
+    helmfile --selector appGroup=true destroy
+fi

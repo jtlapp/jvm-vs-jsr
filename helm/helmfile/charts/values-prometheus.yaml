@@ -1,0 +1,20 @@
+server:
+  retention: 3d
+  scrape_interval: 2s
+  resources:
+    requests:
+      memory: 500Mi
+      cpu: 500m
+    limits:
+      memory: 1Gi
+      cpu: 1
+  service:
+    servicePort: 9090
+  nodeSelector:
+    kubernetes.io/hostname: client
+
+alertmanager:
+  enabled: false
+
+prometheus-pushgateway:
+  enabled: false
