@@ -4,7 +4,7 @@ metadata:
   name: pgbouncer-service
 spec:
   selector:
-    app: postgres
+    app: backend-postgres
   ports:
     - port: {{ .Values.global.pgbouncer.port }}
       targetPort: {{ .Values.global.pgbouncer.port }}

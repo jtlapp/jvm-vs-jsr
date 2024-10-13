@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  name: backend-postgres
 spec:
   replicas: {{ .Values.global.database.replicaCount }}
   selector:
     matchLabels:
-      app: postgres
+      app: backend-postgres
   template:
     metadata:
       labels:
-        app: postgres
+        app: backend-postgres
     spec:
       nodeSelector:
         kubernetes.io/hostname: database
 
       containers:
 
-        - name: postgres
+        - name: backend-postgres
           image: postgres:15
           env:
             - name: POSTGRES_DB
