@@ -1,0 +1,2 @@
+./bin/jc-undeploy $1
+./bin/jc-deploy $2

@@ -1,2 +1,0 @@
-./bin/undeploy $1
-./bin/deploy $1

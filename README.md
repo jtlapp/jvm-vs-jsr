@@ -48,9 +48,9 @@ Create your cluster and configure `kubectl` to use it. Then:
 
 ```bash
 mvn clean install
-./bin/deploy database
-./bin/deploy client
-./bin/deploy spring-jdbc-kernel # or another app
+./bin/jc-deploy database
+./bin/jc-deploy client
+./bin/jc-deploy spring-jdbc-kernel # or another app
 ```
 
 ## Testing
@@ -68,10 +68,27 @@ non-JSON, it also prints each unique combination of status code and response bod
 ## Useful commands:
 
 ```bash
-./bin/redeploy <release-name>
-./bin/replace <deployed-release> <replacement-release>
+./bin/jc-redeploy <release-name>
+./bin/jc-replace <deployed-release> <replacement-release>
 
-./bin/undeploy database
-./bin/undeploy client
-./bin/undeploy spring-jdbc-kernel # or another app
+./bin/jc-undeploy database
+./bin/jc-undeploy client
+./bin/jc-undeploy spring-jdbc-kernel # or another app
 ```
+
+## Alternative Helm Deployments
+
+I'm temporarily also using this repo to explore various approaches to deploying Helm charts to 
+Kubernetes. The following approaches are supported:
+
+### Just Charts
+
+This approach deploys everything using only Helm charts and the `bin/` scripts prefixed `jc-`.
+
+### Helmfile
+
+Planned, but not yet supported.
+
+### Timoni
+
+PLanned, but not yet supported. [See here.](https://timoni.sh/)
