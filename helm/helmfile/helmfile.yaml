@@ -60,16 +60,30 @@ releases:
       appGroup: "true"
 
   - name: spring-jdbc-kernel-app
-    chart: charts/app2
-    installed: false
+    chart: charts/spring-jdbc-app
+    installed: {{ .Values | getOrNil "spring-jdbc-kernel-app_installed" | default false }}
     labels:
       appGroup: "true"
+    values:
+      - charts/global-values.yaml
+      - charts/values-secret.yaml
+      - spring:
+          threads:
+            virtual:
+              enabled: "false"
 
   - name: spring-jdbc-virtual-app
-    chart: charts/app2
-    installed: false
+    chart: charts/spring-jdbc-app
+    installed: {{ .Values | getOrNil "spring-jdbc-virtual-app_installed" | default false }}
     labels:
       appGroup: "true"
+    values:
+      - charts/global-values.yaml
+      - charts/values-secret.yaml
+      - spring:
+          threads:
+            virtual:
+              enabled: "true"
 
   - name: spring-webflux-app
     chart: charts/app2
