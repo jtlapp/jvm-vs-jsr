@@ -14,6 +14,7 @@ cd helm/helmfile
 if [ "$CHART_NAME" == "client" ]; then
 
     push_image "bench"
+    helmfile destroy --selector clientGroup=true -q
     helmfile apply --selector clientGroup=true --suppress-diff -q
 
     echo "Waiting for pods to start..."
@@ -40,6 +41,7 @@ else
     if [ "$CHART_NAME" == "backend-postgres" ]; then
         helmfile -l name=$CHART_NAME apply --suppress-diff -q
     else
+        helmfile destroy --selector appGroup=true -q
         helmfile apply --selector appGroup=true --state-values-set "${CHART_NAME}_installed=true" --suppress-diff -q
     fi
 
