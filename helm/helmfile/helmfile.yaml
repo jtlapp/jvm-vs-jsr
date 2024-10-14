@@ -32,6 +32,15 @@ releases:
       - charts/values-grafana.yaml
     labels:
       clientGroup: "true"
+    hooks:
+      - events: ["presync"]
+        command: "kubectl"
+        args: [
+          "create",
+          "configmap",
+          "node-metrics-dashboard",
+          "--from-file=charts/client/dashboards/node-metrics-dashboard.json"
+        ]
 
   # application group
 
