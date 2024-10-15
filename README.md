@@ -83,14 +83,18 @@ Kubernetes. The following approaches are supported:
 
 ### Just Charts
 
-This approach deploys everything using only Helm charts and the `bin/` scripts prefixed `jc-`.
+This approach deploys using only helm charts via the `bin/` scripts prefixed `jc-`.
 
 ### Helmfile
 
-Planned, but not yet supported.
+This approach deploys using helmfile and helm charts via the `bin/` scripts prefixed `hf-`. The 
+approach works but is not yet idiomatic.
 
-Requires installing `helmfile` and running `helmfile init` to further install the Helm "diff" 
-and "secrets" plugins. 
+Run `hf-deploy` to deploy a chart or replace an existing chart in the same chart group. Run 
+`hf-undeploy` to remove a chart.
+
+Requires first installing `helmfile` and running `helmfile init` to further install the Helm "diff" 
+and "secrets" plugins.
 
 ### Timoni
 
