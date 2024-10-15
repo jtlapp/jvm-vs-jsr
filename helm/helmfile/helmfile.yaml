@@ -41,21 +41,19 @@ releases:
     labels:
       clientGroup: "true"
     hooks:
-      - events: ["presync"]
-        command: "kubectl"
-        args: [
-          "create",
-          "configmap",
-          "node-metrics-dashboard",
-          "--from-file=charts/client/dashboards/node-metrics-dashboard.json"
-        ]
-      - events: ["postuninstall"]
-        command: "kubectl"
-        args: [
-          "delete",
-          "configmap",
-          "node-metrics-dashboard"
-        ]
+      - events: ['presync']
+        command: 'kubectl'
+        args:
+          - create
+          - configmap
+          - node-metrics-dashboard
+          - --from-file=charts/client/dashboards/node-metrics-dashboard.json
+      - events: ['postuninstall']
+        command: 'kubectl'
+        args:
+          - delete
+          - configmap
+          - node-metrics-dashboard
 
   # application group
 
