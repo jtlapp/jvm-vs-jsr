@@ -1,7 +1,7 @@
 environments:
   default:
     values:
-      # provides the global values to this helmfile
+      # provides the global values to templates in this helmfile
       - charts/global-values.yaml
 
 ---
@@ -60,10 +60,18 @@ releases:
   # application group
 
   - name: jooby-nomvc-app
-    chart: charts/app1
-    installed: false
+    chart: charts/generic-app
+    installed: {{ .Values | getOrNil "jooby-nomvc-app_installed" | default false }}
     labels:
       appGroup: "true"
+    values:
+      - charts/global-values.yaml
+      - charts/values-secret.yaml
+      - env:
+          SERVER_PORT: "{{ .Values.global.app.port }}"
+          DATABASE_URL: "jdbc:{{ .Values.global.pgbouncer.host }}"
+          DATABASE_USERNAME: "{{ .Values.global.database.username }}"
+          DATABASE_PASSWORD: "{{ .Values.global.database.password }}"
 
   - name: jooby-r2dbc-app
     chart: charts/generic-app
@@ -82,16 +90,29 @@ releases:
           DATABASE_PASSWORD: "{{ .Values.global.database.password }}"
 
   - name: jooby-vertx-app
-    chart: charts/app2
-    installed: false
+    chart: charts/generic-app
+    installed: {{ .Values | getOrNil "jooby-vertx-app_installed" | default false }}
     labels:
       appGroup: "true"
+    values:
+      - charts/global-values.yaml
+      - charts/values-secret.yaml
+      - env:
+          SERVER_PORT: "{{ .Values.global.app.port }}"
+          DATABASE_HOST_NAME: "{{ .Values.global.pgbouncer.hostName }}"
+          DATABASE_PORT: "{{ .Values.global.pgbouncer.port }}"
+          DATABASE_NAME: "{{ .Values.global.database.name }}"
+          DATABASE_USERNAME: "{{ .Values.global.database.username }}"
+          DATABASE_PASSWORD: "{{ .Values.global.database.password }}"
 
   - name: spring-async-app
-    chart: charts/app2
-    installed: false
+    chart: charts/generic-app
+    installed: {{ .Values | getOrNil "spring-async-app_installed" | default false }}
     labels:
       appGroup: "true"
+    values:
+      - charts/global-values.yaml
+      - charts/values-secret.yaml
 
   - name: spring-jdbc-kernel-app
     chart: charts/spring-jdbc-app
@@ -120,7 +141,15 @@ releases:
               enabled: "true"
 
   - name: spring-webflux-app
-    chart: charts/app2
-    installed: false
+    chart: charts/generic-app
+    installed: {{ .Values | getOrNil "spring-webflux-app_installed" | default false }}
     labels:
       appGroup: "true"
+    values:
+      - charts/global-values.yaml
+      - charts/values-secret.yaml
+      - env:
+          SERVER_PORT: "{{ .Values.global.app.port }}"
+          SPRING_R2DBC_URL: "r2dbc:{{ .Values.global.pgbouncer.host }}"
+          SPRING_R2DBC_USERNAME: "{{ .Values.global.database.username }}"
+          SPRING_R2DBC_PASSWORD: "{{ .Values.global.database.password }}"
