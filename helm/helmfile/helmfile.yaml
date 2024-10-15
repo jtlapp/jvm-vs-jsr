@@ -68,10 +68,14 @@ releases:
       - charts/global-values.yaml
       - charts/values-secret.yaml
       - env:
-          SERVER_PORT: "{{ .Values.global.app.port }}"
-          DATABASE_URL: "jdbc:{{ .Values.global.pgbouncer.host }}"
-          DATABASE_USERNAME: "{{ .Values.global.database.username }}"
-          DATABASE_PASSWORD: "{{ .Values.global.database.password }}"
+        - name: SERVER_PORT
+          value: "{{ .Values.global.app.port }}"
+        - name: DATABASE_URL
+          value: "jdbc:{{ .Values.global.pgbouncer.host }}"
+        - name: DATABASE_USERNAME
+          value: "{{ .Values.global.database.username }}"
+        - name: DATABASE_PASSWORD
+          value: "{{ .Values.global.database.password }}"
 
   - name: jooby-r2dbc-app
     chart: charts/generic-app
@@ -82,12 +86,18 @@ releases:
       - charts/global-values.yaml
       - charts/values-secret.yaml
       - env:
-          SERVER_PORT: "{{ .Values.global.app.port }}"
-          DATABASE_HOST_NAME: "{{ .Values.global.pgbouncer.hostName }}"
-          DATABASE_PORT: "{{ .Values.global.pgbouncer.port }}"
-          DATABASE_NAME: "{{ .Values.global.database.name }}"
-          DATABASE_USERNAME: "{{ .Values.global.database.username }}"
-          DATABASE_PASSWORD: "{{ .Values.global.database.password }}"
+        - name: SERVER_PORT
+          value: "{{ .Values.global.app.port }}"
+        - name: DATABASE_HOST_NAME
+          value: "{{ .Values.global.pgbouncer.hostName }}"
+        - name: DATABASE_PORT
+          value: "{{ .Values.global.pgbouncer.port }}"
+        - name: DATABASE_NAME
+          value: "{{ .Values.global.database.name }}"
+        - name: DATABASE_USERNAME
+          value: "{{ .Values.global.database.username }}"
+        - name: DATABASE_PASSWORD
+          value: "{{ .Values.global.database.password }}"
 
   - name: jooby-vertx-app
     chart: charts/generic-app
@@ -98,12 +108,18 @@ releases:
       - charts/global-values.yaml
       - charts/values-secret.yaml
       - env:
-          SERVER_PORT: "{{ .Values.global.app.port }}"
-          DATABASE_HOST_NAME: "{{ .Values.global.pgbouncer.hostName }}"
-          DATABASE_PORT: "{{ .Values.global.pgbouncer.port }}"
-          DATABASE_NAME: "{{ .Values.global.database.name }}"
-          DATABASE_USERNAME: "{{ .Values.global.database.username }}"
-          DATABASE_PASSWORD: "{{ .Values.global.database.password }}"
+        - name: SERVER_PORT
+          value: "{{ .Values.global.app.port }}"
+        - name: DATABASE_HOST_NAME
+          value: "{{ .Values.global.pgbouncer.hostName }}"
+        - name: DATABASE_PORT
+          value: "{{ .Values.global.pgbouncer.port }}"
+        - name: DATABASE_NAME
+          value: "{{ .Values.global.database.name }}"
+        - name: DATABASE_USERNAME
+          value: "{{ .Values.global.database.username }}"
+        - name: DATABASE_PASSWORD
+          value: "{{ .Values.global.database.password }}"
 
   - name: spring-async-app
     chart: charts/generic-app
@@ -149,7 +165,11 @@ releases:
       - charts/global-values.yaml
       - charts/values-secret.yaml
       - env:
-          SERVER_PORT: "{{ .Values.global.app.port }}"
-          SPRING_R2DBC_URL: "r2dbc:{{ .Values.global.pgbouncer.host }}"
-          SPRING_R2DBC_USERNAME: "{{ .Values.global.database.username }}"
-          SPRING_R2DBC_PASSWORD: "{{ .Values.global.database.password }}"
+        - name: SERVER_PORT
+          value: "{{ .Values.global.app.port }}"
+        - name: SPRING_R2DBC_URL
+          value: "r2dbc:{{ .Values.global.pgbouncer.host }}"
+        - name: SPRING_R2DBC_USERNAME
+          value: "{{ .Values.global.database.username }}"
+        - name: SPRING_R2DBC_PASSWORD
+          value: "{{ .Values.global.database.password }}"
