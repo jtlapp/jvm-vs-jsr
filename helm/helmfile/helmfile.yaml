@@ -65,7 +65,7 @@ releases:
     values:
       - charts/values-secret.yaml
       - charts/global-values.yaml
-      - env-vars/generic-evs.yaml.gotmpl
+      - env-vars/generic-env-vars.yaml.gotmpl
 
   - name: jooby-r2dbc-app
     chart: charts/generic-app
@@ -75,7 +75,7 @@ releases:
     values:
       - charts/values-secret.yaml
       - charts/global-values.yaml
-      - env-vars/generic-evs.yaml.gotmpl
+      - env-vars/generic-env-vars.yaml.gotmpl
 
   - name: jooby-vertx-app
     chart: charts/generic-app
@@ -85,7 +85,7 @@ releases:
     values:
       - charts/values-secret.yaml
       - charts/global-values.yaml
-      - env-vars/generic-evs.yaml.gotmpl
+      - env-vars/generic-env-vars.yaml.gotmpl
 
   - name: spring-async-app
     chart: charts/generic-app
@@ -108,7 +108,7 @@ releases:
           threads:
             virtual:
               enabled: "false"
-      - env-vars/spring-jdbc-evs.yaml.gotmpl
+      - env-vars/spring-jdbc-env-vars.yaml.gotmpl
 
   - name: spring-jdbc-virtual-app
     chart: charts/spring-jdbc-app
@@ -122,7 +122,7 @@ releases:
           threads:
             virtual:
               enabled: "true"
-      - env-vars/spring-jdbc-evs.yaml.gotmpl
+      - env-vars/spring-jdbc-env-vars.yaml.gotmpl
 
   - name: spring-webflux-app
     chart: charts/generic-app
@@ -132,4 +132,4 @@ releases:
     values:
       - charts/global-values.yaml
       - charts/values-secret.yaml
-      - env-vars/spring-r2dbc-evs.yaml.gotmpl
+      - env-vars/spring-r2dbc-env-vars.yaml.gotmpl
