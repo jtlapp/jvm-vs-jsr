@@ -1,0 +1,11 @@
+env:
+  - name: SPRING_THREADS_VIRTUAL_ENABLED
+    value: "{{ .Values.spring.threads.virtual.enabled }}"
+  - name: SERVER_PORT
+    value: "{{ .Values.global.app.port }}"
+  - name: SPRING_DATASOURCE_URL
+    value: "jdbc:{{ .Values.global.pgbouncer.host }}"
+  - name: SPRING_DATASOURCE_USERNAME
+    value: "{{ .Values.global.database.username }}"
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: "{{ .Values.global.database.password }}"
