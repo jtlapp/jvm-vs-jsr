@@ -1,7 +1,6 @@
 environments:
   default:
     values:
-      # provides the global values to templates in this helmfile
       - charts/global-values.yaml
 
 ---
