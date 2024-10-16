@@ -31,7 +31,7 @@ Label the three nodes as follows:
 ```bash
 kubectl label nodes <node-1-name> kubernetes.io/hostname=client --overwrite
 kubectl label nodes <node-2-name> kubernetes.io/hostname=app --overwrite
-kubectl label nodes <node-3-name> kubernetes.io/hostname=database --overwrite
+kubectl label nodes <node-3-name> kubernetes.io/hostname=backend --overwrite
 ```
 
 Add the Helm repos for Prometheus and Grafana:
