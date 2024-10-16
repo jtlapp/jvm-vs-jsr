@@ -1,9 +1,8 @@
 environments:
   default:
     values:
+      # required to templatize files that helmfile loads
       - charts/global-values.yaml
-
----
 
 helmDefaults:
   timeout: 30
@@ -62,17 +61,9 @@ releases:
     labels:
       appGroup: "true"
     values:
-      - charts/global-values.yaml
       - charts/values-secret.yaml
-      - env:
-        - name: SERVER_PORT
-          value: "{{ .Values.global.app.port }}"
-        - name: DATABASE_URL
-          value: "jdbc:{{ .Values.global.pgbouncer.host }}"
-        - name: DATABASE_USERNAME
-          value: "{{ .Values.global.database.username }}"
-        - name: DATABASE_PASSWORD
-          value: "{{ .Values.global.database.password }}"
+      - charts/global-values.yaml
+      - env-vars/generic-env-vars.yaml.gotmpl
 
   - name: jooby-r2dbc-app
     chart: charts/generic-app
@@ -80,21 +71,9 @@ releases:
     labels:
       appGroup: "true"
     values:
-      - charts/global-values.yaml
       - charts/values-secret.yaml
-      - env:
-        - name: SERVER_PORT
-          value: "{{ .Values.global.app.port }}"
-        - name: DATABASE_HOST_NAME
-          value: "{{ .Values.global.pgbouncer.hostName }}"
-        - name: DATABASE_PORT
-          value: "{{ .Values.global.pgbouncer.port }}"
-        - name: DATABASE_NAME
-          value: "{{ .Values.global.database.name }}"
-        - name: DATABASE_USERNAME
-          value: "{{ .Values.global.database.username }}"
-        - name: DATABASE_PASSWORD
-          value: "{{ .Values.global.database.password }}"
+      - charts/global-values.yaml
+      - env-vars/generic-env-vars.yaml.gotmpl
 
   - name: jooby-vertx-app
     chart: charts/generic-app
@@ -102,21 +81,9 @@ releases:
     labels:
       appGroup: "true"
     values:
-      - charts/global-values.yaml
       - charts/values-secret.yaml
-      - env:
-        - name: SERVER_PORT
-          value: "{{ .Values.global.app.port }}"
-        - name: DATABASE_HOST_NAME
-          value: "{{ .Values.global.pgbouncer.hostName }}"
-        - name: DATABASE_PORT
-          value: "{{ .Values.global.pgbouncer.port }}"
-        - name: DATABASE_NAME
-          value: "{{ .Values.global.database.name }}"
-        - name: DATABASE_USERNAME
-          value: "{{ .Values.global.database.username }}"
-        - name: DATABASE_PASSWORD
-          value: "{{ .Values.global.database.password }}"
+      - charts/global-values.yaml
+      - env-vars/generic-env-vars.yaml.gotmpl
 
   - name: spring-async-app
     chart: charts/generic-app
@@ -124,8 +91,8 @@ releases:
     labels:
       appGroup: "true"
     values:
-      - charts/global-values.yaml
       - charts/values-secret.yaml
+      - charts/global-values.yaml
 
   - name: spring-jdbc-kernel-app
     chart: charts/spring-jdbc-app
@@ -133,12 +100,13 @@ releases:
     labels:
       appGroup: "true"
     values:
-      - charts/global-values.yaml
       - charts/values-secret.yaml
+      - charts/global-values.yaml
       - spring:
           threads:
             virtual:
               enabled: "false"
+      - env-vars/spring-jdbc-env-vars.yaml.gotmpl
 
   - name: spring-jdbc-virtual-app
     chart: charts/spring-jdbc-app
@@ -146,12 +114,13 @@ releases:
     labels:
       appGroup: "true"
     values:
-      - charts/global-values.yaml
       - charts/values-secret.yaml
+      - charts/global-values.yaml
       - spring:
           threads:
             virtual:
               enabled: "true"
+      - env-vars/spring-jdbc-env-vars.yaml.gotmpl
 
   - name: spring-webflux-app
     chart: charts/generic-app
@@ -161,12 +130,4 @@ releases:
     values:
       - charts/global-values.yaml
       - charts/values-secret.yaml
-      - env:
-        - name: SERVER_PORT
-          value: "{{ .Values.global.app.port }}"
-        - name: SPRING_R2DBC_URL
-          value: "r2dbc:{{ .Values.global.pgbouncer.host }}"
-        - name: SPRING_R2DBC_USERNAME
-          value: "{{ .Values.global.database.username }}"
-        - name: SPRING_R2DBC_PASSWORD
-          value: "{{ .Values.global.database.password }}"
+      - env-vars/spring-r2dbc-env-vars.yaml.gotmpl
