@@ -27,3 +27,5 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
             {{- end }}
+            - name: SPRING_THREADS_VIRTUAL_ENABLED
+              value: "{{ .Values.spring.threads.virtual.enabled }}"

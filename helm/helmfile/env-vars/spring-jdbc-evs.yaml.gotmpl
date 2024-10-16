@@ -1,6 +1,4 @@
 env:
-  - name: SPRING_THREADS_VIRTUAL_ENABLED
-    value: "{{ .Values.spring.threads.virtual.enabled }}"
   - name: SERVER_PORT
     value: "{{ .Values.global.app.port }}"
   - name: SPRING_DATASOURCE_URL
