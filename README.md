@@ -1,8 +1,22 @@
-# jvm-vs-js
+# jvm-vs-jsr
 
 Benchmarks comparing JVM and JS Runtime concurrency frameworks.
 
 **CURRENTLY UNDER DEVELOPMENT**
+
+## Introduction
+
+When Node.js first came out, people were astonished that it could provide better throughput than 
+Java for I/O-bound operations. Numerous reactive frameworks have since been created to rectify the 
+issue in Java, but I had trouble finding apples-to-apples comparisons of how well these frameworks
+perform relative to node.js. TechEmpower [provides benchmarks](https://www.techempower.com/benchmarks),
+but I found it difficult to understand the commonalities and differences between any two
+implementations. So I decided to create the present repo to definitively answer the question of how
+Java presently compares to Node.js for I/O-bound work, though also as an exercise in helping me 
+personally gain understanding. To provide a fuller comparison of modern Java to modern JS, I'll
+also include benchmarks for Deno and Bun.
+
+Please do let me know how I can improve the performance of any of these implementations.
 
 ## Installation and Setup
 
