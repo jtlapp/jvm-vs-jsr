@@ -20,7 +20,7 @@ Please do let me know how I can improve the performance of any of these implemen
 
 ## Installation and Setup
 
-Install kubectl, helm, helmfile, and configure kubectl for your cluster.
+Install kubectl, helm, and helmfile, and configure kubectl for your cluster.
 
 Run `helmfile init` to further install the Helm "diff" and "secrets" plugins.
 
