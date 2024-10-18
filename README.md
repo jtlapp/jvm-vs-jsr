@@ -4,9 +4,11 @@ Benchmarks comparing JVM and JS Runtime concurrency frameworks.
 
 **CURRENTLY UNDER DEVELOPMENT**
 
-## Preparation
+## Installation and Setup
 
-Install kubectl and helm, and configure kubectl for your cluster.
+Install kubectl, helm, helmfile, and configure kubectl for your cluster.
+
+Run `helmfile init` to further install the Helm "diff" and "secrets" plugins.
 
 Set the docker image prefix in an environment variables:
 
@@ -42,16 +44,19 @@ helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 ```
 
-## Installation
+## Building and Deploying
 
 Create your cluster and configure `kubectl` to use it. Then:
 
 ```bash
 mvn clean install
-./bin/jc-deploy database
-./bin/jc-deploy client
-./bin/jc-deploy spring-jdbc-kernel # or another app
+./bin/deploy database
+./bin/deploy client
+./bin/deploy spring-jdbc-kernel # or another app
 ```
+
+The `deploy` command deploys or redeploys. In the case of apps, it replaces the currently 
+deployed app (if any) with the named app.
 
 ## Testing
 
@@ -68,34 +73,7 @@ non-JSON, it also prints each unique combination of status code and response bod
 ## Useful commands:
 
 ```bash
-./bin/jc-redeploy <release-name>
-./bin/jc-replace <deployed-release> <replacement-release>
-
-./bin/jc-undeploy database
-./bin/jc-undeploy client
-./bin/jc-undeploy spring-jdbc-kernel # or another app
+./bin/undeploy database
+./bin/undeploy client
+./bin/undeploy spring-jdbc-kernel # or another app
 ```
-
-## Alternative Helm Deployments
-
-I'm temporarily also using this repo to explore various approaches to deploying Helm charts to 
-Kubernetes. The following approaches are supported:
-
-### Just Charts
-
-This approach deploys using only helm charts via the `bin/` scripts prefixed `jc-`.
-
-### Helmfile
-
-This approach deploys using helmfile and helm charts via the `bin/` scripts prefixed `hf-`. The 
-approach works but is not yet idiomatic.
-
-Run `hf-deploy` to deploy a chart or replace an existing chart in the same chart group. Run 
-`hf-undeploy` to remove a chart.
-
-Requires first installing `helmfile` and running `helmfile init` to further install the Helm "diff" 
-and "secrets" plugins.
-
-### Timoni
-
-PLanned, but not yet supported. [See here.](https://timoni.sh/)

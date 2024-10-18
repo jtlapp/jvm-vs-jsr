@@ -1,9 +1,8 @@
 # Removes deployment of the chart of the provided name and its associated artifacts.
 
 CHART_NAME=$1
-TIMEOUT=30s
 
-cd helm/helmfile
+cd helm
 
 if [ "$CHART_NAME" == "client" ]; then
     helmfile --selector clientGroup=true destroy -q

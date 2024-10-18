@@ -4,6 +4,8 @@ environments:
       # required to templatize files that helmfile loads
       - charts/global-values.yaml
 
+---
+
 helmDefaults:
   timeout: 30
 

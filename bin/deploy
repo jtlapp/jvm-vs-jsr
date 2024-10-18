@@ -2,14 +2,13 @@
 # Deploys the Helm chart of the provided name along with associated components.
 
 CHART_NAME=$1
-TIMEOUT=30s
 
 push_image() {
     local image=$1
     docker push $DOCKER_IMAGE_PREFIX/$image
 }
 
-cd helm/helmfile
+cd helm
 
 if [ "$CHART_NAME" == "client" ]; then
 
