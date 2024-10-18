@@ -72,7 +72,7 @@ mvn clean install
 The `deploy` command deploys or redeploys. In the case of apps, it replaces the currently 
 deployed app (if any) with the named app.
 
-## Testing
+## Running Benchmarks
 
 1. Exec into the client pod using bash: `kubectl exec -it <client-pod> -- bash`.
 2. Run `./benchmark <test-suite> setup-all` to set up the test suite of the given name.
@@ -84,7 +84,7 @@ When running a test, the test outputs the first response for each unique combina
 status code, shared query name, and error message. For queries erroneously returning
 non-JSON, it also prints each unique combination of status code and response body.
 
-## Useful commands:
+## Useful Commands
 
 ```bash
 ./bin/undeploy database
