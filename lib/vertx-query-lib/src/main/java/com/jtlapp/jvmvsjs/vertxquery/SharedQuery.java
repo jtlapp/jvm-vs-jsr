@@ -1,11 +1,10 @@
 package com.jtlapp.jvmvsjs.vertxquery;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.vertx.core.Future;
-import io.vertx.pgclient.PgPool;
+import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.Tuple;
@@ -15,8 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SharedQuery {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public enum ReturnType {
         NOTHING("nothing"),
@@ -83,7 +80,7 @@ public class SharedQuery {
      * @return A JSON representation of the query result. Either an array
      *      of JSON objects or a JSON object having property "rowCount".
      */
-    public Future<String> executeUsingGson(PgPool db, String jsonArgs) {
+    public Future<String> executeUsingGson(Pool db, String jsonArgs) {
         var args = JsonParser.parseString(jsonArgs).getAsJsonObject();
         var tuple = buildTuple(args);
 

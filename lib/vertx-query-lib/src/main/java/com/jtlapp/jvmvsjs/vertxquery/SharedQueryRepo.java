@@ -1,7 +1,7 @@
 package com.jtlapp.jvmvsjs.vertxquery;
 
 import io.vertx.core.Future;
-import io.vertx.pgclient.PgPool;
+import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.Tuple;
 import io.vertx.sqlclient.Row;
 
@@ -9,10 +9,10 @@ import java.util.HashMap;
 
 public class SharedQueryRepo {
 
-    private final PgPool db;
+    private final Pool db;
     private final HashMap<String, SharedQuery> cache = new HashMap<>();
 
-    public SharedQueryRepo(PgPool db) {
+    public SharedQueryRepo(Pool db) {
         this.db = db;
     }
 

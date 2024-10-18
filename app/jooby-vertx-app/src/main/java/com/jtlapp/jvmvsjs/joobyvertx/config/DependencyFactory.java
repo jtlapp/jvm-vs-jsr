@@ -5,7 +5,7 @@ import io.avaje.inject.Bean;
 import io.avaje.inject.External;
 import io.avaje.inject.Factory;
 import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.pgclient.PgPool;
+import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
 import jakarta.inject.Named;
 
@@ -21,7 +21,7 @@ public class DependencyFactory {
     }
 
     @Bean
-    public PgPool pgPool(
+    public Pool pgPool(
             @External @Named("DATABASE_HOST_NAME") String hostName,
             @External @Named("DATABASE_PORT") String port,
             @External @Named("DATABASE_NAME") String databaseName,
@@ -42,12 +42,12 @@ public class DependencyFactory {
         // TODO: What pool size?
         PoolOptions poolOptions = new PoolOptions().setMaxSize(5);
 
-        // TODO: PgPool vs PgConnection?
-        return PgPool.pool(connectOptions, poolOptions);
+        // TODO: Pool vs PgConnection?
+        return Pool.pool(connectOptions, poolOptions);
     }
 
     @Bean
-    public SharedQueryRepo sharedQueryRepo(PgPool pgPool) {
+    public SharedQueryRepo sharedQueryRepo(Pool pgPool) {
         return new SharedQueryRepo(pgPool);
     }
 }

@@ -9,7 +9,7 @@ import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import io.jooby.annotation.PathParam;
 import io.vertx.core.Future;
-import io.vertx.pgclient.PgPool;
+import io.vertx.sqlclient.Pool;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -28,7 +28,7 @@ public class ApiController {
     SharedQueryRepo sharedQueryRepo;
 
     @Inject
-    PgPool pgPool;
+    Pool pgPool;
 
     @POST("/query/{queryName}")
     public CompletableFuture<String> query(

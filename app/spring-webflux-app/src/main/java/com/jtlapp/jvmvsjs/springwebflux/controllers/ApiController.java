@@ -3,12 +3,9 @@ package com.jtlapp.jvmvsjs.springwebflux.controllers;
 import com.jtlapp.jvmvsjs.r2dbcquery.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ScheduledExecutorService;
