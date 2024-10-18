@@ -82,7 +82,8 @@ Run `./benchmark` to get usage help.
 
 When running a test, the test outputs the first response for each unique combination of
 status code, shared query name, and error message. For queries erroneously returning
-non-JSON, it also prints each unique combination of status code and response body.
+non-JSON, it also prints each unique combination of status code and response body. This
+output assists with debugging newly added applications.
 
 ## Useful Commands
 
