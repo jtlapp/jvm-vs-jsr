@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 
 	// Import test suites
@@ -23,6 +24,7 @@ type Config struct {
 	baseUrl         string
 	suiteName       string
 	mode            string
+	cpuCount        int
 	rate            int
 	durationSeconds int
 }
@@ -87,6 +89,7 @@ func parseArgs() Config {
 	mode := os.Args[2]
 
 	flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	cpuCount := flagSet.Int("cpus", runtime.NumCPU(), "Number of CPUs to use")
 	rate := flagSet.Int("rate", 10, "Requests per second")
 	duration := flagSet.Int("duration", 5, "Duration of the benchmark in seconds")
 	if len(os.Args) > 3 {
@@ -98,7 +101,7 @@ func parseArgs() Config {
 		fail("%s environment variable is required", baseUrlEnvVar)
 	}
 
-	return Config{baseUrl, suiteName, mode, *rate, *duration}
+	return Config{baseUrl, suiteName, mode, *cpuCount, *rate, *duration}
 }
 
 func runBenchmark(config Config, suite lib.TestSuite) {
@@ -106,7 +109,7 @@ func runBenchmark(config Config, suite lib.TestSuite) {
 	targetProvider := suite.GetTargetProvider(config.baseUrl)
 	logger := lib.NewResponseLogger()
 
-	attacker := vegeta.NewAttacker()
+	attacker := vegeta.NewAttacker(vegeta.Workers(uint64(config.cpuCount)))
 	rateLimiter := vegeta.Rate{Freq: config.rate, Per: time.Second}
 	duration := time.Duration(config.durationSeconds) * time.Second
 
@@ -119,6 +122,7 @@ func runBenchmark(config Config, suite lib.TestSuite) {
 
 	metrics.Close()
 
+	fmt.Printf("CPUs used: %d\n", config.cpuCount)
 	fmt.Printf("Requests: %d\n", metrics.Requests)
 	fmt.Printf("Success Rate: %.2f%%\n", metrics.Success*100)
 	fmt.Printf("Average Latency: %s\n", metrics.Latencies.Mean)
@@ -145,6 +149,7 @@ func showUsage() {
 		fmt.Printf("    %s\n", suite.GetName())
 	}
 	fmt.Println("\n'test' options:")
+	fmt.Println("    -cpus <number-of-CPUs>")
 	fmt.Println("    -rate <requests-per-second>")
 	fmt.Println("    -duration <seconds>")
 	fmt.Println()
