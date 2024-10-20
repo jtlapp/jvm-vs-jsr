@@ -31,17 +31,18 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 
 	// Warm up the application, in case it does JIT.
 
-	fmt.Print("Warming up...")
+	fmt.Print("Warming up...\n")
 	br.TestRate(br.config.InitialRate/5, warmupSeconds)
 
 	// Find the highest rate that the system can handle without errors.
 
 	rateUpperBound := br.config.InitialRate
 	rateLowerBound := 0
-	currentRate := rateUpperBound
-	nextRate := -1
+	currentRate := -1
+	nextRate := rateUpperBound
 
 	for currentRate != 0 && nextRate != currentRate {
+		currentRate = nextRate
 
 		time.Sleep(resetSeconds * time.Second)
 		fmt.Printf("Testing %d requests/sec...\n", currentRate)
