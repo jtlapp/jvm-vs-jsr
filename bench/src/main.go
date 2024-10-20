@@ -70,18 +70,15 @@ func main() {
 		}
 	case "run":
 		benchmarkConfig := toBenchmarkConfig(commandConfig)
-		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).DetermineRate(
-			commandConfig.rate, commandConfig.durationSeconds,
-		)
-		fmt.Printf("CPUs used: %d\n", commandConfig.cpuCount)
+		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).DetermineRate()
 		benchmarkStats.Print()
+		fmt.Printf("CPUs used: %d\n", commandConfig.cpuCount)
 	case "test":
 		benchmarkConfig := toBenchmarkConfig(commandConfig)
-		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).TestRate(
-			commandConfig.rate, commandConfig.durationSeconds,
-		)
+		metrics := runner.NewBenchmarkRunner(benchmarkConfig, scenario).TestRate(
+			commandConfig.rate, commandConfig.durationSeconds)
+		runner.PrintMetrics(metrics)
 		fmt.Printf("CPUs used: %d\n", commandConfig.cpuCount)
-		benchmarkStats.Print()
 	default:
 		fail("Invalid argument '%s'. Must be 'setup' or 'test'.", commandConfig.mode)
 	}
@@ -121,9 +118,11 @@ func toBenchmarkConfig(config commandConfig) runner.BenchmarkConfig {
 		fail("%s environment variable is required", baseUrlEnvVar)
 	}
 	return runner.BenchmarkConfig{
-		BaseURL:      baseUrl,
-		ScenarioName: config.scenarioName,
-		CPUCount:     config.cpuCount,
+		BaseURL:         baseUrl,
+		ScenarioName:    config.scenarioName,
+		InitialRate:     config.rate,
+		DurationSeconds: config.durationSeconds,
+		CPUCount:        config.cpuCount,
 	}
 }
 
