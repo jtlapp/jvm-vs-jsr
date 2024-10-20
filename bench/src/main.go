@@ -5,79 +5,89 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"time"
 
-	// Import test suites
+	// Import test scenarios
 
-	vegeta "github.com/tsenart/vegeta/lib"
-	"jvm-vs-js.jtlapp.com/benchmark/lib"
-	"jvm-vs-js.jtlapp.com/benchmark/suites/orderitems"
-	"jvm-vs-js.jtlapp.com/benchmark/suites/sleep"
-	"jvm-vs-js.jtlapp.com/benchmark/suites/taggedints"
+	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
+	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/orderitems"
+	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/sleep"
+	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/taggedints"
+	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
 const (
 	baseUrlEnvVar = "BASE_APP_URL"
 )
 
-type Config struct {
-	baseUrl         string
-	suiteName       string
+type commandConfig struct {
+	scenarioName    string
 	mode            string
 	cpuCount        int
 	rate            int
 	durationSeconds int
 }
 
-var testSuitesSlice = []lib.TestSuite{
-	&sleep.Suite{},
-	&taggedints.Suite{},
-	&orderitems.Suite{},
+var scenariosSlice = []runner.Scenario{
+	&sleep.Scenario{},
+	&taggedints.Scenario{},
+	&orderitems.Scenario{},
 }
 
-func getTestSuite(name string) (lib.TestSuite, bool) {
-	for _, suite := range testSuitesSlice {
-		if suite.GetName() == name {
-			return suite, true
+func getScenario(name string) (runner.Scenario, bool) {
+	for _, scenario := range scenariosSlice {
+		if scenario.GetName() == name {
+			return scenario, true
 		}
 	}
 	return nil, false
 }
 
 func main() {
-	config := parseArgs()
+	commandConfig := parseArgs()
 
-	backendDB := lib.NewBackendDatabase()
+	backendDB := util.NewBackendDatabase()
 	defer backendDB.ClosePool()
 
-	suite, valid := getTestSuite(config.suiteName)
+	scenario, valid := getScenario(commandConfig.scenarioName)
 	if !valid {
-		fail("Unknown test suite: %s", config.suiteName)
+		fail("Unknown test scenario: %s", commandConfig.scenarioName)
 	}
-	if err := suite.Init(backendDB); err != nil {
+	if err := scenario.Init(backendDB); err != nil {
 		fail("Initialization failed: %v", err)
 	}
 
-	switch config.mode {
+	switch commandConfig.mode {
 	case "setup-all":
-		if err := suite.SetUpTestTables(); err != nil {
+		if err := scenario.SetUpTestTables(); err != nil {
 			fail("Failed to set up DB: %v", err)
 		}
-		if err := suite.SetSharedQueries(); err != nil {
+		if err := scenario.SetSharedQueries(); err != nil {
 			fail("Failed to set queries: %v", err)
 		}
 	case "set-queries":
-		if err := suite.SetSharedQueries(); err != nil {
+		if err := scenario.SetSharedQueries(); err != nil {
 			fail("Failed to set queries: %v", err)
 		}
+	case "run":
+		benchmarkConfig := toBenchmarkConfig(commandConfig)
+		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).DetermineRate(
+			commandConfig.rate, commandConfig.durationSeconds,
+		)
+		fmt.Printf("CPUs used: %d\n", commandConfig.cpuCount)
+		benchmarkStats.Print()
 	case "test":
-		runBenchmark(config, suite)
+		benchmarkConfig := toBenchmarkConfig(commandConfig)
+		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).TestRate(
+			commandConfig.rate, commandConfig.durationSeconds,
+		)
+		fmt.Printf("CPUs used: %d\n", commandConfig.cpuCount)
+		benchmarkStats.Print()
 	default:
-		fail("Invalid argument '%s'. Must be 'setup' or 'test'.", config.mode)
+		fail("Invalid argument '%s'. Must be 'setup' or 'test'.", commandConfig.mode)
 	}
 }
 
-func parseArgs() Config {
+func parseArgs() commandConfig {
 	if len(os.Args) == 1 {
 		showUsage()
 		os.Exit(0)
@@ -85,7 +95,7 @@ func parseArgs() Config {
 		failWithUsage("Too few arguments")
 	}
 
-	suiteName := os.Args[1]
+	scenarioName := os.Args[1]
 	mode := os.Args[2]
 
 	flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
@@ -96,39 +106,25 @@ func parseArgs() Config {
 		flagSet.Parse(os.Args[3:])
 	}
 
+	return commandConfig{
+		scenarioName:    scenarioName,
+		mode:            mode,
+		cpuCount:        *cpuCount,
+		rate:            *rate,
+		durationSeconds: *duration,
+	}
+}
+
+func toBenchmarkConfig(config commandConfig) runner.BenchmarkConfig {
 	baseUrl := os.Getenv(baseUrlEnvVar)
 	if baseUrl == "" {
 		fail("%s environment variable is required", baseUrlEnvVar)
 	}
-
-	return Config{baseUrl, suiteName, mode, *cpuCount, *rate, *duration}
-}
-
-func runBenchmark(config Config, suite lib.TestSuite) {
-
-	targetProvider := suite.GetTargetProvider(config.baseUrl)
-	logger := lib.NewResponseLogger()
-
-	attacker := vegeta.NewAttacker(vegeta.Workers(uint64(config.cpuCount)))
-	rateLimiter := vegeta.Rate{Freq: config.rate, Per: time.Second}
-	duration := time.Duration(config.durationSeconds) * time.Second
-
-	var metrics vegeta.Metrics
-	for res := range attacker.Attack(targetProvider, rateLimiter, duration,
-		"Benchmark sleep API") {
-		logger.Log(res.Code, string(res.Body))
-		metrics.Add(res)
+	return runner.BenchmarkConfig{
+		BaseURL:      baseUrl,
+		ScenarioName: config.scenarioName,
+		CPUCount:     config.cpuCount,
 	}
-
-	metrics.Close()
-
-	fmt.Printf("CPUs used: %d\n", config.cpuCount)
-	fmt.Printf("Requests: %d\n", metrics.Requests)
-	fmt.Printf("Success Rate: %.2f%%\n", metrics.Success*100)
-	fmt.Printf("Average Latency: %s\n", metrics.Latencies.Mean)
-	fmt.Printf("99th Percentile Latency: %s\n", metrics.Latencies.P99)
-	fmt.Printf("Max Latency: %s\n", metrics.Latencies.Max)
-	fmt.Printf("Status Codes: %v\n", metrics.StatusCodes)
 }
 
 func fail(format string, a ...interface{}) {
@@ -143,14 +139,19 @@ func failWithUsage(format string, a ...interface{}) {
 }
 
 func showUsage() {
-	fmt.Printf("\nUsage: %s <test-suite-name> setup-all | set-queries | test\n", os.Args[0])
-	fmt.Println("\nTest suites:")
-	for _, suite := range testSuitesSlice {
-		fmt.Printf("    %s\n", suite.GetName())
+	fmt.Printf("\nUsage: %s <test-scenario-name> setup-all | set-queries | test\n", os.Args[0])
+	fmt.Println("\nTest scenarios:")
+	for _, scenario := range scenariosSlice {
+		fmt.Printf("    %s\n", scenario.GetName())
 	}
-	fmt.Println("\n'test' options:")
+	fmt.Println("\n'run' finds the highest constant/stable rate. Options:")
 	fmt.Println("    -cpus <number-of-CPUs>")
-	fmt.Println("    -rate <requests-per-second>")
-	fmt.Println("    -duration <seconds>")
+	fmt.Println("    -rate <requests-per-second> -- initial rate guess for hastening convergence")
+	fmt.Println("    -duration <seconds> -- time over which rate must be error-free")
+	fmt.Println()
+	fmt.Println("\n'test' tests a provided rate. Options:")
+	fmt.Println("    -cpus <number-of-CPUs>")
+	fmt.Println("    -rate <requests-per-second> -- rate to test")
+	fmt.Println("    -duration <seconds> -- duration of the test")
 	fmt.Println()
 }

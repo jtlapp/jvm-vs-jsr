@@ -5,35 +5,35 @@ import (
 	"fmt"
 
 	vegeta "github.com/tsenart/vegeta/lib"
-	"jvm-vs-js.jtlapp.com/benchmark/lib"
+	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
 const (
 	sleepDuration = 1000
 )
 
-type Suite struct{}
+type Scenario struct{}
 
-func (s *Suite) GetName() string {
+func (s *Scenario) GetName() string {
 	return "sleep"
 }
 
-func (s *Suite) Init(backendDB *lib.BackendDB) error {
+func (s *Scenario) Init(backendDB *util.BackendDB) error {
 	// nothing to do
 	return nil
 }
 
-func (s *Suite) SetUpTestTables() error {
+func (s *Scenario) SetUpTestTables() error {
 	// nothing to do
 	return nil
 }
 
-func (s *Suite) SetSharedQueries() error {
+func (s *Scenario) SetSharedQueries() error {
 	// nothing to do
 	return nil
 }
 
-func (s *Suite) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {
+func (s *Scenario) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {
 	return func(target *vegeta.Target) error {
 		*target = vegeta.Target{
 			Method: "GET",
