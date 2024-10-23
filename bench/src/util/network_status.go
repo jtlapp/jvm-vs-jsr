@@ -40,15 +40,14 @@ func GetPortsInUsePercents() (timeWaitPercent, establishedPercent int) {
 	// Column 4 contains the connection state in hex
 	for _, line := range lines {
 		fields := strings.Fields(line)
-		if len(fields) < 4 {
-			continue
-		}
-		state := fields[3]
-		switch state {
-		case "06":
-			timeWaitCount++
-		case "01":
-			establishedCount++
+		if len(fields) >= 4 {
+			state := fields[3]
+			switch state {
+			case "06":
+				timeWaitCount++
+			case "01":
+				establishedCount++
+			}
 		}
 	}
 
