@@ -3,6 +3,7 @@ package taggedints
 import (
 	"fmt"
 	"math/rand"
+	"net/http"
 
 	vegeta "github.com/tsenart/vegeta/lib"
 )
@@ -41,6 +42,7 @@ func (t *BenchmarkTest) getLongRequest() *vegeta.Target {
 	return &vegeta.Target{
 		Method: "POST",
 		URL:    fmt.Sprintf("%s/api/query/taggedints_sumInts", t.baseUrl),
+		Header: http.Header{},
 		Body:   []byte(body),
 	}
 }
@@ -51,6 +53,7 @@ func (t *BenchmarkTest) getShortRequest() *vegeta.Target {
 	return &vegeta.Target{
 		Method: "POST",
 		URL:    fmt.Sprintf("%s/api/query/taggedints_getInt", t.baseUrl),
+		Header: http.Header{},
 		Body:   []byte(body),
 	}
 }

@@ -36,6 +36,6 @@ func (rl *ResponseLogger) Log(responseCode uint16, body string) {
 
 	if !rl.loggedResponses[comboKey] {
 		rl.loggedResponses[comboKey] = true
-		fmt.Printf("STATUS %d: %s\n", responseCode, body)
+		fmt.Printf("  ex. STATUS %d: %s\n", responseCode, body)
 	}
 }

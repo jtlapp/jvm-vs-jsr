@@ -8,6 +8,8 @@ RUN apt-get update && \
     apt-get install -y \
         vim \
         curl \
+        net-tools \
+        iproute2 \
         git \
         build-essential && \
     rm -rf /var/lib/apt/lists/*

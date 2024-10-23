@@ -25,6 +25,7 @@ type commandConfig struct {
 	cpuCount        int
 	rate            int
 	durationSeconds int
+	timeoutSeconds  int
 }
 
 var scenariosSlice = []runner.Scenario{
@@ -71,12 +72,14 @@ func main() {
 	case "run":
 		benchmarkConfig := toBenchmarkConfig(commandConfig)
 		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).DetermineRate()
+		fmt.Println()
 		benchmarkStats.Print()
 		fmt.Printf("CPUs used: %d\n", commandConfig.cpuCount)
 	case "test":
 		benchmarkConfig := toBenchmarkConfig(commandConfig)
 		metrics := runner.NewBenchmarkRunner(benchmarkConfig, scenario).TestRate(
 			commandConfig.rate, commandConfig.durationSeconds)
+		fmt.Println()
 		runner.PrintMetrics(metrics)
 		fmt.Printf("CPUs used: %d\n", commandConfig.cpuCount)
 	default:
@@ -99,6 +102,7 @@ func parseArgs() commandConfig {
 	cpuCount := flagSet.Int("cpus", runtime.NumCPU(), "Number of CPUs to use")
 	rate := flagSet.Int("rate", 10, "Requests per second")
 	duration := flagSet.Int("duration", 5, "Duration of the benchmark in seconds")
+	timeout := flagSet.Int("timeout", 10, "Request response timeout in seconds")
 	if len(os.Args) > 3 {
 		flagSet.Parse(os.Args[3:])
 	}
@@ -109,6 +113,7 @@ func parseArgs() commandConfig {
 		cpuCount:        *cpuCount,
 		rate:            *rate,
 		durationSeconds: *duration,
+		timeoutSeconds:  *timeout,
 	}
 }
 
@@ -118,11 +123,12 @@ func toBenchmarkConfig(config commandConfig) runner.BenchmarkConfig {
 		fail("%s environment variable is required", baseUrlEnvVar)
 	}
 	return runner.BenchmarkConfig{
-		BaseURL:         baseUrl,
-		ScenarioName:    config.scenarioName,
-		InitialRate:     config.rate,
-		DurationSeconds: config.durationSeconds,
-		CPUCount:        config.cpuCount,
+		BaseURL:               baseUrl,
+		ScenarioName:          config.scenarioName,
+		InitialRate:           config.rate,
+		DurationSeconds:       config.durationSeconds,
+		CPUCount:              config.cpuCount,
+		RequestTimeoutSeconds: config.timeoutSeconds,
 	}
 }
 
@@ -138,19 +144,25 @@ func failWithUsage(format string, a ...interface{}) {
 }
 
 func showUsage() {
-	fmt.Printf("\nUsage: %s <test-scenario-name> setup-all | set-queries | test\n", os.Args[0])
+	fmt.Printf("\nUsage: %s <test-scenario-name> setup-all | set-queries | run | test\n", os.Args[0])
 	fmt.Println("\nTest scenarios:")
 	for _, scenario := range scenariosSlice {
 		fmt.Printf("    %s\n", scenario.GetName())
 	}
-	fmt.Println("\n'run' finds the highest constant/stable rate. Options:")
-	fmt.Println("    -cpus <number-of-CPUs>")
-	fmt.Println("    -rate <requests-per-second> -- initial rate guess for hastening convergence")
-	fmt.Println("    -duration <seconds> -- time over which rate must be error-free")
-	fmt.Println()
-	fmt.Println("\n'test' tests a provided rate. Options:")
-	fmt.Println("    -cpus <number-of-CPUs>")
-	fmt.Println("    -rate <requests-per-second> -- rate to test")
-	fmt.Println("    -duration <seconds> -- duration of the test")
+
+	fmt.Println("\nCommands:")
+	fmt.Println("    setup-all -- Creates database tables and queries required for the test scenario.")
+	fmt.Println("    set-queries -- Sets only the queries required for the test scenario")
+	fmt.Println("    run -- Finds the highest constant/stable rate. The resulting rate is guaranteed")
+	fmt.Println("      to be error-free for the specified duration. Provide a rate guess to hasten")
+	fmt.Println("      convergence on the stable rate.")
+	fmt.Println("    test -- Tests issuing requests at the given rate for the specified duration.")
+
+	fmt.Println("\nOptions:")
+
+	fmt.Println("    -cpus <number-of-CPUs> (default: all CPUs)")
+	fmt.Println("    -rate <requests-per-second> -- Rate to test or initial rate guess")
+	fmt.Println("    -duration <seconds> -- Test duration or time over which rate must be error-free")
+	fmt.Println("    -timeout <seconds> -- Request response timeout and half delay between tests (default 10)")
 	fmt.Println()
 }

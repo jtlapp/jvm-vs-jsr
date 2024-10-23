@@ -2,6 +2,7 @@ package runner
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	vegeta "github.com/tsenart/vegeta/lib"
@@ -9,7 +10,6 @@ import (
 
 const (
 	warmupSeconds = 5
-	resetSeconds  = 5
 )
 
 type BenchmarkRunner struct {
@@ -32,7 +32,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 	// Warm up the application, in case it does JIT.
 
 	fmt.Print("Warming up...\n")
-	br.TestRate(br.config.InitialRate/5, warmupSeconds)
+	br.TestRate(br.config.InitialRate, warmupSeconds)
 
 	// Find the highest rate that the system can handle without errors.
 
@@ -44,9 +44,15 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 	for currentRate != 0 && nextRate != currentRate {
 		currentRate = nextRate
 
-		time.Sleep(resetSeconds * time.Second)
+		time.Sleep(time.Duration(br.config.RequestTimeoutSeconds) * time.Second)
 		fmt.Printf("Testing %d requests/sec...\n", currentRate)
 		br.currentMetrics = br.TestRate(currentRate, br.config.DurationSeconds)
+		fmt.Printf(
+			"  Success rate: %.2f%%, requests: %d, errors: %s\n",
+			br.currentMetrics.Success*100,
+			br.currentMetrics.Requests,
+			strings.Join(br.currentMetrics.Errors, ", "),
+		)
 
 		if br.currentMetrics.Success < 1 {
 			rateUpperBound = currentRate
@@ -77,7 +83,11 @@ func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metric
 
 	targetProvider := br.scenario.GetTargetProvider(br.config.BaseURL)
 
-	attacker := vegeta.NewAttacker(vegeta.Workers(uint64(br.config.CPUCount)))
+	attacker := vegeta.NewAttacker(
+		vegeta.Workers(uint64(br.config.CPUCount)),
+		vegeta.Timeout(time.Duration(br.config.RequestTimeoutSeconds)*time.Second),
+		// vegeta.KeepAlive(true),
+	)
 	rateLimiter := vegeta.Rate{Freq: rate, Per: time.Second}
 	duration := time.Duration(durationSeconds) * time.Second
 
@@ -89,5 +99,6 @@ func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metric
 		metrics.Add(res)
 	}
 	metrics.Close()
+
 	return metrics
 }
