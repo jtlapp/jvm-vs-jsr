@@ -6,8 +6,6 @@ import (
 	"os"
 	"runtime"
 
-	// Import test scenarios
-
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/orderitems"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/sleep"

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	vegeta "github.com/tsenart/vegeta/lib"
+	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
 const (
@@ -47,12 +48,8 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 		time.Sleep(time.Duration(br.config.RequestTimeoutSeconds) * time.Second)
 		fmt.Printf("Testing %d requests/sec...\n", currentRate)
 		br.currentMetrics = br.TestRate(currentRate, br.config.DurationSeconds)
-		fmt.Printf(
-			"  Success rate: %.2f%%, requests: %d, errors: %s\n",
-			br.currentMetrics.Success*100,
-			br.currentMetrics.Requests,
-			strings.Join(br.currentMetrics.Errors, ", "),
-		)
+
+		br.printStatus()
 
 		if br.currentMetrics.Success < 1 {
 			rateUpperBound = currentRate
@@ -86,7 +83,7 @@ func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metric
 	attacker := vegeta.NewAttacker(
 		vegeta.Workers(uint64(br.config.CPUCount)),
 		vegeta.Timeout(time.Duration(br.config.RequestTimeoutSeconds)*time.Second),
-		// vegeta.KeepAlive(true),
+		vegeta.KeepAlive(true),
 	)
 	rateLimiter := vegeta.Rate{Freq: rate, Per: time.Second}
 	duration := time.Duration(durationSeconds) * time.Second
@@ -101,4 +98,23 @@ func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metric
 	metrics.Close()
 
 	return metrics
+}
+
+func (br *BenchmarkRunner) printStatus() {
+
+	timeWaitPct, establishedPct := util.GetPortsInUsePercents()
+	errorMessages := strings.Join(br.currentMetrics.Errors, ", ")
+	if errorMessages == "" {
+		errorMessages = "(none)"
+	}
+
+	fmt.Printf(
+		"  Success rate: %.2f%%, requests: %d, ports active: %d%%, ports waiting: %d%%, FDs: %d%%, errors: %s\n",
+		br.currentMetrics.Success*100,
+		br.currentMetrics.Requests,
+		establishedPct,
+		timeWaitPct,
+		util.GetFDsInUsePercent(),
+		errorMessages,
+	)
 }
