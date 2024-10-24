@@ -75,13 +75,13 @@ deployed app (if any) with the named app.
 ## Running Benchmarks
 
 1. Exec into the client pod using bash: `kubectl exec -it <client-pod> -- bash`.
-2. Run `./benchmark <test-suite> setup-all` to set up the test suite of the given name.
-3. Run `./benchmark <test-suite> test -rate <requests-per-sec> -duration <seconds>`.
+2. Run `./benchmark setup-all <scenario>` to set up the scenario of the given name.
+3. Run `./benchmark run <scenario> -rate <requests-per-sec> -duration <seconds>`.
 
-Run `./benchmark` to get usage help.
+Run `./benchmark` to see other commands and get usage help.
 
-When running a test, the test outputs the first response for each unique combination of
-status code, shared query name, and error message. For queries erroneously returning
+When running a test scenario, it outputs the first response for each unique combination
+of status code, shared query name, and error message. For queries erroneously returning
 non-JSON, it also prints each unique combination of status code and response body. This
 output assists with debugging newly added applications.
 
