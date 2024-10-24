@@ -75,7 +75,7 @@ func main() {
 		fmt.Printf("CPUs used: %d\n", benchmarkConfig.CPUCount)
 	case "status":
 		timeWaitPercent, establishedPercent := util.GetPortsInUsePercents()
-		fmt.Printf("active ports: %d%%, waiting ports: %d%%, FDs in use: %d%%\n\n",
+		fmt.Printf("  active ports: %d%%, waiting ports: %d%%, FDs in use: %d%%\n\n",
 			establishedPercent, timeWaitPercent, util.GetFDsInUsePercent())
 	default:
 		fail("Invalid argument command '%s'", command)

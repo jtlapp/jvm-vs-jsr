@@ -73,9 +73,9 @@ func getPortRangeSize() uint16 {
 }
 
 func WaitForPortsToClear() {
-	timeWaitPct, establishedPct := GetPortsInUsePercents()
-	for timeWaitPct > 0 || establishedPct > 0 {
+	timeWaitPercent, establishedPercent := GetPortsInUsePercents()
+	for timeWaitPercent + establishedPercent > 0 {
 		time.Sleep(time.Second)
-		timeWaitPct, establishedPct = GetPortsInUsePercents()
+		timeWaitPercent, establishedPercent = GetPortsInUsePercents()
 	}
 }

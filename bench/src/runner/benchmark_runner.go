@@ -111,7 +111,7 @@ func (br *BenchmarkRunner) printStatus() {
 	}
 
 	fmt.Printf(
-		"  Success rate: %.1f%%, requests/sec: %.1f, ports active: %d%%, ports waiting: %d%%, FDs: %d%%, errors: %s\n",
+		"  Success rate: %.1f%%, req/sec: %.1f, ports active: %d%%, ports waiting: %d%%, FDs: %d%%, errors: %s\n",
 		br.currentMetrics.Success*100,
 		br.currentMetrics.Rate,
 		establishedPct,
