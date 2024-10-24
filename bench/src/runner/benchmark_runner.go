@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	warmupRequestsPerSecond = 100
 	warmupSeconds = 5
 )
 
@@ -33,7 +34,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 	// Warm up the application, in case it does JIT.
 
 	fmt.Print("Warming up...\n")
-	br.TestRate(br.config.InitialRate, warmupSeconds)
+	br.TestRate(warmupRequestsPerSecond, warmupSeconds)
 
 	// Find the highest rate that the system can handle without errors.
 
@@ -43,9 +44,9 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 	nextRate := rateUpperBound
 
 	for currentRate != 0 && nextRate != currentRate {
+		util.WaitForPortsToClear()
 		currentRate = nextRate
 
-		time.Sleep(time.Duration(br.config.RequestTimeoutSeconds) * time.Second)
 		fmt.Printf("Testing %d requests/sec...\n", currentRate)
 		br.currentMetrics = br.TestRate(currentRate, br.config.DurationSeconds)
 

@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"syscall"
+	"time"
 )
 
 var portRangeSize = getPortRangeSize()
@@ -69,4 +70,12 @@ func getPortRangeSize() uint16 {
 		panic(err)
 	}
 	return uint16(highPort - lowPort)
+}
+
+func WaitForPortsToClear() {
+	timeWaitPct, establishedPct := GetPortsInUsePercents()
+	for timeWaitPct > 0 || establishedPct > 0 {
+		time.Sleep(time.Second)
+		timeWaitPct, establishedPct = GetPortsInUsePercents()
+	}
 }
