@@ -82,6 +82,7 @@ func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metric
 
 	attacker := vegeta.NewAttacker(
 		vegeta.Workers(uint64(br.config.CPUCount)),
+		vegeta.Connections(br.config.MaxConnections),
 		vegeta.Timeout(time.Duration(br.config.RequestTimeoutSeconds)*time.Second),
 		vegeta.KeepAlive(true),
 	)
@@ -109,9 +110,9 @@ func (br *BenchmarkRunner) printStatus() {
 	}
 
 	fmt.Printf(
-		"  Success rate: %.2f%%, requests: %d, ports active: %d%%, ports waiting: %d%%, FDs: %d%%, errors: %s\n",
+		"  Success rate: %.1f%%, requests/sec: %.1f, ports active: %d%%, ports waiting: %d%%, FDs: %d%%, errors: %s\n",
 		br.currentMetrics.Success*100,
-		br.currentMetrics.Requests,
+		br.currentMetrics.Rate,
 		establishedPct,
 		timeWaitPct,
 		util.GetFDsInUsePercent(),
