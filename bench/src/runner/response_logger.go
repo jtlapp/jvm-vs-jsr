@@ -5,6 +5,10 @@ import (
 	"fmt"
 )
 
+const (
+	emptyBody = "(empty)"
+)
+
 type ResponseLogger struct {
 	loggedResponses map[string]bool
 }
@@ -31,11 +35,15 @@ func (rl *ResponseLogger) Log(responseCode uint16, body string) {
 		}
 	} else {
 		comboKey = fmt.Sprintf("%d", responseCode)
-		body = "(empty)"
+		body = emptyBody
 	}
 
 	if !rl.loggedResponses[comboKey] {
 		rl.loggedResponses[comboKey] = true
-		fmt.Printf("  ex. STATUS %d: %s\n", responseCode, body)
+		if (responseCode == 0 && body == emptyBody) {
+			fmt.Printf("  ex. STATUS: timeout\n")
+		} else {
+			fmt.Printf("  ex. STATUS %d: %s\n", responseCode, body)
+		}
 	}
 }
