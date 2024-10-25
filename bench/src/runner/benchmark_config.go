@@ -8,4 +8,5 @@ type BenchmarkConfig struct {
 	InitialRate           int
 	DurationSeconds       int
 	RequestTimeoutSeconds int
+	MinWaitSeconds        int
 }

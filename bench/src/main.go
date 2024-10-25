@@ -103,10 +103,11 @@ func parseScenario(backendDB *util.BackendDB) runner.Scenario {
 func parseBenchmarkArgs(scenarioName string) runner.BenchmarkConfig {
 	flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	cpuCount := flagSet.Int("cpus", runtime.NumCPU(), "Number of CPUs to use")
+	maxConnections := flagSet.Int("maxconns", 0, "Maximum number of connections to use")
 	rate := flagSet.Int("rate", 10, "Requests per second")
 	duration := flagSet.Int("duration", 5, "Duration of the benchmark in seconds")
 	timeout := flagSet.Int("timeout", 10, "Request response timeout in seconds")
-	maxConnections := flagSet.Int("maxconns", 0, "Maximum number of connections to use")
+	minWait := flagSet.Int("minwait", 0, "Minimum wait time between tests in seconds")
 	if len(os.Args) > 3 {
 		flagSet.Parse(os.Args[3:])
 	}
@@ -123,6 +124,7 @@ func parseBenchmarkArgs(scenarioName string) runner.BenchmarkConfig {
 		InitialRate:           *rate,
 		DurationSeconds:       *duration,
 		RequestTimeoutSeconds: *timeout,
+		MinWaitSeconds:        *minWait,
 	}
 }
 
@@ -169,6 +171,8 @@ func showUsage() {
 	fmt.Println("    -duration <seconds>")
 	fmt.Println("        Test duration or time over which rate must be error-free (default: 5)")
 	fmt.Println("    -timeout <seconds>")
-	fmt.Println("        Request response timeout and half delay between tests (default 10)")
+	fmt.Println("        Request response timeout (default 10)")
+	fmt.Println("    -minwait <seconds>")
+	fmt.Println("        Minimum wait time between tests (default 0)")
 	fmt.Println()
 }

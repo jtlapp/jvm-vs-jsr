@@ -43,7 +43,8 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 	nextRate := rateUpperBound
 
 	for currentRate != 0 && nextRate != currentRate {
-		util.WaitForPortsToClear()
+		br.waitBetweenTests()
+
 		currentRate = nextRate
 		if currentRate == rateLowerBound {
 			break
@@ -95,6 +96,17 @@ func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metric
 	metrics.Close()
 
 	return metrics
+}
+
+func (br *BenchmarkRunner) waitBetweenTests() {
+	start := time.Now()
+	util.WaitForPortsToClear()
+	elapsed := time.Since(start)
+	minDuration := time.Duration(br.config.MinWaitSeconds) * time.Second
+
+	if remainingTime := minDuration - elapsed; remainingTime > 0 {
+		time.Sleep(remainingTime)
+	}
 }
 
 func printTestStatus(metrics vegeta.Metrics) {
