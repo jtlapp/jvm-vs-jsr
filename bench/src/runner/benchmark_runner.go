@@ -50,7 +50,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 			break
 		}
 
-		util.Log("Testing %d requests/sec...", currentRate)
+		util.Log("\nTesting %d requests/sec...", currentRate)
 		metrics := br.TestRate(currentRate, br.config.DurationSeconds)
 		printTestStatus(metrics)
 
@@ -118,7 +118,7 @@ func printTestStatus(metrics vegeta.Metrics) {
 	}
 
 	util.Log(
-		"  %.1f%% successful (%.1f req/s): issued %.1f req/s, %d%% ports active, %d%% ports waiting, %d%% FDs, errors: %s\n",
+		"  %.1f%% successful (%.1f req/s): issued %.1f req/s, %d%% ports active, %d%% ports waiting, %d%% FDs, errors: %s",
 		metrics.Success*100,
 		metrics.Throughput,
 		metrics.Rate,
