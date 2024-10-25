@@ -1,9 +1,8 @@
 package runner
 
 import (
-	"fmt"
-
 	vegeta "github.com/tsenart/vegeta/lib"
+	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
 type BenchmarkStats struct {
@@ -12,16 +11,16 @@ type BenchmarkStats struct {
 }
 
 func (bs BenchmarkStats) Print() {
-	fmt.Printf("Steady State Rate: %d\n", bs.SteadyStateRate)
+	util.Log("Steady State Rate: %d", bs.SteadyStateRate)
 	PrintMetrics(bs.Metrics)
 }
 
 func PrintMetrics(metrics vegeta.Metrics) {
-	fmt.Printf("Throughput: %f requests/sec\n", metrics.Throughput)
-	fmt.Printf("Requests: %d\n", metrics.Requests)
-	fmt.Printf("Success Rate: %.2f%%\n", metrics.Success*100)
-	fmt.Printf("Average Latency: %s\n", metrics.Latencies.Mean)
-	fmt.Printf("99th Percentile Latency: %s\n", metrics.Latencies.P99)
-	fmt.Printf("Max Latency: %s\n", metrics.Latencies.Max)
-	fmt.Printf("Status Codes: %v\n", metrics.StatusCodes)
+	util.Log("Throughput: %f requests/sec", metrics.Throughput)
+	util.Log("Requests: %d", metrics.Requests)
+	util.Log("Success Rate: %.2f%%", metrics.Success*100)
+	util.Log("Average Latency: %s", metrics.Latencies.Mean)
+	util.Log("99th Percentile Latency: %s", metrics.Latencies.P99)
+	util.Log("Max Latency: %s", metrics.Latencies.Max)
+	util.Log("Status Codes: %v", metrics.StatusCodes)
 }

@@ -3,6 +3,8 @@ package runner
 import (
 	"encoding/json"
 	"fmt"
+
+	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
 const (
@@ -41,9 +43,9 @@ func (rl *ResponseLogger) Log(responseCode uint16, body string) {
 	if !rl.loggedResponses[comboKey] {
 		rl.loggedResponses[comboKey] = true
 		if responseCode == 0 && body == emptyBody {
-			fmt.Printf("  ex. STATUS: timeout\n")
+			util.Log("  ex. STATUS: timeout")
 		} else {
-			fmt.Printf("  ex. STATUS %d: %s\n", responseCode, body)
+			util.Log("  ex. STATUS %d: %s", responseCode, body)
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -33,7 +32,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 
 	// Warm up the application, in case it does JIT.
 
-	fmt.Print("Warming up...\n")
+	util.Log("Warming up...")
 	br.TestRate(warmupRequestsPerSecond, warmupSeconds)
 
 	// Find the highest rate that the system can handle without errors.
@@ -50,7 +49,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 			break
 		}
 
-		fmt.Printf("Testing %d requests/sec...\n", currentRate)
+		util.Log("Testing %d requests/sec...", currentRate)
 		metrics := br.TestRate(currentRate, br.config.DurationSeconds)
 		printTestStatus(metrics)
 
@@ -89,9 +88,7 @@ func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metric
 	duration := time.Duration(durationSeconds) * time.Second
 
 	var metrics vegeta.Metrics
-	var trialName = fmt.Sprintf("Scenario %s, rate %d, duration %d", br.config.ScenarioName,
-		rate, durationSeconds)
-	for res := range attacker.Attack(targetProvider, rateLimiter, duration, trialName) {
+	for res := range attacker.Attack(targetProvider, rateLimiter, duration, "") {
 		br.logger.Log(res.Code, string(res.Body))
 		metrics.Add(res)
 	}
@@ -108,9 +105,10 @@ func printTestStatus(metrics vegeta.Metrics) {
 		errorMessages = "(none)"
 	}
 
-	fmt.Printf(
-		"  Success rate: %.1f%%, req/sec: %.1f, ports active: %d%%, ports waiting: %d%%, FDs: %d%%, errors: %s\n",
+	util.Log(
+		"  %.1f%% successful (%.1f req/s): issued %.1f req/s, %d%% ports active, %d%% ports waiting, %d%% FDs, errors: %s\n",
 		metrics.Success*100,
+		metrics.Throughput,
 		metrics.Rate,
 		establishedPct,
 		timeWaitPct,

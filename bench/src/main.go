@@ -57,22 +57,24 @@ func main() {
 			fail("Failed to set queries: %v", err)
 		}
 	case "run":
+		util.LogCommand()
 		scenario := parseScenario(backendDB)
 		benchmarkConfig := parseBenchmarkArgs(scenario.GetName())
 
 		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).DetermineRate()
-		fmt.Println()
+		util.Log("")
 		benchmarkStats.Print()
-		fmt.Printf("CPUs used: %d\n", benchmarkConfig.CPUCount)
+		util.Log("CPUs used: %d", benchmarkConfig.CPUCount)
 	case "test":
+		util.LogCommand()
 		scenario := parseScenario(backendDB)
 		benchmarkConfig := parseBenchmarkArgs(scenario.GetName())
 
 		metrics := runner.NewBenchmarkRunner(benchmarkConfig, scenario).TestRate(
 			benchmarkConfig.InitialRate, benchmarkConfig.DurationSeconds)
-		fmt.Println()
+		util.Log("")
 		runner.PrintMetrics(metrics)
-		fmt.Printf("CPUs used: %d\n", benchmarkConfig.CPUCount)
+		util.Log("CPUs used: %d", benchmarkConfig.CPUCount)
 	case "status":
 		timeWaitPercent, establishedPercent := util.GetPortsInUsePercents()
 		fmt.Printf("  active ports: %d%%, waiting ports: %d%%, FDs in use: %d%%\n\n",
