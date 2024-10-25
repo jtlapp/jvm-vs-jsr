@@ -32,7 +32,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 
 	// Warm up the application, in case it does JIT.
 
-	util.Log("Warming up...")
+	util.Log("\nWarm up run (ignored)...")
 	br.TestRate(warmupRequestsPerSecond, warmupSeconds)
 
 	// Find the highest rate that the system can handle without errors.

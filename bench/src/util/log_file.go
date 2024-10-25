@@ -18,7 +18,6 @@ func LogCommand() {
 
 	writeToFile("\n========================================\n")
 	writeToFile(time.Now().Format("2006-01-02 15:04:05") + " " + commandLine)
-	writeToFile("")
 }
 
 func Log(format string, args ...interface{}) {
