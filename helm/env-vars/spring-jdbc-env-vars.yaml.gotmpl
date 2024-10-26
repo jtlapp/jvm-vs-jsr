@@ -2,8 +2,8 @@ env:
   - name: SERVER_PORT
     value: "{{ .Values.global.app.port }}"
   - name: SPRING_DATASOURCE_URL
-    value: "jdbc:{{ .Values.global.pgbouncer.host }}"
+    value: "jdbc:{{ .Values.global.backend.pgbouncer.host }}"
   - name: SPRING_DATASOURCE_USERNAME
-    value: "{{ .Values.global.database.username }}"
+    value: "{{ .Values.global.backend.database.username }}"
   - name: SPRING_DATASOURCE_PASSWORD
-    value: "{{ .Values.global.database.password }}"
+    value: "{{ .Values.global.backend.database.password }}"

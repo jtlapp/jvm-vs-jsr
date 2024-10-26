@@ -12,8 +12,8 @@ helmDefaults:
 releases:
   # backend database
 
-  - name: backend-postgres
-    chart: charts/backend-postgres
+  - name: backend-database
+    chart: charts/backend-database
     values:
       - charts/global-values.yaml
 

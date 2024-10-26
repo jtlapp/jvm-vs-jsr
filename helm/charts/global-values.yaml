@@ -6,14 +6,14 @@ global:
     replicaCount: 1
     port: 8080
 
-  database:
-    replicaCount: 1
-    port: 5432
-    name: testdb
-    username: "user"
-    password: "password"
-
-  pgbouncer:
-    host: "postgresql://pgbouncer-service:6432/testdb"
-    hostName: "pgbouncer-service"
-    port: 6432
+  backend:
+    database:
+      replicaCount: 1
+      port: 5432
+      name: testdb
+      username: "user"
+      password: "password"
+    pgbouncer:
+      host: "postgresql://pgbouncer-service:6432/testdb"
+      hostName: "pgbouncer-service"
+      port: 6432

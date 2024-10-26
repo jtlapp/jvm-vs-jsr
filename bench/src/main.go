@@ -43,7 +43,7 @@ func main() {
 	defer backendDB.ClosePool()
 
 	switch command {
-	case "setup-all":
+	case "setup":
 		scenario := parseScenario(backendDB)
 		if err := scenario.SetUpTestTables(); err != nil {
 			fail("Failed to set up DB: %v", err)
@@ -143,7 +143,7 @@ func showUsage() {
 	fmt.Println("\nBenchmark tool for testing the performance of a web application.")
 
 	fmt.Println("\nCommands:")
-	fmt.Println("    setup-all <scenario>")
+	fmt.Println("    setup <scenario>")
 	fmt.Println("        Creates database tables and queries required for the test scenario.")
 	fmt.Println("    set-queries <scenario>")
 	fmt.Println("        Sets only the queries required for the test scenario")

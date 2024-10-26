@@ -22,9 +22,9 @@ spec:
             - name: BASE_APP_URL
               value: "{{ .Values.global.app.baseUrl }}"
             - name: DATABASE_URL
-              value: "{{ .Values.global.pgbouncer.host }}"
+              value: "{{ .Values.global.backend.pgbouncer.host }}"
             - name: DATABASE_USERNAME
-              value: "{{ .Values.global.database.username }}"
+              value: "{{ .Values.global.backend.database.username }}"
             - name: DATABASE_PASSWORD
-              value: "{{ .Values.global.database.password }}"
+              value: "{{ .Values.global.backend.database.password }}"
 

@@ -75,7 +75,7 @@ deployed app (if any) with the named app.
 ## Running Benchmarks
 
 1. Exec into the client pod using bash: `kubectl exec -it <client-pod> -- bash`.
-2. Run `./benchmark setup-all <scenario>` to set up the scenario of the given name.
+2. Run `./benchmark setup <scenario>` to set up the scenario of the given name.
 3. Run `./benchmark run <scenario> -rate <requests-per-sec> -duration <seconds>`.
 
 Run `./benchmark` to see other commands and get usage help.
