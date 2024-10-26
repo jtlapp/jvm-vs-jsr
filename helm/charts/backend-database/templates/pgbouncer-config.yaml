@@ -6,12 +6,12 @@ data:
   pgbouncer.ini: |
     [databases]
     
-    {{ .Values.global.database.name }} = host=localhost port={{ .Values.global.database.port }} user={{ .Values.global.database.username }} password={{ .Values.global.database.password }}
+    {{ .Values.global.backend.database.name }} = host=localhost port={{ .Values.global.backend.database.port }} user={{ .Values.global.backend.database.username }} password={{ .Values.global.backend.database.password }}
 
     [pgbouncer]
     
     listen_addr = 0.0.0.0
-    listen_port = {{ .Values.global.pgbouncer.port }}
+    listen_port = {{ .Values.global.backend.pgbouncer.port }}
     auth_type = md5
     auth_file = /etc/pgbouncer/userlist.txt
 

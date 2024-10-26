@@ -8,6 +8,7 @@ import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.Tuple;
+import io.vertx.sqlclient.data.Numeric;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -139,6 +140,8 @@ public class SharedQuery {
                     jsonObject.addProperty(columnName, (Double) value);
                 } else if (value instanceof java.time.LocalDate) {
                     jsonObject.addProperty(columnName, value.toString()); // Dates converted to strings
+                } else if (value instanceof Numeric) {
+                    jsonObject.addProperty(columnName, (Numeric) value);
                 } else if (value instanceof java.time.LocalDateTime) {
                     jsonObject.addProperty(columnName, value.toString()); // Timestamps converted to strings
                 } else if (value == null) {

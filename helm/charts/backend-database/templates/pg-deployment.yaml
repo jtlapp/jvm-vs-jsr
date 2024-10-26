@@ -1,33 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-postgres
+  name: backend-database
 spec:
-  replicas: {{ .Values.global.database.replicaCount }}
+  replicas: {{ .Values.global.backend.database.replicaCount }}
   selector:
     matchLabels:
-      app: backend-postgres
+      app: backend-database
   template:
     metadata:
       labels:
-        app: backend-postgres
+        app: backend-database
     spec:
       nodeSelector:
         kubernetes.io/hostname: backend
 
       containers:
 
-        - name: backend-postgres
+        - name: backend-database
           image: postgres:15
           env:
             - name: POSTGRES_DB
-              value: {{ .Values.global.database.name }}
+              value: {{ .Values.global.backend.database.name }}
             - name: POSTGRES_USER
-              value: {{ .Values.global.database.username }}
+              value: {{ .Values.global.backend.database.username }}
             - name: POSTGRES_PASSWORD
-              value: {{ .Values.global.database.password }}
+              value: {{ .Values.global.backend.database.password }}
           ports:
-            - containerPort: {{ .Values.global.database.port }}
+            - containerPort: {{ .Values.global.backend.database.port }}
           volumeMounts:
             - name: backend-sql-config
               mountPath: /docker-entrypoint-initdb.d/
@@ -36,9 +36,9 @@ spec:
           image: edoburu/pgbouncer:latest
           env:
             - name: DATABASE_URL
-              value: "jdbc:postgresql://localhost:{{ .Values.global.database.port }}/{{ .Values.global.database.name }}"
+              value: "jdbc:postgresql://localhost:{{ .Values.global.backend.database.port }}/{{ .Values.global.backend.database.name }}"
           ports:
-            - containerPort: {{ .Values.global.pgbouncer.port }}
+            - containerPort: {{ .Values.global.backend.pgbouncer.port }}
           volumeMounts:
             - name: pgbouncer-config
               mountPath: /etc/pgbouncer
