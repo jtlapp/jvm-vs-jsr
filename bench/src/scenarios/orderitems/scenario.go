@@ -2,25 +2,25 @@ package orderitems
 
 import (
 	vegeta "github.com/tsenart/vegeta/lib"
-	"jvm-vs-jsr.jtlapp.com/benchmark/util"
+	"jvm-vs-jsr.jtlapp.com/benchmark/backend"
 )
 
 type Scenario struct {
-	databaseSetup *util.DatabaseSetup
+	databaseSetup *backend.DatabaseSetup
 }
 
 func (s *Scenario) GetName() string {
 	return "orderitems"
 }
 
-func (s *Scenario) Init(backendDB *util.BackendDB) error {
+func (s *Scenario) Init(backendDB *backend.BackendDB) error {
 	dbPool, err := backendDB.GetPool()
 	if err != nil {
 		return err
 	}
 	impl := &SetupImpl{dbPool}
 
-	s.databaseSetup = util.NewDatabaseSetup(dbPool, impl)
+	s.databaseSetup = backend.NewDatabaseSetup(dbPool, impl)
 	return nil
 }
 

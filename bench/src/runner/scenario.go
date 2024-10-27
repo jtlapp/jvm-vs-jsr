@@ -2,12 +2,12 @@ package runner
 
 import (
 	vegeta "github.com/tsenart/vegeta/lib"
-	"jvm-vs-jsr.jtlapp.com/benchmark/util"
+	"jvm-vs-jsr.jtlapp.com/benchmark/backend"
 )
 
 type Scenario interface {
 	GetName() string
-	Init(backendDB *util.BackendDB) error
+	Init(backendDB *backend.BackendDB) error
 	SetUpTestTables() error
 	SetSharedQueries() error
 	GetTargetProvider(baseUrl string) func(*vegeta.Target) error

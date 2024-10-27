@@ -1,4 +1,4 @@
-package util
+package backend
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	dbUrlEnvVar      = "DATABASE_URL"
-	dbUsernameEnvVar = "DATABASE_USERNAME"
-	dbPasswordEnvVar = "DATABASE_PASSWORD"
+	dbUrlEnvVar      = "BACKEND_DATABASE_URL"
+	dbUsernameEnvVar = "BACKEND_DATABASE_USERNAME"
+	dbPasswordEnvVar = "BACKEND_DATABASE_PASSWORD"
 )
 
 type BackendDB struct {

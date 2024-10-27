@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	vegeta "github.com/tsenart/vegeta/lib"
-	"jvm-vs-jsr.jtlapp.com/benchmark/util"
+	"jvm-vs-jsr.jtlapp.com/benchmark/backend"
 )
 
 const (
@@ -18,7 +18,7 @@ func (s *Scenario) GetName() string {
 	return "sleep"
 }
 
-func (s *Scenario) Init(backendDB *util.BackendDB) error {
+func (s *Scenario) Init(backendDB *backend.BackendDB) error {
 	// nothing to do
 	return nil
 }

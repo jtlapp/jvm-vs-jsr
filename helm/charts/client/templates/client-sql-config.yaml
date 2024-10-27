@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: client-sql-config
+data:
+  init-query.sql: |
+    CREATE TABLE results (
+      id SERIAL PRIMARY KEY,
+      clientVersion VARCHAR NOT NULL,
+      clientAction VARCHAR NOT NULL,
+      appName VARCHAR NOT NULL,
+      appVersion VARCHAR NOT NULL,
+      appConfig JSONB NOT NULL,
+      testScenarioName VARCHAR NOT NULL,
+      testScenarioVersion VARCHAR NOT NULL,
+      testInitialRequestsPerSecond INTEGER NOT NULL,
+      testMaxConnections INTEGER NOT NULL,
+      testWorkerCount INTEGER NOT NULL,
+      testCpusUsed INTEGER NOT NULL,
+      testDurationSeconds INTEGER NOT NULL,
+      testTimeoutSeconds INTEGER NOT NULL,
+      testMinWaitSeconds INTEGER NOT NULL,
+      resultTestsPerformed INTEGER NOT NULL,
+      resultTestDurationSeconds INTEGER NOT NULL,
+      resultRequestsPerSecond DOUBLE PRECISION NOT NULL,
+      resultSuccessPercent DOUBLE PRECISION NOT NULL,
+      resultSuccessfulRequestsPerSecond DOUBLE PRECISION NOT NULL,
+      resultTotalRequests INTEGER NOT NULL,
+      resultMeanLatency VARCHAR NOT NULL,
+      result50thPercentileLatency VARCHAR NOT NULL,
+      result95thPercentileLatency VARCHAR NOT NULL,
+      result99thPercentileLatency VARCHAR NOT NULL,
+      resultMaxLatency VARCHAR NOT NULL,
+      resultHistogram JSONB NOT NULL,
+      resultStatusCodes JSONB NOT NULL,
+      resultErrorMessages VARCHAR,
+      remainingPortsActive INTEGER NOT NULL,
+      remainingPortsWaiting INTEGER NOT NULL,
+      remainingFDsInUse INTEGER NOT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX idx_results_client_version ON results(clientVersion);
+    CREATE INDEX idx_results_client_action ON results(clientAction);
+    CREATE INDEX idx_results_app_name ON results(appName);
+    CREATE INDEX idx_results_app_version ON results(appVersion);
+    CREATE INDEX idx_results_app_config ON results USING GIN (appConfig);
+    CREATE INDEX idx_results_test_scenario_name ON results(testScenarioName);
+    CREATE INDEX idx_results_test_scenario_version ON results(testScenarioVersion);

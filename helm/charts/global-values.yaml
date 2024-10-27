@@ -1,5 +1,12 @@
 global:
 
+  client:
+    database:
+      port: 5432
+      name: clientdb
+      username: "user"
+      password: "password"
+
   app:
     baseUrl: http://api-service:8080
     imagePullPolicy: Always

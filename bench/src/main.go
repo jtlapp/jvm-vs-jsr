@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 
+	"jvm-vs-jsr.jtlapp.com/benchmark/backend"
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/orderitems"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/sleep"
@@ -39,7 +40,7 @@ func main() {
 	}
 	command := os.Args[1]
 
-	backendDB := util.NewBackendDatabase()
+	backendDB := backend.NewBackendDatabase()
 	defer backendDB.ClosePool()
 
 	switch command {
@@ -84,7 +85,7 @@ func main() {
 	}
 }
 
-func parseScenario(backendDB *util.BackendDB) runner.Scenario {
+func parseScenario(backendDB *backend.BackendDB) runner.Scenario {
 	if len(os.Args) < 3 {
 		failWithUsage("Scenario name is required")
 	}
