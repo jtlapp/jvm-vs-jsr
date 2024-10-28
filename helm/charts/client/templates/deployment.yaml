@@ -15,7 +15,7 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: client
 
-      # Uncomment this to completely re-install the database.
+      # Uncomment this to completely re-install the client database.
 #      initContainers:
 #        - name: clear-data
 #          image: busybox
