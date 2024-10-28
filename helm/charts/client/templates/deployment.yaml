@@ -14,6 +14,7 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: client
+
       containers:
 
         - name: client
@@ -34,6 +35,13 @@ spec:
               value: "{{ .Values.global.backend.database.username }}"
             - name: BACKEND_DATABASE_PASSWORD
               value: "{{ .Values.global.backend.database.password }}"
+          # To delete the DB, uncomment this volume, comment out the client-database
+          # container, exec into the client, and run `rm -rdf /var/lib/postgresql/data/*`
+          # (include the trailing asterisk). It can't be done from within the client-
+          # database container because postgres will fail and Kubernetes will restart it.
+#          volumeMounts:
+#            - name: postgres-data
+#              mountPath: /var/lib/postgresql/data
 
         - name: client-database
           image: postgres:15
@@ -49,11 +57,11 @@ spec:
           volumeMounts:
             - name: client-sql-config
               mountPath: /docker-entrypoint-initdb.d/
-            - name: postgresdata
+            - name: postgres-data
               mountPath: /var/lib/postgresql/data
 
       volumes:
-        - name: postgresdata
+        - name: postgres-data
           persistentVolumeClaim:
             claimName: client-postgres-volume-claim
 
