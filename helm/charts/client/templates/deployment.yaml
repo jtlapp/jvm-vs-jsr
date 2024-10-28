@@ -15,6 +15,15 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: client
 
+      # Uncomment this to completely re-install the database.
+#      initContainers:
+#        - name: clear-data
+#          image: busybox
+#          command: [ 'sh', '-c', 'rm -rdf /var/lib/postgresql/data/*' ]
+#          volumeMounts:
+#            - name: postgres-data
+#              mountPath: /var/lib/postgresql/data
+
       containers:
 
         - name: client
@@ -35,13 +44,6 @@ spec:
               value: "{{ .Values.global.backend.database.username }}"
             - name: BACKEND_DATABASE_PASSWORD
               value: "{{ .Values.global.backend.database.password }}"
-          # To delete the DB, uncomment this volume, comment out the client-database
-          # container, exec into the client, and run `rm -rdf /var/lib/postgresql/data/*`
-          # (include the trailing asterisk). It can't be done from within the client-
-          # database container because postgres will fail and Kubernetes will restart it.
-#          volumeMounts:
-#            - name: postgres-data
-#              mountPath: /var/lib/postgresql/data
 
         - name: client-database
           image: postgres:15
