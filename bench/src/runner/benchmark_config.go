@@ -1,7 +1,11 @@
 package runner
 
 type BenchmarkConfig struct {
-	BaseURL               string
+	ClientVersion		  string
+	BaseAppUrl            string
+	AppName			   string
+	AppVersion			string
+	AppConfig			 map[string]interface{}
 	ScenarioName          string
 	CPUCount              int
 	MaxConnections        int

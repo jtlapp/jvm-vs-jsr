@@ -1,5 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyr2dbc.controllers;
 
+import com.google.gson.JsonObject;
 import com.jtlapp.jvmvsjs.r2dbcquery.SharedQueryRepo;
 import io.jooby.Context;
 import io.jooby.StatusCode;
@@ -8,6 +9,7 @@ import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import io.jooby.annotation.PathParam;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;
@@ -21,6 +23,14 @@ import java.util.concurrent.TimeUnit;
 public class ApiController {
 
     @Inject
+    @Named("application.name")
+    String appName;
+
+    @Inject
+    @Named("application.version")
+    String appVersion;
+
+    @Inject
     ScheduledExecutorService scheduler;
 
     @Inject
@@ -28,6 +38,15 @@ public class ApiController {
 
     @Inject
     DatabaseClient db;
+
+    @GET("/info")
+    public CompletableFuture<String> info() {
+        var gson = new JsonObject();
+        gson.addProperty("appName", appName);
+        gson.addProperty("appVersion", appVersion);
+        gson.add("appConfig", new JsonObject());
+        return CompletableFuture.completedFuture(gson.toString());
+    }
 
     @POST("/query/{queryName}")
     public Mono<String> query(

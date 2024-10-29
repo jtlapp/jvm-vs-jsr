@@ -1,7 +1,9 @@
 package com.jtlapp.jvmvsjs.springwebflux.controllers;
 
+import com.google.gson.JsonObject;
 import com.jtlapp.jvmvsjs.r2dbcquery.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -15,6 +17,11 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api")
 public class ApiController {
 
+    @Value("${application.name")
+    public String appName;
+    @Value("${application.version")
+    public String appVersion;
+
     @Autowired
     private ScheduledExecutorService scheduler;
 
@@ -23,6 +30,15 @@ public class ApiController {
 
     @Autowired
     private SharedQueryRepo sharedQueryRepo;
+
+    @GetMapping("/info")
+    public Mono<String> info() {
+        var gson = new JsonObject();
+        gson.addProperty("appName", appName);
+        gson.addProperty("appVersion", appVersion);
+        gson.add("appConfig", new JsonObject());
+        return Mono.just(gson.toString());
+    }  
 
     @PostMapping("/query/{queryName}")
     public Mono<ResponseEntity<String>> query(

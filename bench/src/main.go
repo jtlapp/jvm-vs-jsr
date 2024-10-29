@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	baseUrlEnvVar = "BASE_APP_URL"
+	version = "0.1.0"
+	baseAppUrlEnvVar = "BASE_APP_URL"
 )
 
 var scenariosSlice = []runner.Scenario{
@@ -113,12 +114,22 @@ func parseBenchmarkArgs(scenarioName string) runner.BenchmarkConfig {
 		flagSet.Parse(os.Args[3:])
 	}
 
-	baseUrl := os.Getenv(baseUrlEnvVar)
-	if baseUrl == "" {
-		fail("%s environment variable is required", baseUrlEnvVar)
+	baseAppUrl := os.Getenv(baseAppUrlEnvVar)
+	if baseAppUrl == "" {
+		fail("%s environment variable is required", baseAppUrlEnvVar)
 	}
+
+	appInfo, err := util.GetAppInfo(baseAppUrl)
+	if err != nil {
+		fail("Failed to get app info: %v", err)
+	}
+
 	return runner.BenchmarkConfig{
-		BaseURL:               baseUrl,
+		ClientVersion:         version,
+		BaseAppUrl:            baseAppUrl,
+		AppName:               appInfo.AppName,
+		AppVersion:            appInfo.AppVersion,
+		AppConfig:             appInfo.AppConfig,
 		ScenarioName:          scenarioName,
 		CPUCount:              *cpuCount,
 		MaxConnections:        *maxConnections,
@@ -141,7 +152,7 @@ func failWithUsage(format string, a ...interface{}) {
 }
 
 func showUsage() {
-	fmt.Println("\nBenchmark tool for testing the performance of a web application.")
+	fmt.Printf("\nBenchmark tool for testing the performance of a web application (v%s).", version)
 
 	fmt.Println("\nCommands:")
 	fmt.Println("    setup <scenario>")

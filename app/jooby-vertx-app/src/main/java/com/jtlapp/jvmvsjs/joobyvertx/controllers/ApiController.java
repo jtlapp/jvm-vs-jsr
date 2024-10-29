@@ -1,5 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyvertx.controllers;
 
+import com.google.gson.JsonObject;
 import com.jtlapp.jvmvsjs.vertxquery.SharedQueryRepo;
 import com.jtlapp.jvmvsjs.vertxquery.VertxUtil;
 import io.jooby.Context;
@@ -11,6 +12,7 @@ import io.jooby.annotation.PathParam;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import java.util.concurrent.CompletableFuture;
@@ -22,6 +24,14 @@ import java.util.concurrent.TimeUnit;
 public class ApiController {
 
     @Inject
+    @Named("application.name")
+    String appName;
+
+    @Inject
+    @Named("application.version")
+    String appVersion;
+
+    @Inject
     ScheduledExecutorService scheduler;
 
     @Inject
@@ -29,6 +39,15 @@ public class ApiController {
 
     @Inject
     Pool pgPool;
+
+    @GET("/info")
+    public CompletableFuture<String> info() {
+        var gson = new JsonObject();
+        gson.addProperty("appName", appName);
+        gson.addProperty("appVersion", appVersion);
+        gson.add("appConfig", new JsonObject());
+        return CompletableFuture.completedFuture(gson.toString());
+    }
 
     @POST("/query/{queryName}")
     public CompletableFuture<String> query(

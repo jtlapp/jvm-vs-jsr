@@ -77,7 +77,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 
 func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metrics {
 
-	targetProvider := br.scenario.GetTargetProvider(br.config.BaseURL)
+	targetProvider := br.scenario.GetTargetProvider(br.config.BaseAppUrl)
 
 	attacker := vegeta.NewAttacker(
 		vegeta.Workers(uint64(br.config.CPUCount)),

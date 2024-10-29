@@ -1,6 +1,7 @@
 package com.jtlapp.jvmvsjs.joobynomvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
@@ -13,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class JoobyNoMVCApp extends Jooby {
+    public final String appName = getClass().getSimpleName();
+    public final String appVersion = "0.1.0";
 
     {
         var scheduler = Executors.newScheduledThreadPool(1);
@@ -27,6 +30,14 @@ public class JoobyNoMVCApp extends Jooby {
         use(ReactiveSupport.concurrent());
 
         get("/", ctx -> "Running Jooby without MVC\n");
+
+        get("/api/info", ctx -> {
+            var gson = new JsonObject();
+            gson.addProperty("appName", appName);
+            gson.addProperty("appVersion", appVersion);
+            gson.add("appConfig", new JsonObject());
+            return CompletableFuture.completedFuture(gson.toString());
+        });
 
         post("/api/echoText", ctx -> {
             var body = ctx.body(String.class);
