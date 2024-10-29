@@ -80,7 +80,7 @@ func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metric
 	targetProvider := br.scenario.GetTargetProvider(br.config.BaseAppUrl)
 
 	attacker := vegeta.NewAttacker(
-		vegeta.Workers(uint64(br.config.CPUCount)),
+		vegeta.Workers(uint64(br.config.CPUsToUse)),
 		vegeta.Connections(br.config.MaxConnections),
 		vegeta.Timeout(time.Duration(br.config.RequestTimeoutSeconds)*time.Second),
 		vegeta.KeepAlive(true),

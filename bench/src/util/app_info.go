@@ -8,8 +8,8 @@ import (
 )
 
 type AppInfo struct {
-	AppName    string    `json:"appName"`
-	AppVersion string    `json:"appVersion"`
+	AppName    string                 `json:"appName"`
+	AppVersion string                 `json:"appVersion"`
 	AppConfig  map[string]interface{} `json:"appConfig"`
 }
 
@@ -52,4 +52,3 @@ func GetAppInfo(baseAppUrl string) (*AppInfo, error) {
 	// 	}
 	// }
 }
-

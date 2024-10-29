@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	version = "0.1.0"
+	version          = "0.1.0"
 	baseAppUrlEnvVar = "BASE_APP_URL"
 )
 
@@ -66,7 +66,7 @@ func main() {
 		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).DetermineRate()
 		util.Log("")
 		benchmarkStats.Print()
-		util.Log("CPUs used: %d", benchmarkConfig.CPUCount)
+		util.Log("CPUs used: %d", benchmarkConfig.CPUsToUse)
 	case "test":
 		util.LogCommand()
 		scenario := parseScenario(backendDB)
@@ -76,7 +76,7 @@ func main() {
 			benchmarkConfig.InitialRate, benchmarkConfig.DurationSeconds)
 		util.Log("")
 		runner.PrintMetrics(metrics)
-		util.Log("CPUs used: %d", benchmarkConfig.CPUCount)
+		util.Log("CPUs used: %d", benchmarkConfig.CPUsToUse)
 	case "status":
 		timeWaitPercent, establishedPercent := util.GetPortsInUsePercents()
 		fmt.Printf("  active ports: %d%%, waiting ports: %d%%, FDs in use: %d%%\n\n",
@@ -103,8 +103,10 @@ func parseScenario(backendDB *backend.BackendDB) runner.Scenario {
 }
 
 func parseBenchmarkArgs(scenarioName string) runner.BenchmarkConfig {
+	cpusPerNode := runtime.NumCPU()
+
 	flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-	cpuCount := flagSet.Int("cpus", runtime.NumCPU(), "Number of CPUs to use")
+	cpusToUse := flagSet.Int("cpus", cpusPerNode, "Number of CPUs to use")
 	maxConnections := flagSet.Int("maxconns", 0, "Maximum number of connections to use")
 	rate := flagSet.Int("rate", 10, "Requests per second")
 	duration := flagSet.Int("duration", 5, "Duration of the benchmark in seconds")
@@ -131,7 +133,8 @@ func parseBenchmarkArgs(scenarioName string) runner.BenchmarkConfig {
 		AppVersion:            appInfo.AppVersion,
 		AppConfig:             appInfo.AppConfig,
 		ScenarioName:          scenarioName,
-		CPUCount:              *cpuCount,
+		CPUsPerNode:           cpusPerNode,
+		CPUsToUse:             *cpusToUse,
 		MaxConnections:        *maxConnections,
 		InitialRate:           *rate,
 		DurationSeconds:       *duration,
