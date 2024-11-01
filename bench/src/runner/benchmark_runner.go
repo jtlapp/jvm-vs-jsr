@@ -114,7 +114,9 @@ func (br *BenchmarkRunner) waitBetweenTests() {
 }
 
 func printTestStatus(metrics vegeta.Metrics) {
-	remainingResources := util.GetRemainingResources()
+	resourceStatus := util.NewResourceStatus()
+	establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
+		resourceStatus.GetPercentages()
 
 	errorMessages := strings.Join(metrics.Errors, ", ")
 	if errorMessages == "" {
@@ -126,9 +128,9 @@ func printTestStatus(metrics vegeta.Metrics) {
 		metrics.Success*100,
 		metrics.Throughput,
 		metrics.Rate,
-		remainingResources.EstablishedPortsPercent,
-		remainingResources.TimeWaitPortsPercent,
-		remainingResources.FDsInUsePercent,
+		uint(establishedPortsPercent+.5),
+		uint(timeWaitPortsPercent+.5),
+		uint(fdsInUsePercent+.5),
 		errorMessages,
 	)
 }

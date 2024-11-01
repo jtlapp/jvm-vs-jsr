@@ -77,11 +77,13 @@ func main() {
 		runner.PrintMetrics(metrics)
 		util.Log("CPUs used: %d", benchmarkConfig.CPUsToUse)
 	case "status":
-		remainingResources := util.GetRemainingResources()
+		resources := util.NewResourceStatus()
+		establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
+			resources.GetPercentages()
 		fmt.Printf("  active ports: %d%%, waiting ports: %d%%, FDs in use: %d%%\n\n",
-			remainingResources.EstablishedPortsPercent,
-			remainingResources.EstablishedPortsPercent,
-			remainingResources.FDsInUsePercent)
+			uint(establishedPortsPercent+.5),
+			uint(timeWaitPortsPercent+.5),
+			uint(fdsInUsePercent+.5))
 	default:
 		fail("Invalid argument command '%s'", command)
 	}
