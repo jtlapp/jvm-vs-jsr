@@ -8,9 +8,32 @@ import (
 	"time"
 )
 
+type RemainingResources struct {
+	FDsInUsePercent         uint
+	TimeWaitPortsPercent    int
+	EstablishedPortsPercent int
+}
+
 var portRangeSize = getPortRangeSize()
 
-func GetFDsInUsePercent() uint {
+func GetRemainingResources() RemainingResources {
+	timeWaitPortsPercent, establishedPortsPercent := getPortsInUsePercents()
+	return RemainingResources{
+		FDsInUsePercent:         getFDsInUsePercent(),
+		TimeWaitPortsPercent:    timeWaitPortsPercent,
+		EstablishedPortsPercent: establishedPortsPercent,
+	}
+}
+
+func WaitForPortsToClear() {
+	timeWaitPercent, establishedPercent := getPortsInUsePercents()
+	for timeWaitPercent+establishedPercent > 0 {
+		time.Sleep(time.Second)
+		timeWaitPercent, establishedPercent = getPortsInUsePercents()
+	}
+}
+
+func getFDsInUsePercent() uint {
 	inUseFDs, err := os.ReadDir("/proc/self/fd")
 	if err != nil {
 		panic(err)
@@ -27,7 +50,7 @@ func GetFDsInUsePercent() uint {
 	return uint((inUseFDCount/float64(rlimit.Cur))*100.0 + 0.5)
 }
 
-func GetPortsInUsePercents() (timeWaitPercent, establishedPercent int) {
+func getPortsInUsePercents() (timeWaitPercent, establishedPercent int) {
 	var timeWaitCount, establishedCount float64
 
 	data, err := os.ReadFile("/proc/net/tcp")
@@ -70,12 +93,4 @@ func getPortRangeSize() uint16 {
 		panic(err)
 	}
 	return uint16(highPort - lowPort)
-}
-
-func WaitForPortsToClear() {
-	timeWaitPercent, establishedPercent := GetPortsInUsePercents()
-	for timeWaitPercent+establishedPercent > 0 {
-		time.Sleep(time.Second)
-		timeWaitPercent, establishedPercent = GetPortsInUsePercents()
-	}
 }

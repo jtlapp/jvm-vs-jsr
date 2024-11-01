@@ -30,11 +30,11 @@ spec:
           image: {{ .Values.global.app.dockerImagePrefix }}/bench:latest
           imagePullPolicy: {{ .Values.global.app.imagePullPolicy }}
           env:
-            - name: CLIENT_DATABASE_URL
+            - name: RESULTS_DATABASE_URL
               value: "{{ .Values.global.client.database.host }}"
-            - name: CLIENT_DATABASE_USERNAME
+            - name: RESULTS_DATABASE_USERNAME
               value: "{{ .Values.global.client.database.username }}"
-            - name: CLIENT_DATABASE_PASSWORD
+            - name: RESULTS_DATABASE_PASSWORD
               value: "{{ .Values.global.client.database.password }}"
             - name: BASE_APP_URL
               value: "{{ .Values.global.app.baseUrl }}"

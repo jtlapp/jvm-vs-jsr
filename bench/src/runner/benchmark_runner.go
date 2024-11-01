@@ -33,7 +33,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 	// Warm up the application, in case it does JIT.
 
 	util.Log("\nWarmup run (ignored)...")
-	br.TestRate(warmupRequestsPerSecond, warmupSeconds)
+	br.performRateTrial(warmupRequestsPerSecond, warmupSeconds)
 
 	// Find the highest rate that the system can handle without errors.
 
@@ -51,7 +51,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 		}
 
 		util.Log("\nTesting %d requests/sec...", currentRate)
-		metrics := br.TestRate(currentRate, br.config.DurationSeconds)
+		metrics := br.performRateTrial(currentRate, br.config.DurationSeconds)
 		printTestStatus(metrics)
 
 		if metrics.Success < 1 {
@@ -75,12 +75,16 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 	}
 }
 
-func (br *BenchmarkRunner) TestRate(rate int, durationSeconds int) vegeta.Metrics {
+func (br *BenchmarkRunner) TestRate() vegeta.Metrics {
+	return br.performRateTrial(br.config.InitialRate, br.config.DurationSeconds)
+}
+
+func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) vegeta.Metrics {
 
 	targetProvider := br.scenario.GetTargetProvider(br.config.BaseAppUrl)
 
 	attacker := vegeta.NewAttacker(
-		vegeta.Workers(uint64(br.config.CPUsToUse)),
+		vegeta.Workers(uint64(br.config.WorkerCount)),
 		vegeta.Connections(br.config.MaxConnections),
 		vegeta.Timeout(time.Duration(br.config.RequestTimeoutSeconds)*time.Second),
 		vegeta.KeepAlive(true),
@@ -110,8 +114,8 @@ func (br *BenchmarkRunner) waitBetweenTests() {
 }
 
 func printTestStatus(metrics vegeta.Metrics) {
+	remainingResources := util.GetRemainingResources()
 
-	timeWaitPct, establishedPct := util.GetPortsInUsePercents()
 	errorMessages := strings.Join(metrics.Errors, ", ")
 	if errorMessages == "" {
 		errorMessages = "(none)"
@@ -122,9 +126,9 @@ func printTestStatus(metrics vegeta.Metrics) {
 		metrics.Success*100,
 		metrics.Throughput,
 		metrics.Rate,
-		establishedPct,
-		timeWaitPct,
-		util.GetFDsInUsePercent(),
+		remainingResources.EstablishedPortsPercent,
+		remainingResources.TimeWaitPortsPercent,
+		remainingResources.FDsInUsePercent,
 		errorMessages,
 	)
 }

@@ -46,7 +46,7 @@ func main() {
 
 	switch command {
 	case "setup":
-		scenario := parseScenario(backendDB)
+		scenario := createScenario(backendDB)
 		if err := scenario.SetUpTestTables(); err != nil {
 			fail("Failed to set up DB: %v", err)
 		}
@@ -54,13 +54,13 @@ func main() {
 			fail("Failed to set queries: %v", err)
 		}
 	case "set-queries":
-		scenario := parseScenario(backendDB)
+		scenario := createScenario(backendDB)
 		if err := scenario.SetSharedQueries(); err != nil {
 			fail("Failed to set queries: %v", err)
 		}
 	case "run":
 		util.LogCommand()
-		scenario := parseScenario(backendDB)
+		scenario := createScenario(backendDB)
 		benchmarkConfig := parseBenchmarkArgs(scenario.GetName())
 
 		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).DetermineRate()
@@ -69,24 +69,25 @@ func main() {
 		util.Log("CPUs used: %d", benchmarkConfig.CPUsToUse)
 	case "test":
 		util.LogCommand()
-		scenario := parseScenario(backendDB)
+		scenario := createScenario(backendDB)
 		benchmarkConfig := parseBenchmarkArgs(scenario.GetName())
 
-		metrics := runner.NewBenchmarkRunner(benchmarkConfig, scenario).TestRate(
-			benchmarkConfig.InitialRate, benchmarkConfig.DurationSeconds)
+		metrics := runner.NewBenchmarkRunner(benchmarkConfig, scenario).TestRate()
 		util.Log("")
 		runner.PrintMetrics(metrics)
 		util.Log("CPUs used: %d", benchmarkConfig.CPUsToUse)
 	case "status":
-		timeWaitPercent, establishedPercent := util.GetPortsInUsePercents()
+		remainingResources := util.GetRemainingResources()
 		fmt.Printf("  active ports: %d%%, waiting ports: %d%%, FDs in use: %d%%\n\n",
-			establishedPercent, timeWaitPercent, util.GetFDsInUsePercent())
+			remainingResources.EstablishedPortsPercent,
+			remainingResources.EstablishedPortsPercent,
+			remainingResources.FDsInUsePercent)
 	default:
 		fail("Invalid argument command '%s'", command)
 	}
 }
 
-func parseScenario(backendDB *backend.BackendDB) runner.Scenario {
+func createScenario(backendDB *backend.BackendDB) runner.Scenario {
 	if len(os.Args) < 3 {
 		failWithUsage("Scenario name is required")
 	}
@@ -135,6 +136,7 @@ func parseBenchmarkArgs(scenarioName string) runner.BenchmarkConfig {
 		ScenarioName:          scenarioName,
 		CPUsPerNode:           cpusPerNode,
 		CPUsToUse:             *cpusToUse,
+		WorkerCount:           *cpusToUse,
 		MaxConnections:        *maxConnections,
 		InitialRate:           *rate,
 		DurationSeconds:       *duration,

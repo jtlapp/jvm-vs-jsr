@@ -34,9 +34,9 @@ data:
       "resultHistogram" JSONB NOT NULL,
       "resultStatusCodes" JSONB NOT NULL,
       "resultErrorMessages" VARCHAR,
-      "remainingPortsActive" INTEGER NOT NULL,
-      "remainingPortsWaiting" INTEGER NOT NULL,
-      "remainingFDsInUse" INTEGER NOT NULL,
+      "remainingPortsActivePercent" DOUBLE PRECISION NOT NULL,
+      "remainingPortsWaitingPercent" DOUBLE PRECISION NOT NULL,
+      "remainingFDsInUsePercent" DOUBLE PRECISION NOT NULL,
       "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
     );
 

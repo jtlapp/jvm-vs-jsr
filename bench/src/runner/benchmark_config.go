@@ -9,6 +9,7 @@ type BenchmarkConfig struct {
 	ScenarioName          string
 	CPUsPerNode           int
 	CPUsToUse             int
+	WorkerCount           int
 	MaxConnections        int
 	InitialRate           int
 	DurationSeconds       int
