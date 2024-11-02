@@ -7,11 +7,11 @@ data:
     CREATE TABLE results (
       "id" SERIAL PRIMARY KEY,
       "clientVersion" VARCHAR NOT NULL,
-      "clientAction" VARCHAR NOT NULL,
       "appName" VARCHAR NOT NULL,
       "appVersion" VARCHAR NOT NULL,
       "appConfig" JSONB NOT NULL,
-      "testCPUsPerNode" INTEGER NOT NULL,
+      "cpusPerNode" INTEGER NOT NULL,
+      "testAction" VARCHAR NOT NULL,
       "testScenarioName" VARCHAR NOT NULL,
       "testInitialRequestsPerSecond" INTEGER NOT NULL,
       "testMaxConnections" INTEGER NOT NULL,

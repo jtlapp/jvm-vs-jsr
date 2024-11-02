@@ -6,7 +6,7 @@ import (
 )
 
 type Scenario struct {
-	databaseSetup *database.DatabaseSetup
+	backendSetup *database.BackendSetup
 }
 
 func (s *Scenario) GetName() string {
@@ -20,16 +20,16 @@ func (s *Scenario) Init(backendDB *database.BackendDB) error {
 	}
 	impl := &SetupImpl{dbPool}
 
-	s.databaseSetup = database.NewDatabaseSetup(dbPool, impl)
+	s.backendSetup = database.NewBackendSetup(dbPool, impl)
 	return nil
 }
 
 func (s *Scenario) SetUpTestTables() error {
-	return s.databaseSetup.PopulateDatabase()
+	return s.backendSetup.PopulateDatabase()
 }
 
 func (s *Scenario) SetSharedQueries() error {
-	return s.databaseSetup.CreateSharedQueries()
+	return s.backendSetup.CreateSharedQueries()
 }
 
 func (s *Scenario) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {

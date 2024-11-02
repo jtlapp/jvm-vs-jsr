@@ -12,22 +12,22 @@ type SharedQuery struct {
 	Returns string
 }
 
-type DatabaseSetupImpl interface {
+type BackendSetupImpl interface {
 	CreateTables() error
 	PopulateTables() error
 	GetSharedQueries() []SharedQuery
 }
 
-type DatabaseSetup struct {
+type BackendSetup struct {
 	pool *pgxpool.Pool
-	impl DatabaseSetupImpl
+	impl BackendSetupImpl
 }
 
-func NewDatabaseSetup(pool *pgxpool.Pool, impl DatabaseSetupImpl) *DatabaseSetup {
-	return &DatabaseSetup{pool, impl}
+func NewBackendSetup(pool *pgxpool.Pool, impl BackendSetupImpl) *BackendSetup {
+	return &BackendSetup{pool, impl}
 }
 
-func (ds *DatabaseSetup) PopulateDatabase() error {
+func (ds *BackendSetup) PopulateDatabase() error {
 	if err := DropTables(ds.pool); err != nil {
 		return err
 	}
@@ -37,7 +37,7 @@ func (ds *DatabaseSetup) PopulateDatabase() error {
 	return ds.impl.PopulateTables()
 }
 
-func (ds *DatabaseSetup) CreateSharedQueries() error {
+func (ds *BackendSetup) CreateSharedQueries() error {
 	if err := EmptyTable(ds.pool, "shared_queries"); err != nil {
 		return err
 	}
