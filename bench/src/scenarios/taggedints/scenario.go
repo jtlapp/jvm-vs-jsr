@@ -4,18 +4,18 @@ import (
 	"math/rand"
 
 	vegeta "github.com/tsenart/vegeta/lib"
-	"jvm-vs-jsr.jtlapp.com/benchmark/backend"
+	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
 
 type Scenario struct {
-	databaseSetup *backend.DatabaseSetup
+	databaseSetup *database.DatabaseSetup
 }
 
 func (s *Scenario) GetName() string {
 	return "taggedints"
 }
 
-func (s *Scenario) Init(backendDB *backend.BackendDB) error {
+func (s *Scenario) Init(backendDB *database.BackendDB) error {
 	dbPool, err := backendDB.GetPool()
 	if err != nil {
 		return err
@@ -23,7 +23,7 @@ func (s *Scenario) Init(backendDB *backend.BackendDB) error {
 	randGen := rand.New(rand.NewSource(randomSeed))
 	impl := &SetupImpl{dbPool, randGen}
 
-	s.databaseSetup = backend.NewDatabaseSetup(dbPool, impl)
+	s.databaseSetup = database.NewDatabaseSetup(dbPool, impl)
 	return nil
 }
 

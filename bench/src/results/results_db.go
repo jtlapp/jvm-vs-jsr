@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"strings"
 
+	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
-var databaseConfig = util.DatabaseConfig{
+var databaseConfig = database.DatabaseConfig{
 	UrlEnvVar:      "RESULTS_DATABASE_URL",
 	UsernameEnvVar: "RESULTS_DATABASE_USERNAME",
 	PasswordEnvVar: "RESULTS_DATABASE_PASSWORD",
@@ -24,11 +25,11 @@ type TestInfo struct {
 }
 
 type ResultsDB struct {
-	util.Database
+	database.Database
 }
 
 func NewResultsDatabase() *ResultsDB {
-	return &ResultsDB{*util.NewDatabase(&databaseConfig)}
+	return &ResultsDB{*database.NewDatabase(&databaseConfig)}
 }
 
 func (rdb *ResultsDB) SaveResults(

@@ -5,7 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"jvm-vs-jsr.jtlapp.com/benchmark/backend"
+	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
 
 const (
@@ -49,8 +49,8 @@ func (s *SetupImpl) PopulateTables() error {
 	return nil
 }
 
-func (s *SetupImpl) GetSharedQueries() []backend.SharedQuery {
-	return []backend.SharedQuery{
+func (s *SetupImpl) GetSharedQueries() []database.SharedQuery {
+	return []database.SharedQuery{
 		{
 			Name:    "taggedints_sumInts",
 			Query:   `SELECT SUM(int) AS sum FROM tagged_ints WHERE tag1=${tag1} AND tag2=${tag2}`,

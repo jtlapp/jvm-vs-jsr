@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"jvm-vs-jsr.jtlapp.com/benchmark/backend"
+	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
 
 const (
@@ -121,8 +121,8 @@ func (s *SetupImpl) PopulateTables() error {
 	return nil
 }
 
-func (s *SetupImpl) GetSharedQueries() []backend.SharedQuery {
-	return []backend.SharedQuery{
+func (s *SetupImpl) GetSharedQueries() []database.SharedQuery {
+	return []database.SharedQuery{
 		{
 			Name: "orderitems_getOrder",
 			Query: `
