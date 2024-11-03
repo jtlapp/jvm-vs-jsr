@@ -37,7 +37,7 @@ func (ds *BackendSetup) PopulateDatabase() error {
 	return ds.impl.PopulateTables()
 }
 
-func (ds *BackendSetup) CreateSharedQueries() error {
+func (ds *BackendSetup) AssignSharedQueries() error {
 	if err := EmptyTable(ds.pool, "shared_queries"); err != nil {
 		return err
 	}

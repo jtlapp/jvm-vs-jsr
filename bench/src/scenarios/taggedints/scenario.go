@@ -7,32 +7,22 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
 
-type Scenario struct {
-	backendSetup *database.BackendSetup
-}
+type Scenario struct{}
 
 func (s *Scenario) GetName() string {
 	return "taggedints"
 }
 
-func (s *Scenario) Init(backendDB *database.BackendDB) error {
+func (s *Scenario) CreateBackendSetup(backendDB *database.BackendDB) (*database.BackendSetup, error) {
 	dbPool, err := backendDB.GetPool()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	randGen := rand.New(rand.NewSource(randomSeed))
 	impl := &SetupImpl{dbPool, randGen}
 
-	s.backendSetup = database.NewBackendSetup(dbPool, impl)
-	return nil
-}
-
-func (s *Scenario) SetUpTestTables() error {
-	return s.backendSetup.PopulateDatabase()
-}
-
-func (s *Scenario) SetSharedQueries() error {
-	return s.backendSetup.CreateSharedQueries()
+	backendSetup := database.NewBackendSetup(dbPool, impl)
+	return backendSetup, nil
 }
 
 func (s *Scenario) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {

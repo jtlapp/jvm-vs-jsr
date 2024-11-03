@@ -39,7 +39,7 @@ func (db *Database) GetPool() (*pgxpool.Pool, error) {
 	return db.pool, nil
 }
 
-func (db *Database) ClosePool() {
+func (db *Database) Close() {
 	if db.pool != nil {
 		db.pool.Close()
 	}

@@ -2,6 +2,7 @@ package sleep
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 
 	vegeta "github.com/tsenart/vegeta/lib"
@@ -18,19 +19,8 @@ func (s *Scenario) GetName() string {
 	return "sleep"
 }
 
-func (s *Scenario) Init(backendDB *database.BackendDB) error {
-	// nothing to do
-	return nil
-}
-
-func (s *Scenario) SetUpTestTables() error {
-	// nothing to do
-	return nil
-}
-
-func (s *Scenario) SetSharedQueries() error {
-	// nothing to do
-	return nil
+func (s *Scenario) CreateBackendSetup(backendDB *database.BackendDB) (*database.BackendSetup, error) {
+	return nil, errors.New("this scenario has no backend setup")
 }
 
 func (s *Scenario) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {

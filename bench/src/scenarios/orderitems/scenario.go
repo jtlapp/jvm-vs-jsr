@@ -5,31 +5,21 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
 
-type Scenario struct {
-	backendSetup *database.BackendSetup
-}
+type Scenario struct{}
 
 func (s *Scenario) GetName() string {
 	return "orderitems"
 }
 
-func (s *Scenario) Init(backendDB *database.BackendDB) error {
+func (s *Scenario) CreateBackendSetup(backendDB *database.BackendDB) (*database.BackendSetup, error) {
 	dbPool, err := backendDB.GetPool()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	impl := &SetupImpl{dbPool}
 
-	s.backendSetup = database.NewBackendSetup(dbPool, impl)
-	return nil
-}
-
-func (s *Scenario) SetUpTestTables() error {
-	return s.backendSetup.PopulateDatabase()
-}
-
-func (s *Scenario) SetSharedQueries() error {
-	return s.backendSetup.CreateSharedQueries()
+	backendSetup := database.NewBackendSetup(dbPool, impl)
+	return backendSetup, nil
 }
 
 func (s *Scenario) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {

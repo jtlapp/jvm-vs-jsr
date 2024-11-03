@@ -5,6 +5,7 @@ import (
 	"time"
 
 	vegeta "github.com/tsenart/vegeta/lib"
+	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
@@ -15,12 +16,12 @@ const (
 
 type BenchmarkRunner struct {
 	config         BenchmarkConfig
-	scenario       Scenario
+	scenario       *scenarios.Scenario
 	successMetrics vegeta.Metrics
 	logger         *ResponseLogger
 }
 
-func NewBenchmarkRunner(config BenchmarkConfig, scenario Scenario) *BenchmarkRunner {
+func NewBenchmarkRunner(config BenchmarkConfig, scenario *scenarios.Scenario) *BenchmarkRunner {
 	return &BenchmarkRunner{
 		config:   config,
 		scenario: scenario,
@@ -81,7 +82,7 @@ func (br *BenchmarkRunner) TestRate() vegeta.Metrics {
 
 func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) vegeta.Metrics {
 
-	targetProvider := br.scenario.GetTargetProvider(br.config.BaseAppUrl)
+	targetProvider := (*br.scenario).GetTargetProvider(br.config.BaseAppUrl)
 
 	attacker := vegeta.NewAttacker(
 		vegeta.Workers(uint64(br.config.WorkerCount)),

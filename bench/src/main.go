@@ -1,16 +1,11 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
-	"runtime"
 
-	"jvm-vs-jsr.jtlapp.com/benchmark/database"
-	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
-	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/orderitems"
-	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/sleep"
-	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/taggedints"
+	"jvm-vs-jsr.jtlapp.com/benchmark/command"
+	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
@@ -19,143 +14,46 @@ const (
 	baseAppUrlEnvVar = "BASE_APP_URL"
 )
 
-var scenariosSlice = []runner.Scenario{
-	&sleep.Scenario{},
-	&taggedints.Scenario{},
-	&orderitems.Scenario{},
-}
-
-func getScenario(name string) (runner.Scenario, bool) {
-	for _, scenario := range scenariosSlice {
-		if scenario.GetName() == name {
-			return scenario, true
-		}
-	}
-	return nil, false
-}
-
 func main() {
 	if len(os.Args) == 1 {
 		showUsage()
 		os.Exit(0)
 	}
-	command := os.Args[1]
-
-	backendDB := database.NewBackendDatabase()
-	defer backendDB.ClosePool()
-
-	switch command {
-	case "setup":
-		scenario := createScenario(backendDB)
-		if err := scenario.SetUpTestTables(); err != nil {
-			fail("Failed to set up DB: %v", err)
-		}
-		if err := scenario.SetSharedQueries(); err != nil {
-			fail("Failed to set queries: %v", err)
-		}
-	case "set-queries":
-		scenario := createScenario(backendDB)
-		if err := scenario.SetSharedQueries(); err != nil {
-			fail("Failed to set queries: %v", err)
-		}
-	case "run":
-		util.LogCommand()
-		scenario := createScenario(backendDB)
-		benchmarkConfig := parseBenchmarkArgs(scenario.GetName())
-
-		benchmarkStats := runner.NewBenchmarkRunner(benchmarkConfig, scenario).DetermineRate()
-		util.Log("")
-		benchmarkStats.Print()
-		util.Log("CPUs used: %d", benchmarkConfig.CPUsToUse)
-	case "test":
-		util.LogCommand()
-		scenario := createScenario(backendDB)
-		benchmarkConfig := parseBenchmarkArgs(scenario.GetName())
-
-		metrics := runner.NewBenchmarkRunner(benchmarkConfig, scenario).TestRate()
-		util.Log("")
-		runner.PrintMetrics(metrics)
-		util.Log("CPUs used: %d", benchmarkConfig.CPUsToUse)
-	case "status":
-		resources := util.NewResourceStatus()
-		establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
-			resources.GetPercentages()
-		fmt.Printf("  active ports: %d%%, waiting ports: %d%%, FDs in use: %d%%\n\n",
-			uint(establishedPortsPercent+.5),
-			uint(timeWaitPortsPercent+.5),
-			uint(fdsInUsePercent+.5))
-	default:
-		fail("Invalid argument command '%s'", command)
-	}
-}
-
-func createScenario(backendDB *database.BackendDB) runner.Scenario {
-	if len(os.Args) < 3 {
-		failWithUsage("Scenario name is required")
-	}
-	scenarioName := os.Args[2]
-
-	scenario, valid := getScenario(scenarioName)
-	if !valid {
-		fail("Unknown test scenario: %s", scenarioName)
-	}
-	if err := scenario.Init(backendDB); err != nil {
-		fail("Initialization failed: %v", err)
-	}
-	return scenario
-}
-
-func parseBenchmarkArgs(scenarioName string) runner.BenchmarkConfig {
-	cpusPerNode := runtime.NumCPU()
-
-	flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-	cpusToUse := flagSet.Int("cpus", cpusPerNode, "Number of CPUs to use")
-	maxConnections := flagSet.Int("maxconns", 0, "Maximum number of connections to use")
-	rate := flagSet.Int("rate", 10, "Requests per second")
-	duration := flagSet.Int("duration", 5, "Duration of the benchmark in seconds")
-	timeout := flagSet.Int("timeout", 10, "Request response timeout in seconds")
-	minWait := flagSet.Int("minwait", 0, "Minimum wait time between tests in seconds")
-	if len(os.Args) > 3 {
-		flagSet.Parse(os.Args[3:])
-	}
+	commandName := os.Args[1]
+	util.LogCommand()
+	var err error
 
 	baseAppUrl := os.Getenv(baseAppUrlEnvVar)
 	if baseAppUrl == "" {
-		fail("%s environment variable is required", baseAppUrlEnvVar)
+		err = fmt.Errorf("%s environment variable is required", baseAppUrlEnvVar)
+	}
+	clientInfo := command.ClientInfo{ClientVersion: version, BaseAppUrl: baseAppUrl}
+	argsParser := command.NewArgsParser(clientInfo)
+
+	if err == nil {
+		switch commandName {
+		case "setup-backend":
+			err = command.SetupBackendDB(argsParser)
+		case "assign-queries":
+			err = command.AssignQueries(argsParser)
+		case "run":
+			err = command.DetermineRate(argsParser)
+		case "test":
+			err = command.TestRate(argsParser)
+		case "status":
+			err = command.ShowStatus()
+		default:
+			err = fmt.Errorf("invalid argument command '%s'", commandName)
+		}
 	}
 
-	appInfo, err := util.GetAppInfo(baseAppUrl)
 	if err != nil {
-		fail("Failed to get app info: %v", err)
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		if command.IsUsageError(err) {
+			showUsage()
+		}
+		os.Exit(1)
 	}
-
-	return runner.BenchmarkConfig{
-		ClientVersion:         version,
-		BaseAppUrl:            baseAppUrl,
-		AppName:               appInfo.AppName,
-		AppVersion:            appInfo.AppVersion,
-		AppConfig:             appInfo.AppConfig,
-		ScenarioName:          scenarioName,
-		CPUsPerNode:           cpusPerNode,
-		CPUsToUse:             *cpusToUse,
-		WorkerCount:           *cpusToUse,
-		MaxConnections:        *maxConnections,
-		InitialRate:           *rate,
-		DurationSeconds:       *duration,
-		RequestTimeoutSeconds: *timeout,
-		MinWaitSeconds:        *minWait,
-	}
-}
-
-func fail(format string, a ...interface{}) {
-	fmt.Printf(format+"\n", a...)
-	os.Exit(1)
-}
-
-func failWithUsage(format string, a ...interface{}) {
-	fmt.Printf(format+"\n", a...)
-	showUsage()
-	os.Exit(1)
 }
 
 func showUsage() {
@@ -176,7 +74,7 @@ func showUsage() {
 	fmt.Println("        Prints the active ports, waiting ports, and file descriptors in use.")
 
 	fmt.Println("\nAvailable scenarios:")
-	for _, scenario := range scenariosSlice {
+	for _, scenario := range scenarios.GetScenarios() {
 		fmt.Printf("    %s\n", scenario.GetName())
 	}
 
