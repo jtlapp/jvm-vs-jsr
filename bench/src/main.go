@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/command"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
@@ -15,38 +16,61 @@ const (
 )
 
 func main() {
+
+	// Extract environment variables.
+
+	baseAppUrl := os.Getenv(baseAppUrlEnvVar)
+	if baseAppUrl == "" {
+		err := fmt.Errorf("%s environment variable is required", baseAppUrlEnvVar)
+		if err != nil {
+			fail(err)
+		}
+	}
+
+	// Extract the command.
+
 	if len(os.Args) == 1 {
 		showUsage()
 		os.Exit(0)
 	}
 	commandName := os.Args[1]
-	util.LogCommand()
-	var err error
 
-	baseAppUrl := os.Getenv(baseAppUrlEnvVar)
-	if baseAppUrl == "" {
-		err = fmt.Errorf("%s environment variable is required", baseAppUrlEnvVar)
+	// Log the command line.
+
+	commandLine := os.Args[0]
+	for _, arg := range os.Args[1:] {
+		commandLine += " " + arg
 	}
+	util.Log("\n========================================\n")
+	util.Log(time.Now().Format("2006-01-02 15:04:05") + " " + commandLine)
+
+	// Execute the command.
+
 	clientInfo := command.ClientInfo{ClientVersion: version, BaseAppUrl: baseAppUrl}
 	argsParser := command.NewArgsParser(clientInfo)
+	var err error
 
-	if err == nil {
-		switch commandName {
-		case "setup-backend":
-			err = command.SetupBackendDB(argsParser)
-		case "assign-queries":
-			err = command.AssignQueries(argsParser)
-		case "run":
-			err = command.DetermineRate(argsParser)
-		case "test":
-			err = command.TestRate(argsParser)
-		case "status":
-			err = command.ShowStatus()
-		default:
-			err = fmt.Errorf("invalid argument command '%s'", commandName)
-		}
+	switch commandName {
+	case "setup-backend":
+		err = command.SetupBackendDB(argsParser)
+	case "assign-queries":
+		err = command.AssignQueries(argsParser)
+	case "run":
+		err = command.DetermineRate(argsParser)
+	case "test":
+		err = command.TestRate(argsParser)
+	case "status":
+		err = command.ShowStatus()
+	default:
+		err = fmt.Errorf("invalid argument command '%s'", commandName)
 	}
 
+	if err != nil {
+		fail(err)
+	}
+}
+
+func fail(err error) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		if command.IsUsageError(err) {
