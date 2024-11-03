@@ -3,6 +3,7 @@ package scenarios
 import (
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/orderitems"
@@ -12,7 +13,7 @@ import (
 
 type Scenario interface {
 	GetName() string
-	CreateBackendSetup(backendDB *database.BackendDB) (*database.BackendSetup, error)
+	CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSetup, error)
 	GetTargetProvider(baseUrl string) func(*vegeta.Target) error
 }
 

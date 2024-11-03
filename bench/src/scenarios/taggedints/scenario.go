@@ -3,6 +3,7 @@ package taggedints
 import (
 	"math/rand"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
@@ -13,15 +14,9 @@ func (s *Scenario) GetName() string {
 	return "taggedints"
 }
 
-func (s *Scenario) CreateBackendSetup(backendDB *database.BackendDB) (*database.BackendSetup, error) {
-	dbPool, err := backendDB.GetPool()
-	if err != nil {
-		return nil, err
-	}
+func (s *Scenario) CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSetup, error) {
 	randGen := rand.New(rand.NewSource(randomSeed))
-	impl := &SetupImpl{dbPool, randGen}
-
-	backendSetup := database.NewBackendSetup(dbPool, impl)
+	backendSetup := database.NewBackendSetup(dbPool, &SetupImpl{dbPool, randGen})
 	return backendSetup, nil
 }
 

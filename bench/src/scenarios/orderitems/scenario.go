@@ -1,6 +1,7 @@
 package orderitems
 
 import (
+	"github.com/jackc/pgx/v5/pgxpool"
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
@@ -11,14 +12,8 @@ func (s *Scenario) GetName() string {
 	return "orderitems"
 }
 
-func (s *Scenario) CreateBackendSetup(backendDB *database.BackendDB) (*database.BackendSetup, error) {
-	dbPool, err := backendDB.GetPool()
-	if err != nil {
-		return nil, err
-	}
-	impl := &SetupImpl{dbPool}
-
-	backendSetup := database.NewBackendSetup(dbPool, impl)
+func (s *Scenario) CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSetup, error) {
+	backendSetup := database.NewBackendSetup(dbPool, &SetupImpl{dbPool})
 	return backendSetup, nil
 }
 

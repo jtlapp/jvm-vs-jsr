@@ -3,34 +3,41 @@ package command
 import (
 	"fmt"
 
+	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
 func DetermineRate(argsParser *ArgsParser) error {
-	benchmarkConfig, scenario, err := createBenchmarkConfig(argsParser)
+	resultsDB := database.NewResultsDatabase()
+	defer resultsDB.Close()
+
+	benchmarkRunner, err := createBenchmarkRunner(argsParser, resultsDB)
 	if err != nil {
 		return err
 	}
 
-	benchmarkStats := runner.NewBenchmarkRunner(*benchmarkConfig, scenario).DetermineRate()
+	benchmarkStats := benchmarkRunner.DetermineRate()
 	util.Log("")
 	benchmarkStats.Print()
-	util.Log("CPUs used: %d", benchmarkConfig.CPUsToUse)
+	util.Log("CPUs used: %d", benchmarkRunner.GetConfig().CPUsToUse)
 	return nil
 }
 
 func TestRate(argsParser *ArgsParser) error {
-	benchmarkConfig, scenario, err := createBenchmarkConfig(argsParser)
+	resultsDB := database.NewResultsDatabase()
+	defer resultsDB.Close()
+
+	benchmarkRunner, err := createBenchmarkRunner(argsParser, resultsDB)
 	if err != nil {
 		return err
 	}
 
-	metrics := runner.NewBenchmarkRunner(*benchmarkConfig, scenario).TestRate()
+	metrics := benchmarkRunner.TestRate()
 	util.Log("")
 	runner.PrintMetrics(metrics)
-	util.Log("CPUs used: %d", benchmarkConfig.CPUsToUse)
+	util.Log("CPUs used: %d", benchmarkRunner.GetConfig().CPUsToUse)
 	return nil
 }
 
@@ -45,18 +52,26 @@ func ShowStatus() error {
 	return nil
 }
 
-func createBenchmarkConfig(argsParser *ArgsParser) (*runner.BenchmarkConfig, *scenarios.Scenario, error) {
-	scenarioName, err := argsParser.GetScenarioArg()
+func createBenchmarkRunner(argsParser *ArgsParser, resultsDB *database.ResultsDB) (*runner.BenchmarkRunner, error) {
+	scenarioName, err := argsParser.GetScenarioName()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
 	scenario, err := scenarios.GetScenario(scenarioName)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
 	benchmarkConfig, err := argsParser.GetBenchmarkArgs(scenarioName)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return benchmarkConfig, &scenario, nil
+
+	dbPool, err := resultsDB.GetPool()
+	if err != nil {
+		return nil, err
+	}
+
+	return runner.NewBenchmarkRunner(*benchmarkConfig, &scenario, dbPool)
 }

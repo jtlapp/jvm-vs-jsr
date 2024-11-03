@@ -84,9 +84,9 @@ func showUsage() {
 	fmt.Printf("\nBenchmark tool for testing the performance of a web application (v%s).", version)
 
 	fmt.Println("\nCommands:")
-	fmt.Println("    setup <scenario>")
+	fmt.Println("    setup-backend <scenario>")
 	fmt.Println("        Creates database tables and queries required for the test scenario.")
-	fmt.Println("    set-queries <scenario>")
+	fmt.Println("    assign-queries <scenario>")
 	fmt.Println("        Sets only the queries required for the test scenario")
 	fmt.Println("    run <scenario> [<attack-options>]")
 	fmt.Println("        Finds the highest constant/stable rate. The resulting rate is guaranteed")

@@ -17,7 +17,7 @@ func NewArgsParser(clientInfo ClientInfo) *ArgsParser {
 	return &ArgsParser{clientInfo}
 }
 
-func (ap *ArgsParser) GetScenarioArg() (string, error) {
+func (ap *ArgsParser) GetScenarioName() (string, error) {
 	if len(os.Args) < 3 {
 		return "", NewUsageError("scenario name is required")
 	}

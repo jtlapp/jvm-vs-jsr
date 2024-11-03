@@ -33,7 +33,7 @@ func AssignQueries(argsParser *ArgsParser) error {
 }
 
 func createBackendSetup(argsParser *ArgsParser, backendDB *database.BackendDB) (*database.BackendSetup, error) {
-	scenarioName, err := argsParser.GetScenarioArg()
+	scenarioName, err := argsParser.GetScenarioName()
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,12 @@ func createBackendSetup(argsParser *ArgsParser, backendDB *database.BackendDB) (
 		return nil, err
 	}
 
-	backendSetup, err := scenario.CreateBackendSetup(backendDB)
+	dbPool, err := backendDB.GetPool()
+	if err != nil {
+		return nil, err
+	}
+
+	backendSetup, err := scenario.CreateBackendSetup(dbPool)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create backend setup: %v", err)
 	}

@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
@@ -17,16 +18,22 @@ const (
 type BenchmarkRunner struct {
 	config         BenchmarkConfig
 	scenario       *scenarios.Scenario
+	pool           *pgxpool.Pool
 	successMetrics vegeta.Metrics
 	logger         *ResponseLogger
 }
 
-func NewBenchmarkRunner(config BenchmarkConfig, scenario *scenarios.Scenario) *BenchmarkRunner {
+func NewBenchmarkRunner(config BenchmarkConfig, scenario *scenarios.Scenario, dbPool *pgxpool.Pool) (*BenchmarkRunner, error) {
 	return &BenchmarkRunner{
 		config:   config,
 		scenario: scenario,
+		pool:     dbPool,
 		logger:   NewResponseLogger(),
-	}
+	}, nil
+}
+
+func (br *BenchmarkRunner) GetConfig() BenchmarkConfig {
+	return br.config
 }
 
 func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
