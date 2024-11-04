@@ -5,16 +5,15 @@ import (
 	"os"
 	"runtime"
 
-	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
-	"jvm-vs-jsr.jtlapp.com/benchmark/util"
+	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 )
 
 type ArgsParser struct {
-	clientInfo ClientInfo
+	clientConfig config.ClientConfig
 }
 
-func NewArgsParser(clientInfo ClientInfo) *ArgsParser {
-	return &ArgsParser{clientInfo}
+func NewArgsParser(clientConfig config.ClientConfig) *ArgsParser {
+	return &ArgsParser{clientConfig}
 }
 
 func (ap *ArgsParser) GetScenarioName() (string, error) {
@@ -24,11 +23,14 @@ func (ap *ArgsParser) GetScenarioName() (string, error) {
 	return os.Args[2], nil
 }
 
-func (ap *ArgsParser) GetBenchmarkArgs(scenarioName string) (*runner.BenchmarkConfig, error) {
-	cpusPerNode := runtime.NumCPU()
+func (ap *ArgsParser) GetTestConfig() (*config.TestConfig, error) {
+	scenarioName, err := ap.GetScenarioName()
+	if err != nil {
+		return nil, err
+	}
 
 	flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-	cpusToUse := flagSet.Int("cpus", cpusPerNode, "Number of CPUs to use")
+	cpusToUse := flagSet.Int("cpus", runtime.NumCPU(), "Number of CPUs to use")
 	maxConnections := flagSet.Int("maxconns", 0, "Maximum number of connections to use")
 	rate := flagSet.Int("rate", 10, "Requests per second")
 	duration := flagSet.Int("duration", 5, "Duration of the benchmark in seconds")
@@ -38,25 +40,14 @@ func (ap *ArgsParser) GetBenchmarkArgs(scenarioName string) (*runner.BenchmarkCo
 		flagSet.Parse(os.Args[3:])
 	}
 
-	appInfo, err := util.GetAppInfo(ap.clientInfo.BaseAppUrl)
-	if err != nil {
-		return nil, NewUsageError("Failed to get app info: %v", err)
-	}
-
-	return &runner.BenchmarkConfig{
-		ClientVersion:         ap.clientInfo.ClientVersion,
-		BaseAppUrl:            ap.clientInfo.BaseAppUrl,
-		AppName:               appInfo.AppName,
-		AppVersion:            appInfo.AppVersion,
-		AppConfig:             appInfo.AppConfig,
-		ScenarioName:          scenarioName,
-		CPUsPerNode:           cpusPerNode,
-		CPUsToUse:             *cpusToUse,
-		WorkerCount:           *cpusToUse,
-		MaxConnections:        *maxConnections,
-		InitialRate:           *rate,
-		DurationSeconds:       *duration,
-		RequestTimeoutSeconds: *timeout,
-		MinWaitSeconds:        *minWait,
+	return &config.TestConfig{
+		ScenarioName:             scenarioName,
+		CPUsToUse:                *cpusToUse,
+		WorkerCount:              *cpusToUse,
+		MaxConnections:           *maxConnections,
+		InitialRequestsPerSecond: *rate,
+		DurationSeconds:          *duration,
+		RequestTimeoutSeconds:    *timeout,
+		MinWaitSeconds:           *minWait,
 	}, nil
 }

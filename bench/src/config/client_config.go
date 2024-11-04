@@ -1,6 +1,6 @@
-package command
+package config
 
-type ClientInfo struct {
+type ClientConfig struct {
 	ClientVersion string
 	BaseAppUrl    string
 }

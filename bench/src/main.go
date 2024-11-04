@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/command"
+	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
@@ -46,8 +47,8 @@ func main() {
 
 	// Execute the command.
 
-	clientInfo := command.ClientInfo{ClientVersion: version, BaseAppUrl: baseAppUrl}
-	argsParser := command.NewArgsParser(clientInfo)
+	clientConfig := config.ClientConfig{ClientVersion: version, BaseAppUrl: baseAppUrl}
+	argsParser := command.NewArgsParser(clientConfig)
 	var err error
 
 	switch commandName {
@@ -56,9 +57,9 @@ func main() {
 	case "assign-queries":
 		err = command.AssignQueries(argsParser)
 	case "run":
-		err = command.DetermineRate(argsParser)
+		err = command.DetermineRate(clientConfig, argsParser)
 	case "test":
-		err = command.TestRate(argsParser)
+		err = command.TestRate(clientConfig, argsParser)
 	case "status":
 		err = command.ShowStatus()
 	default:

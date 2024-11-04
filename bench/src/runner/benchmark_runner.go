@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	vegeta "github.com/tsenart/vegeta/lib"
+	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
@@ -16,24 +17,26 @@ const (
 )
 
 type BenchmarkRunner struct {
-	config         BenchmarkConfig
+	platformConfig config.PlatformConfig
+	testConfig     config.TestConfig
 	scenario       *scenarios.Scenario
-	pool           *pgxpool.Pool
+	dbPool         *pgxpool.Pool
 	successMetrics vegeta.Metrics
 	logger         *ResponseLogger
 }
 
-func NewBenchmarkRunner(config BenchmarkConfig, scenario *scenarios.Scenario, dbPool *pgxpool.Pool) (*BenchmarkRunner, error) {
+func NewBenchmarkRunner(platformConfig config.PlatformConfig, testConfig config.TestConfig, scenario *scenarios.Scenario, dbPool *pgxpool.Pool) (*BenchmarkRunner, error) {
 	return &BenchmarkRunner{
-		config:   config,
-		scenario: scenario,
-		pool:     dbPool,
-		logger:   NewResponseLogger(),
+		platformConfig: platformConfig,
+		testConfig:     testConfig,
+		scenario:       scenario,
+		dbPool:         dbPool,
+		logger:         NewResponseLogger(),
 	}, nil
 }
 
-func (br *BenchmarkRunner) GetConfig() BenchmarkConfig {
-	return br.config
+func (br *BenchmarkRunner) GetTestConfig() config.TestConfig {
+	return br.testConfig
 }
 
 func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
@@ -45,7 +48,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 
 	// Find the highest rate that the system can handle without errors.
 
-	rateUpperBound := br.config.InitialRate
+	rateUpperBound := br.testConfig.InitialRequestsPerSecond
 	rateLowerBound := 0
 	currentRate := -1
 	nextRate := rateUpperBound
@@ -59,7 +62,7 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 		}
 
 		util.Log("\nTesting %d requests/sec...", currentRate)
-		metrics := br.performRateTrial(currentRate, br.config.DurationSeconds)
+		metrics := br.performRateTrial(currentRate, br.testConfig.DurationSeconds)
 		printTestStatus(metrics)
 
 		if metrics.Success < 1 {
@@ -84,17 +87,17 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 }
 
 func (br *BenchmarkRunner) TestRate() vegeta.Metrics {
-	return br.performRateTrial(br.config.InitialRate, br.config.DurationSeconds)
+	return br.performRateTrial(br.testConfig.InitialRequestsPerSecond, br.testConfig.DurationSeconds)
 }
 
 func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) vegeta.Metrics {
 
-	targetProvider := (*br.scenario).GetTargetProvider(br.config.BaseAppUrl)
+	targetProvider := (*br.scenario).GetTargetProvider(br.platformConfig.BaseAppUrl)
 
 	attacker := vegeta.NewAttacker(
-		vegeta.Workers(uint64(br.config.WorkerCount)),
-		vegeta.Connections(br.config.MaxConnections),
-		vegeta.Timeout(time.Duration(br.config.RequestTimeoutSeconds)*time.Second),
+		vegeta.Workers(uint64(br.testConfig.WorkerCount)),
+		vegeta.Connections(br.testConfig.MaxConnections),
+		vegeta.Timeout(time.Duration(br.testConfig.RequestTimeoutSeconds)*time.Second),
 		vegeta.KeepAlive(true),
 	)
 	rateLimiter := vegeta.Rate{Freq: rate, Per: time.Second}
@@ -114,7 +117,7 @@ func (br *BenchmarkRunner) waitBetweenTests() {
 	start := time.Now()
 	util.WaitForPortsToClear()
 	elapsed := time.Since(start)
-	minDuration := time.Duration(br.config.MinWaitSeconds) * time.Second
+	minDuration := time.Duration(br.testConfig.MinWaitSeconds) * time.Second
 
 	if remainingTime := minDuration - elapsed; remainingTime > 0 {
 		time.Sleep(remainingTime)

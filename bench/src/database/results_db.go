@@ -7,28 +7,9 @@ import (
 	"strings"
 
 	vegeta "github.com/tsenart/vegeta/lib"
+	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
-
-type PlatformInfo struct {
-	ClientVersion string
-	AppName       string
-	AppVersion    string
-	AppConfig     map[string]interface{}
-	CPUsPerNode   int
-}
-
-type TestConfig struct {
-	Action                   string
-	ScenarioName             string
-	InitialRequestsPerSecond int
-	MaxConnections           int
-	WorkerCount              int
-	CPUsToUse                int
-	DurationSeconds          int
-	RequestTimeoutSeconds    int
-	MinWaitSeconds           int
-}
 
 type TestResults struct {
 	TestsPerformed       int
@@ -53,8 +34,9 @@ func NewResultsDatabase() *ResultsDB {
 }
 
 func (rdb *ResultsDB) SaveResults(
-	info *PlatformInfo,
-	config *TestConfig,
+	clientAction string,
+	info *config.PlatformConfig,
+	config *config.TestConfig,
 	results *TestResults,
 	resources *util.ResourceStatus,
 ) error {
@@ -124,7 +106,7 @@ func (rdb *ResultsDB) SaveResults(
 		info.AppVersion,                            // $3  - appVersion
 		appConfigJSON,                              // $4  - appConfig
 		info.CPUsPerNode,                           // $5  - cpusPerNode
-		config.Action,                              // $6  - clientAction
+		clientAction,                               // $6  - clientAction
 		config.ScenarioName,                        // $7  - testScenarioName
 		config.InitialRequestsPerSecond,            // $8  - testInitialRequestsPerSecond
 		config.MaxConnections,                      // $9  - testMaxConnections

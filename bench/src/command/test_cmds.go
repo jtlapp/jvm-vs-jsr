@@ -3,17 +3,18 @@ package command
 import (
 	"fmt"
 
+	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
-func DetermineRate(argsParser *ArgsParser) error {
+func DetermineRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
 	resultsDB := database.NewResultsDatabase()
 	defer resultsDB.Close()
 
-	benchmarkRunner, err := createBenchmarkRunner(argsParser, resultsDB)
+	benchmarkRunner, err := createBenchmarkRunner(clientConfig, argsParser, resultsDB)
 	if err != nil {
 		return err
 	}
@@ -21,15 +22,15 @@ func DetermineRate(argsParser *ArgsParser) error {
 	benchmarkStats := benchmarkRunner.DetermineRate()
 	util.Log("")
 	benchmarkStats.Print()
-	util.Log("CPUs used: %d", benchmarkRunner.GetConfig().CPUsToUse)
+	util.Log("CPUs used: %d", benchmarkRunner.GetTestConfig().CPUsToUse)
 	return nil
 }
 
-func TestRate(argsParser *ArgsParser) error {
+func TestRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
 	resultsDB := database.NewResultsDatabase()
 	defer resultsDB.Close()
 
-	benchmarkRunner, err := createBenchmarkRunner(argsParser, resultsDB)
+	benchmarkRunner, err := createBenchmarkRunner(clientConfig, argsParser, resultsDB)
 	if err != nil {
 		return err
 	}
@@ -37,7 +38,7 @@ func TestRate(argsParser *ArgsParser) error {
 	metrics := benchmarkRunner.TestRate()
 	util.Log("")
 	runner.PrintMetrics(metrics)
-	util.Log("CPUs used: %d", benchmarkRunner.GetConfig().CPUsToUse)
+	util.Log("CPUs used: %d", benchmarkRunner.GetTestConfig().CPUsToUse)
 	return nil
 }
 
@@ -52,7 +53,12 @@ func ShowStatus() error {
 	return nil
 }
 
-func createBenchmarkRunner(argsParser *ArgsParser, resultsDB *database.ResultsDB) (*runner.BenchmarkRunner, error) {
+func createBenchmarkRunner(clientConfig config.ClientConfig, argsParser *ArgsParser, resultsDB *database.ResultsDB) (*runner.BenchmarkRunner, error) {
+	platformConfig, err := config.GetPlatformConfig(clientConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	scenarioName, err := argsParser.GetScenarioName()
 	if err != nil {
 		return nil, err
@@ -63,7 +69,7 @@ func createBenchmarkRunner(argsParser *ArgsParser, resultsDB *database.ResultsDB
 		return nil, err
 	}
 
-	benchmarkConfig, err := argsParser.GetBenchmarkArgs(scenarioName)
+	testConfig, err := argsParser.GetTestConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -73,5 +79,5 @@ func createBenchmarkRunner(argsParser *ArgsParser, resultsDB *database.ResultsDB
 		return nil, err
 	}
 
-	return runner.NewBenchmarkRunner(*benchmarkConfig, &scenario, dbPool)
+	return runner.NewBenchmarkRunner(*platformConfig, *testConfig, &scenario, dbPool)
 }
