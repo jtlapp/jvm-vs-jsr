@@ -14,10 +14,22 @@ import (
 type TestResults struct {
 	TestsPerformed       int
 	TotalDurationSeconds int
-	TotalRequests        int
 	Metrics              vegeta.Metrics
-	StatusCodes          map[string]int
-	ErrorMessages        []string
+}
+
+func (tr *TestResults) Print() {
+	metrics := tr.Metrics
+
+	util.Log("Tests Performed: %d", tr.TestsPerformed)
+	util.Log("Total Duration: %d seconds", tr.TotalDurationSeconds)
+	util.Log("Steady state rate: %.1f", metrics.Rate)
+	util.Log("Throughput: %f requests/sec", metrics.Throughput)
+	util.Log("Requests: %d", metrics.Requests)
+	util.Log("Success Percentage: %.2f%%", metrics.Success*100)
+	util.Log("Average Latency: %s", metrics.Latencies.Mean)
+	util.Log("99th Percentile Latency: %s", metrics.Latencies.P99)
+	util.Log("Max Latency: %s", metrics.Latencies.Max)
+	util.Log("Status Codes: %v", metrics.StatusCodes)
 }
 
 type ResultsDB struct {
@@ -35,8 +47,8 @@ func NewResultsDatabase() *ResultsDB {
 
 func (rdb *ResultsDB) SaveResults(
 	clientAction string,
-	info *config.PlatformConfig,
-	config *config.TestConfig,
+	platformConfig *config.PlatformConfig,
+	testConfig *config.TestConfig,
 	results *TestResults,
 	resources *util.ResourceStatus,
 ) error {
@@ -45,7 +57,7 @@ func (rdb *ResultsDB) SaveResults(
 		return err
 	}
 
-	appConfigJSON, err := json.Marshal(info.AppConfig)
+	appConfigJSON, err := json.Marshal(platformConfig.AppConfig)
 	if err != nil {
 		return fmt.Errorf("failed to marshal app config: %w", err)
 	}
@@ -101,20 +113,20 @@ func (rdb *ResultsDB) SaveResults(
 		)`
 
 	_, err = pool.Exec(context.Background(), query,
-		info.ClientVersion,                         // $1  - clientVersion
-		info.AppName,                               // $2  - appName
-		info.AppVersion,                            // $3  - appVersion
+		platformConfig.ClientVersion,               // $1  - clientVersion
+		platformConfig.AppName,                     // $2  - appName
+		platformConfig.AppVersion,                  // $3  - appVersion
 		appConfigJSON,                              // $4  - appConfig
-		info.CPUsPerNode,                           // $5  - cpusPerNode
+		platformConfig.CPUsPerNode,                 // $5  - cpusPerNode
 		clientAction,                               // $6  - clientAction
-		config.ScenarioName,                        // $7  - testScenarioName
-		config.InitialRequestsPerSecond,            // $8  - testInitialRequestsPerSecond
-		config.MaxConnections,                      // $9  - testMaxConnections
-		config.WorkerCount,                         // $10 - testWorkerCount
-		config.CPUsToUse,                           // $11 - testCPUsUsed
-		config.DurationSeconds,                     // $12 - testDurationSeconds
-		config.RequestTimeoutSeconds,               // $13 - testTimeoutSeconds
-		config.MinWaitSeconds,                      // $14 - testMinWaitSeconds
+		testConfig.ScenarioName,                    // $7  - testScenarioName
+		testConfig.InitialRequestsPerSecond,        // $8  - testInitialRequestsPerSecond
+		testConfig.MaxConnections,                  // $9  - testMaxConnections
+		testConfig.WorkerCount,                     // $10 - testWorkerCount
+		testConfig.CPUsToUse,                       // $11 - testCPUsUsed
+		testConfig.DurationSeconds,                 // $12 - testDurationSeconds
+		testConfig.RequestTimeoutSeconds,           // $13 - testTimeoutSeconds
+		testConfig.MinWaitSeconds,                  // $14 - testMinWaitSeconds
 		results.TestsPerformed,                     // $15 - resultTestsPerformed
 		results.TotalDurationSeconds,               // $16 - resultTestDurationSeconds
 		results.Metrics.Rate,                       // $17 - resultRequestsPerSecond

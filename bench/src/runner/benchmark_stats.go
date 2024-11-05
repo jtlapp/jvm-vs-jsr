@@ -16,9 +16,10 @@ func (bs BenchmarkStats) Print() {
 }
 
 func PrintMetrics(metrics vegeta.Metrics) {
+	util.Log("Steady state rate: %.1f", metrics.Rate)
 	util.Log("Throughput: %f requests/sec", metrics.Throughput)
 	util.Log("Requests: %d", metrics.Requests)
-	util.Log("Success Rate: %.2f%%", metrics.Success*100)
+	util.Log("Success Percentage: %.2f%%", metrics.Success*100)
 	util.Log("Average Latency: %s", metrics.Latencies.Mean)
 	util.Log("99th Percentile Latency: %s", metrics.Latencies.P99)
 	util.Log("Max Latency: %s", metrics.Latencies.Max)

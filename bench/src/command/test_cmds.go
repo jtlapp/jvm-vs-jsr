@@ -19,10 +19,9 @@ func DetermineRate(clientConfig config.ClientConfig, argsParser *ArgsParser) err
 		return err
 	}
 
-	benchmarkStats := benchmarkRunner.DetermineRate()
+	testResults := benchmarkRunner.DetermineRate()
 	util.Log("")
-	benchmarkStats.Print()
-	util.Log("CPUs used: %d", benchmarkRunner.GetTestConfig().CPUsToUse)
+	testResults.Print()
 	return nil
 }
 
@@ -38,7 +37,6 @@ func TestRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
 	metrics := benchmarkRunner.TestRate()
 	util.Log("")
 	runner.PrintMetrics(metrics)
-	util.Log("CPUs used: %d", benchmarkRunner.GetTestConfig().CPUsToUse)
 	return nil
 }
 
@@ -74,10 +72,5 @@ func createBenchmarkRunner(clientConfig config.ClientConfig, argsParser *ArgsPar
 		return nil, err
 	}
 
-	dbPool, err := resultsDB.GetPool()
-	if err != nil {
-		return nil, err
-	}
-
-	return runner.NewBenchmarkRunner(*platformConfig, *testConfig, &scenario, dbPool)
+	return runner.NewBenchmarkRunner(*platformConfig, *testConfig, &scenario, resultsDB)
 }

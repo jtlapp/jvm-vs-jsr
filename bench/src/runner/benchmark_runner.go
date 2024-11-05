@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
+	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
@@ -20,17 +20,17 @@ type BenchmarkRunner struct {
 	platformConfig config.PlatformConfig
 	testConfig     config.TestConfig
 	scenario       *scenarios.Scenario
-	dbPool         *pgxpool.Pool
+	resultsDB      *database.ResultsDB
 	successMetrics vegeta.Metrics
 	logger         *ResponseLogger
 }
 
-func NewBenchmarkRunner(platformConfig config.PlatformConfig, testConfig config.TestConfig, scenario *scenarios.Scenario, dbPool *pgxpool.Pool) (*BenchmarkRunner, error) {
+func NewBenchmarkRunner(platformConfig config.PlatformConfig, testConfig config.TestConfig, scenario *scenarios.Scenario, resultsDB *database.ResultsDB) (*BenchmarkRunner, error) {
 	return &BenchmarkRunner{
 		platformConfig: platformConfig,
 		testConfig:     testConfig,
 		scenario:       scenario,
-		dbPool:         dbPool,
+		resultsDB:      resultsDB,
 		logger:         NewResponseLogger(),
 	}, nil
 }
@@ -39,7 +39,7 @@ func (br *BenchmarkRunner) GetTestConfig() config.TestConfig {
 	return br.testConfig
 }
 
-func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
+func (br *BenchmarkRunner) DetermineRate() *database.TestResults {
 
 	// Warm up the application, in case it does JIT.
 
@@ -52,6 +52,8 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 	rateLowerBound := 0
 	currentRate := -1
 	nextRate := rateUpperBound
+	testsPerformed := 0
+	startTime := time.Now()
 
 	for currentRate != 0 && nextRate != currentRate {
 		br.waitBetweenTests()
@@ -78,12 +80,18 @@ func (br *BenchmarkRunner) DetermineRate() BenchmarkStats {
 				nextRate = (rateLowerBound + rateUpperBound) / 2
 			}
 		}
+		testsPerformed += 1
 	}
 
-	return BenchmarkStats{
-		SteadyStateRate: currentRate,
-		Metrics:         br.successMetrics,
+	testResults := &database.TestResults{
+		TestsPerformed:       testsPerformed,
+		TotalDurationSeconds: int(time.Since(startTime).Seconds()),
+		Metrics:              br.successMetrics,
 	}
+	resources := util.NewResourceStatus()
+	br.resultsDB.SaveResults("det", &br.platformConfig, &br.testConfig, testResults, &resources)
+
+	return testResults
 }
 
 func (br *BenchmarkRunner) TestRate() vegeta.Metrics {
@@ -109,6 +117,14 @@ func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) veget
 		metrics.Add(res)
 	}
 	metrics.Close()
+
+	testResults := &database.TestResults{
+		TestsPerformed:       1,
+		TotalDurationSeconds: int(metrics.Duration.Seconds()),
+		Metrics:              metrics,
+	}
+	resources := util.NewResourceStatus()
+	br.resultsDB.SaveResults("trial", &br.platformConfig, &br.testConfig, testResults, &resources)
 
 	return metrics
 }
