@@ -19,7 +19,7 @@ spec:
 #      initContainers:
 #        - name: clear-data
 #          image: busybox
-#          command: [ 'sh', '-c', 'rm -rdf /var/lib/postgresql/data/*' ]
+#          command: [ 'sh', '-c', 'rm -rf /var/lib/postgresql/data/* && rmdir base || true' ]
 #          volumeMounts:
 #            - name: postgres-data
 #              mountPath: /var/lib/postgresql/data
