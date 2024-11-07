@@ -13,7 +13,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Factory
-public class DependencyFactory {
+public class AppConfig {
+
+    public static final String version = "0.1.0";
+
+    @Bean
+    @Named("application.name")
+    public String getAppName() {
+        return getClass().getSimpleName();
+    }
+
+    @Bean
+    @Named("application.version")
+    public String getAppVersion() {
+        return version;
+    }
 
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {

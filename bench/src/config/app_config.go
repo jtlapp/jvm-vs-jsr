@@ -14,25 +14,31 @@ type AppInfo struct {
 }
 
 func GetAppInfo(baseAppUrl string) (*AppInfo, error) {
-	resp, err := http.Get(fmt.Sprintf("%s/api/info", baseAppUrl))
+	url := fmt.Sprintf("%s/api/info", baseAppUrl)
+	resp, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting app info: %v", err)
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+        return nil, fmt.Errorf("status code %d getting app info from %s", resp.StatusCode, url)
+    }
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error reading app info response: %v", err)
 	}
 
 	var appInfo AppInfo
 	err = json.Unmarshal(body, &appInfo)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error unmarshalling app info: %v", err)
 	}
 
 	return &appInfo, nil
 
+	// TODO: Delete this?
 	// for key, value := range appInfo.AppConfig {
 	// 	switch v := value.(type) {
 	// 	case string:
