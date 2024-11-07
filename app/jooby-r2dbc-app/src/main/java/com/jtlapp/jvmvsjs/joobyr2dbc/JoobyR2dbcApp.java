@@ -17,7 +17,6 @@ import jakarta.inject.Singleton;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Singleton
-@Factory
 public class JoobyR2dbcApp extends Jooby {
 
     @Inject
