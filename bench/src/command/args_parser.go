@@ -37,7 +37,10 @@ func (ap *ArgsParser) GetTestConfig() (*config.TestConfig, error) {
 	timeout := flagSet.Int("timeout", 10, "Request response timeout in seconds")
 	minWait := flagSet.Int("minwait", 0, "Minimum wait time between tests in seconds")
 	if len(os.Args) > 3 {
-		flagSet.Parse(os.Args[3:])
+		err := flagSet.Parse(os.Args[3:])
+		if err != nil {
+			return nil, NewUsageError("%s", err.Error())
+		}
 	}
 
 	return &config.TestConfig{

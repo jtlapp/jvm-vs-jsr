@@ -19,7 +19,10 @@ func DetermineRate(clientConfig config.ClientConfig, argsParser *ArgsParser) err
 		return err
 	}
 
-	testResults := benchmarkRunner.DetermineRate()
+	testResults, err := benchmarkRunner.DetermineRate()
+	if err != nil {
+		return err
+	}
 	util.Log("")
 	testResults.Print()
 	return nil
@@ -34,9 +37,12 @@ func TestRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
 		return err
 	}
 
-	metrics := benchmarkRunner.TestRate()
+	metrics, err := benchmarkRunner.TestRate()
+	if err != nil {
+		return err
+	}
 	util.Log("")
-	runner.PrintMetrics(metrics)
+	runner.PrintMetrics(*metrics)
 	return nil
 }
 

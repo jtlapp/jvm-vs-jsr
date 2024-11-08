@@ -43,7 +43,7 @@ func main() {
 		commandLine += " " + arg
 	}
 	util.Log("\n========================================\n")
-	util.Log(time.Now().Format("2006-01-02 15:04:05") + " " + commandLine)
+	util.Log("%s", time.Now().Format("2006-01-02 15:04:05") + " " + commandLine)
 
 	// Execute the command.
 

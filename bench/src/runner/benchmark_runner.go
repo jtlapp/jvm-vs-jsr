@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -39,12 +40,15 @@ func (br *BenchmarkRunner) GetTestConfig() config.TestConfig {
 	return br.testConfig
 }
 
-func (br *BenchmarkRunner) DetermineRate() *database.TestResults {
+func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
 
 	// Warm up the application, in case it does JIT.
 
 	util.Log("\nWarmup run (ignored)...")
-	br.performRateTrial(warmupRequestsPerSecond, warmupSeconds)
+	_, err := br.performRateTrial(warmupRequestsPerSecond, warmupSeconds)
+	if err != nil {
+		return nil, fmt.Errorf("error performing warmup trial: %v", err)
+	}
 
 	// Find the highest rate that the system can handle without errors.
 
@@ -64,14 +68,17 @@ func (br *BenchmarkRunner) DetermineRate() *database.TestResults {
 		}
 
 		util.Log("\nTesting %d requests/sec...", currentRate)
-		metrics := br.performRateTrial(currentRate, br.testConfig.DurationSeconds)
+		metrics, err := br.performRateTrial(currentRate, br.testConfig.DurationSeconds)
+		if err != nil {
+			return nil, fmt.Errorf("error performing rate trial: %v", err)
+		}
 		printTestStatus(metrics)
 
 		if metrics.Success < 1 {
 			rateUpperBound = currentRate
 			nextRate = (rateLowerBound + rateUpperBound) / 2
 		} else {
-			br.successMetrics = metrics
+			br.successMetrics = *metrics
 			rateLowerBound = currentRate
 			if currentRate == rateUpperBound {
 				rateUpperBound *= 2
@@ -80,7 +87,7 @@ func (br *BenchmarkRunner) DetermineRate() *database.TestResults {
 				nextRate = (rateLowerBound + rateUpperBound) / 2
 			}
 		}
-		testsPerformed += 1
+		testsPerformed++
 	}
 
 	testResults := &database.TestResults{
@@ -89,16 +96,19 @@ func (br *BenchmarkRunner) DetermineRate() *database.TestResults {
 		Metrics:              br.successMetrics,
 	}
 	resources := util.NewResourceStatus()
-	br.resultsDB.SaveResults("det", &br.platformConfig, &br.testConfig, testResults, &resources)
+	err = br.resultsDB.SaveResults("det", &br.platformConfig, &br.testConfig, testResults, &resources)
+	if err != nil {
+		return nil, fmt.Errorf("error saving rate determination results: %v", err)
+	}
 
-	return testResults
+	return testResults, nil
 }
 
-func (br *BenchmarkRunner) TestRate() vegeta.Metrics {
+func (br *BenchmarkRunner) TestRate() (*vegeta.Metrics, error) {
 	return br.performRateTrial(br.testConfig.InitialRequestsPerSecond, br.testConfig.DurationSeconds)
 }
 
-func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) vegeta.Metrics {
+func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*vegeta.Metrics, error) {
 
 	targetProvider := (*br.scenario).GetTargetProvider(br.platformConfig.BaseAppUrl)
 
@@ -124,9 +134,13 @@ func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) veget
 		Metrics:              metrics,
 	}
 	resources := util.NewResourceStatus()
-	br.resultsDB.SaveResults("trial", &br.platformConfig, &br.testConfig, testResults, &resources)
+	err := br.resultsDB.SaveResults("trial", &br.platformConfig, &br.testConfig, testResults, &resources)
+	if err != nil {
+		util.Log("Error saving trial results: %v", err)
+		return nil, err
+	}
 
-	return metrics
+	return &metrics, nil
 }
 
 func (br *BenchmarkRunner) waitBetweenTests() {
@@ -140,7 +154,7 @@ func (br *BenchmarkRunner) waitBetweenTests() {
 	}
 }
 
-func printTestStatus(metrics vegeta.Metrics) {
+func printTestStatus(metrics *vegeta.Metrics) {
 	resourceStatus := util.NewResourceStatus()
 	establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
 		resourceStatus.GetPercentages()
