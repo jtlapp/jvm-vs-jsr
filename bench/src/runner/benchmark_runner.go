@@ -146,7 +146,7 @@ func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*veg
 
 func (br *BenchmarkRunner) waitBetweenTests() {
 	start := time.Now()
-	util.WaitForPortsToClear(br.platformConfig.InitialPortsInUse)
+	util.WaitForPortsToClear(br.platformConfig.MaxReservedPorts)
 	elapsed := time.Since(start)
 	minDuration := time.Duration(br.testConfig.MinWaitSeconds) * time.Second
 

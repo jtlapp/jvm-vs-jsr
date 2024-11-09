@@ -36,9 +36,9 @@ func (rs *ResourceStatus) GetPercentages() (float64, float64, float64) {
 		float64(rs.FDsInUseCount) * 100 / float64(rs.TotalFileDescriptors)
 }
 
-func WaitForPortsToClear(initialPortsInUse uint) {
+func WaitForPortsToClear(maxReservedPorts uint) {
 	timeWaitPortsCount, establishedPortsCount := getPortsInUseCounts()
-	for timeWaitPortsCount+establishedPortsCount > initialPortsInUse {
+	for timeWaitPortsCount+establishedPortsCount > maxReservedPorts {
 		time.Sleep(time.Second)
 		timeWaitPortsCount, establishedPortsCount = getPortsInUseCounts()
 	}

@@ -7,13 +7,17 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
+const (
+	maxReservedPorts = 8
+)
+
 type PlatformConfig struct {
 	ClientConfig
-	AppName           string
-	AppVersion        string
-	AppConfig         map[string]interface{}
-	CPUsPerNode       uint
-	InitialPortsInUse uint
+	AppName          string
+	AppVersion       string
+	AppConfig        map[string]interface{}
+	CPUsPerNode      uint
+	MaxReservedPorts uint
 }
 
 func GetPlatformConfig(clientConfig ClientConfig) (*PlatformConfig, error) {
@@ -28,11 +32,11 @@ func GetPlatformConfig(clientConfig ClientConfig) (*PlatformConfig, error) {
 	}
 
 	return &PlatformConfig{
-		ClientConfig:      clientConfig,
-		AppName:           appInfo.AppName,
-		AppVersion:        appInfo.AppVersion,
-		AppConfig:         appInfo.AppConfig,
-		CPUsPerNode:       uint(runtime.NumCPU()),
-		InitialPortsInUse: resources.EstablishedPortsCount,
+		ClientConfig:     clientConfig,
+		AppName:          appInfo.AppName,
+		AppVersion:       appInfo.AppVersion,
+		AppConfig:        appInfo.AppConfig,
+		CPUsPerNode:      uint(runtime.NumCPU()),
+		MaxReservedPorts: maxReservedPorts,
 	}, nil
 }
