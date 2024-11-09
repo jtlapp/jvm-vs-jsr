@@ -11,7 +11,7 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/taggedints"
 )
 
-type Scenario interface{
+type Scenario interface {
 	GetName() string
 	CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSetup, error)
 	GetTargetProvider(baseUrl string) func(*vegeta.Target) error

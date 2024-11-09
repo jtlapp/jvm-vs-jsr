@@ -23,7 +23,7 @@ func DetermineRate(clientConfig config.ClientConfig, argsParser *ArgsParser) err
 	if err != nil {
 		return err
 	}
-	util.Log("")
+	util.Log()
 	testResults.Print()
 	return nil
 }
@@ -41,7 +41,7 @@ func TestRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
 	if err != nil {
 		return err
 	}
-	util.Log("")
+	util.Log()
 	runner.PrintMetrics(*metrics)
 	return nil
 }
@@ -50,9 +50,14 @@ func ShowStatus() error {
 	resources := util.NewResourceStatus()
 	establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
 		resources.GetPercentages()
-	fmt.Printf("  active ports: %d%%, waiting ports: %d%%, FDs in use: %d%%\n\n",
-		uint(establishedPortsPercent+.5),
-		uint(timeWaitPortsPercent+.5),
+	fmt.Printf("  active ports: %d of %d (%d%%)\n",
+		resources.EstablishedPortsCount, resources.TotalAvailablePorts,
+		uint(establishedPortsPercent+.5))
+	fmt.Printf("  waiting ports: %d of %d (%d%%)\n",
+		resources.TimeWaitPortsCount, resources.TotalAvailablePorts,
+		uint(timeWaitPortsPercent+.5))
+	fmt.Printf("  FDs in use: %d of %d (%d%%)\n",
+		resources.FDsInUseCount, resources.TotalFileDescriptors,
 		uint(fdsInUsePercent+.5))
 	return nil
 }

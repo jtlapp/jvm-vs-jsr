@@ -45,7 +45,7 @@ func (rl *ResponseLogger) Log(responseCode uint16, body string) {
 		if responseCode == 0 && body == emptyBody {
 			util.Log("  ex. STATUS: timeout")
 		} else {
-			util.Log("  ex. STATUS %d: %s", responseCode, body)
+			util.FLog("  ex. STATUS %d: %s", responseCode, body)
 		}
 	}
 }

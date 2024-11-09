@@ -31,7 +31,7 @@ spec:
           imagePullPolicy: {{ .Values.global.app.imagePullPolicy }}
           env:
             - name: RESULTS_DATABASE_URL
-              value: "{{ .Values.global.client.database.host }}"
+              value: "postgresql://client-postgres-service:{{ .Values.global.client.database.port }}/{{ .Values.global.client.database.name }}"
             - name: RESULTS_DATABASE_USERNAME
               value: "{{ .Values.global.client.database.username }}"
             - name: RESULTS_DATABASE_PASSWORD

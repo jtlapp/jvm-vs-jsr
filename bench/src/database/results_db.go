@@ -20,16 +20,16 @@ type TestResults struct {
 func (tr *TestResults) Print() {
 	metrics := tr.Metrics
 
-	util.Log("Tests Performed: %d", tr.TestsPerformed)
-	util.Log("Total Duration: %d seconds", tr.TotalDurationSeconds)
-	util.Log("Steady state rate: %.1f", metrics.Rate)
-	util.Log("Throughput: %f requests/sec", metrics.Throughput)
-	util.Log("Requests: %d", metrics.Requests)
-	util.Log("Success Percentage: %.2f%%", metrics.Success*100)
-	util.Log("Average Latency: %s", metrics.Latencies.Mean)
-	util.Log("99th Percentile Latency: %s", metrics.Latencies.P99)
-	util.Log("Max Latency: %s", metrics.Latencies.Max)
-	util.Log("Status Codes: %v", metrics.StatusCodes)
+	util.FLog("Tests Performed: %d", tr.TestsPerformed)
+	util.FLog("Total Duration: %d seconds", tr.TotalDurationSeconds)
+	util.FLog("Steady state rate: %.1f", metrics.Rate)
+	util.FLog("Throughput: %f requests/sec", metrics.Throughput)
+	util.FLog("Requests: %d", metrics.Requests)
+	util.FLog("Success Percentage: %.2f%%", metrics.Success*100)
+	util.FLog("Average Latency: %s", metrics.Latencies.Mean)
+	util.FLog("99th Percentile Latency: %s", metrics.Latencies.P99)
+	util.FLog("Max Latency: %s", metrics.Latencies.Max)
+	util.FLog("Status Codes: %v", metrics.StatusCodes)
 }
 
 type ResultsDB struct {

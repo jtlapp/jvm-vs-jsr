@@ -9,14 +9,18 @@ const (
 	logfileName = "benchmark.log"
 )
 
-func Log(format string, args ...interface{}) {
+func FLog(format string, args ...interface{}) {
 	line := fmt.Sprintf(format, args...)
+	Log(line)
+}
 
-	// Write line to stdout
+func Log(values ...interface{}) {
+	// Write the values as a line to stdout.
 
+	line := fmt.Sprint(values...)
 	fmt.Println(line)
 
-	// Write line to log file
+	// Write the values as a line to stdout.
 
 	file, err := os.OpenFile(logfileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {

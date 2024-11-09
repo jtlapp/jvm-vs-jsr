@@ -44,7 +44,8 @@ func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
 
 	// Warm up the application, in case it does JIT.
 
-	util.Log("\nWarmup run (ignored)...")
+	util.Log()
+	util.Log("Warmup run (ignored)...")
 	_, err := br.performRateTrial(warmupRequestsPerSecond, warmupSeconds)
 	if err != nil {
 		return nil, fmt.Errorf("error performing warmup trial: %v", err)
@@ -67,7 +68,8 @@ func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
 			break
 		}
 
-		util.Log("\nTesting %d requests/sec...", currentRate)
+		util.Log()
+		util.FLog("Testing %d requests/sec...", currentRate)
 		metrics, err := br.performRateTrial(currentRate, br.testConfig.DurationSeconds)
 		if err != nil {
 			return nil, fmt.Errorf("error performing rate trial: %v", err)
@@ -136,8 +138,7 @@ func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*veg
 	resources := util.NewResourceStatus()
 	err := br.resultsDB.SaveResults("trial", &br.platformConfig, &br.testConfig, testResults, &resources)
 	if err != nil {
-		util.Log("Error saving trial results: %v", err)
-		return nil, err
+		return nil, fmt.Errorf("error saving trial results: %v", err)
 	}
 
 	return &metrics, nil
@@ -145,7 +146,7 @@ func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*veg
 
 func (br *BenchmarkRunner) waitBetweenTests() {
 	start := time.Now()
-	util.WaitForPortsToClear()
+	util.WaitForPortsToClear(br.platformConfig.InitialPortsInUse)
 	elapsed := time.Since(start)
 	minDuration := time.Duration(br.testConfig.MinWaitSeconds) * time.Second
 
@@ -164,7 +165,7 @@ func printTestStatus(metrics *vegeta.Metrics) {
 		errorMessages = "(none)"
 	}
 
-	util.Log(
+	util.FLog(
 		"  %.1f%% successful (%.1f req/s): issued %.1f req/s, %d%% ports active, %d%% ports waiting, %d%% FDs, errors: %s",
 		metrics.Success*100,
 		metrics.Throughput,

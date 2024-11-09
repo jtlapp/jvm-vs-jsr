@@ -11,17 +11,17 @@ type BenchmarkStats struct {
 }
 
 func (bs BenchmarkStats) Print() {
-	util.Log("Steady State Rate: %d", bs.SteadyStateRate)
+	util.FLog("Steady State Rate: %d", bs.SteadyStateRate)
 	PrintMetrics(bs.Metrics)
 }
 
 func PrintMetrics(metrics vegeta.Metrics) {
-	util.Log("Steady state rate: %.1f", metrics.Rate)
-	util.Log("Throughput: %f requests/sec", metrics.Throughput)
-	util.Log("Requests: %d", metrics.Requests)
-	util.Log("Success Percentage: %.2f%%", metrics.Success*100)
-	util.Log("Average Latency: %s", metrics.Latencies.Mean)
-	util.Log("99th Percentile Latency: %s", metrics.Latencies.P99)
-	util.Log("Max Latency: %s", metrics.Latencies.Max)
-	util.Log("Status Codes: %v", metrics.StatusCodes)
+	util.FLog("Steady state rate: %.1f", metrics.Rate)
+	util.FLog("Throughput: %f requests/sec", metrics.Throughput)
+	util.FLog("Requests: %d", metrics.Requests)
+	util.FLog("Success Percentage: %.2f%%", metrics.Success*100)
+	util.FLog("Average Latency: %s", metrics.Latencies.Mean)
+	util.FLog("99th Percentile Latency: %s", metrics.Latencies.P99)
+	util.FLog("Max Latency: %s", metrics.Latencies.Max)
+	util.FLog("Status Codes: %v", metrics.StatusCodes)
 }

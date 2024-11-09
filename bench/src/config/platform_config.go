@@ -1,13 +1,19 @@
 package config
 
-import "runtime"
+import (
+	"fmt"
+	"runtime"
+
+	"jvm-vs-jsr.jtlapp.com/benchmark/util"
+)
 
 type PlatformConfig struct {
 	ClientConfig
-	AppName     string
-	AppVersion  string
-	AppConfig   map[string]interface{}
-	CPUsPerNode int
+	AppName           string
+	AppVersion        string
+	AppConfig         map[string]interface{}
+	CPUsPerNode       uint
+	InitialPortsInUse uint
 }
 
 func GetPlatformConfig(clientConfig ClientConfig) (*PlatformConfig, error) {
@@ -16,11 +22,17 @@ func GetPlatformConfig(clientConfig ClientConfig) (*PlatformConfig, error) {
 		return nil, err
 	}
 
+	resources := util.NewResourceStatus()
+	if resources.TimeWaitPortsCount != 0 {
+		return nil, fmt.Errorf("%d ports are in TIME_WAIT state", resources.TimeWaitPortsCount)
+	}
+
 	return &PlatformConfig{
-		ClientConfig: clientConfig,
-		AppName:      appInfo.AppName,
-		AppVersion:   appInfo.AppVersion,
-		AppConfig:    appInfo.AppConfig,
-		CPUsPerNode:  runtime.NumCPU(),
+		ClientConfig:      clientConfig,
+		AppName:           appInfo.AppName,
+		AppVersion:        appInfo.AppVersion,
+		AppConfig:         appInfo.AppConfig,
+		CPUsPerNode:       uint(runtime.NumCPU()),
+		InitialPortsInUse: resources.EstablishedPortsCount,
 	}, nil
 }

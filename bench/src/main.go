@@ -42,8 +42,11 @@ func main() {
 	for _, arg := range os.Args[1:] {
 		commandLine += " " + arg
 	}
-	util.Log("\n========================================\n")
-	util.Log("%s", time.Now().Format("2006-01-02 15:04:05") + " " + commandLine)
+
+	util.Log()
+	util.Log("========================================")
+	util.Log()
+	util.FLog("%s %s", time.Now().Format("2006-01-02 15:04:05"), commandLine)
 
 	// Execute the command.
 
@@ -73,7 +76,9 @@ func main() {
 
 func fail(err error) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		msg := fmt.Sprintf("Error: %v", err)
+		util.Log(msg)
+		fmt.Fprintf(os.Stderr, "%s\n", msg)
 		if command.IsUsageError(err) {
 			showUsage()
 		}

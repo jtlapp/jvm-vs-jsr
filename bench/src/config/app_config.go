@@ -22,8 +22,8 @@ func GetAppInfo(baseAppUrl string) (*AppInfo, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-        return nil, fmt.Errorf("status code %d getting app info from %s", resp.StatusCode, url)
-    }
+		return nil, fmt.Errorf("status code %d getting app info from %s", resp.StatusCode, url)
+	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
