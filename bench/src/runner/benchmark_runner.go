@@ -41,6 +41,7 @@ func (br *BenchmarkRunner) GetTestConfig() config.TestConfig {
 }
 
 func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
+	br.WaitForPortsToClear()
 
 	// Warm up the application, in case it does JIT.
 
@@ -107,7 +108,17 @@ func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
 }
 
 func (br *BenchmarkRunner) TestRate() (*vegeta.Metrics, error) {
+	br.WaitForPortsToClear()
 	return br.performRateTrial(br.testConfig.InitialRequestsPerSecond, br.testConfig.DurationSeconds)
+}
+
+func (br *BenchmarkRunner) WaitForPortsToClear() {
+	if !util.PortsAreReady(br.platformConfig.MaxReservedPorts) {
+		util.Log()
+		util.Log("Waiting for ports to clear...")
+		util.WaitForPortsToClear(br.platformConfig.MaxReservedPorts)
+		util.Log()
+	}
 }
 
 func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*vegeta.Metrics, error) {
