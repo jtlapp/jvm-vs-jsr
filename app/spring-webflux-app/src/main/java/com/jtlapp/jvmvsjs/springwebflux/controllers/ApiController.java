@@ -3,7 +3,6 @@ package com.jtlapp.jvmvsjs.springwebflux.controllers;
 import com.google.gson.JsonObject;
 import com.jtlapp.jvmvsjs.r2dbcquery.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -17,10 +16,8 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api")
 public class ApiController {
 
-    @Value("${application.name")
-    public String appName;
-    @Value("${application.version")
-    public String appVersion;
+    static final String appName = System.getenv("APP_NAME");;
+    static final String appVersion = System.getenv("APP_VERSION");;
 
     @Autowired
     private ScheduledExecutorService scheduler;

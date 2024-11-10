@@ -27,3 +27,7 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
             {{- end }}
+            - name: APP_NAME
+              value: "{{ .Release.Name }}"
+            - name: APP_VERSION
+              value: "{{ .Values.appVersion }}"

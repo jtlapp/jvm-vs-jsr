@@ -63,6 +63,7 @@ releases:
     labels:
       appGroup: "true"
     values:
+      - appVersion: "0.1.0"
       - charts/values-secret.yaml
       - charts/global-values.yaml
       - env-vars/generic-env-vars.yaml.gotmpl
@@ -73,6 +74,7 @@ releases:
     labels:
       appGroup: "true"
     values:
+      - appVersion: "0.1.0"
       - charts/values-secret.yaml
       - charts/global-values.yaml
       - env-vars/generic-env-vars.yaml.gotmpl
@@ -83,6 +85,7 @@ releases:
     labels:
       appGroup: "true"
     values:
+      - appVersion: "0.1.0"
       - charts/values-secret.yaml
       - charts/global-values.yaml
       - env-vars/generic-env-vars.yaml.gotmpl
@@ -93,6 +96,7 @@ releases:
     labels:
       appGroup: "true"
     values:
+      - appVersion: "0.1.0"
       - charts/values-secret.yaml
       - charts/global-values.yaml
 
@@ -102,6 +106,7 @@ releases:
     labels:
       appGroup: "true"
     values:
+      - appVersion: "0.1.0"
       - charts/values-secret.yaml
       - charts/global-values.yaml
       - spring:
@@ -116,6 +121,7 @@ releases:
     labels:
       appGroup: "true"
     values:
+      - appVersion: "0.1.0"
       - charts/values-secret.yaml
       - charts/global-values.yaml
       - spring:
@@ -130,6 +136,7 @@ releases:
     labels:
       appGroup: "true"
     values:
+      - appVersion: "0.1.0"
       - charts/global-values.yaml
       - charts/values-secret.yaml
       - env-vars/spring-r2dbc-env-vars.yaml.gotmpl

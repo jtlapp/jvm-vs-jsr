@@ -6,7 +6,6 @@ import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryDB;
 import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryException;
 import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +14,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class ApiController {
 
-    @Value("${application.name")
-    public String appName;
-    @Value("${application.version")
-    public String appVersion;
+    static final String appName = System.getenv("APP_NAME");;
+    static final String appVersion = System.getenv("APP_VERSION");;
 
     @Autowired
     private SharedQueryDB sharedQueryDB;

@@ -27,5 +27,9 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
             {{- end }}
+            - name: APP_NAME
+              value: "{{ .Release.Name }}"
+            - name: APP_VERSION
+              value: "{{ .Values.appVersion }}"
             - name: SPRING_THREADS_VIRTUAL_ENABLED
               value: "{{ .Values.spring.threads.virtual.enabled }}"

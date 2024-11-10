@@ -14,8 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class JoobyNoMVCApp extends Jooby {
-    public final String appName = getClass().getSimpleName();
-    public final String appVersion = "0.1.0";
+    public final String appName = System.getenv("APP_NAME");
+    public final String appVersion = System.getenv("APP_VERSION");
 
     {
         var scheduler = Executors.newScheduledThreadPool(1);

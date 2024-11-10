@@ -2,7 +2,6 @@ package com.jtlapp.jvmvsjs.joobyr2dbc;
 
 import com.jtlapp.jvmvsjs.joobyr2dbc.controllers.ApiController;
 import com.jtlapp.jvmvsjs.joobyr2dbc.controllers.HomeController;
-import io.avaje.inject.Bean;
 import io.avaje.inject.Factory;
 import io.avaje.inject.PreDestroy;
 import io.jooby.ExecutionMode;
@@ -13,7 +12,6 @@ import io.jooby.avaje.inject.AvajeInjectModule;
 import io.jooby.netty.NettyServer;
 import io.jooby.reactor.Reactor;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,19 +19,9 @@ import java.util.concurrent.ScheduledExecutorService;
 @Singleton
 @Factory
 public class JoobyR2dbcApp extends Jooby {
-    public static final String version = "0.1.0";
 
-    @Bean
-    @Named("application.name")
-    public String getAppName() {
-        return getClass().getSimpleName();
-    }
-
-    @Bean
-    @Named("application.version")
-    public String getAppVersion() {
-        return version;
-    }
+    static final String appName = System.getenv("APP_NAME");;
+    static final String appVersion = System.getenv("APP_VERSION");;
 
     @Inject
     ScheduledExecutorService scheduler;

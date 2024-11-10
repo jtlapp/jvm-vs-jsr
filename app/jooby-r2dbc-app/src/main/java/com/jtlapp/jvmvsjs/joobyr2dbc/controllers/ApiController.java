@@ -9,7 +9,6 @@ import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import io.jooby.annotation.PathParam;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;
@@ -22,13 +21,8 @@ import java.util.concurrent.TimeUnit;
 @Path("/api")
 public class ApiController {
 
-    @Inject
-    @Named("application.name")
-    String appName;
-
-    @Inject
-    @Named("application.version")
-    String appVersion;
+    static final String appName = System.getenv("APP_NAME");;
+    static final String appVersion = System.getenv("APP_VERSION");;
 
     @Inject
     ScheduledExecutorService scheduler;

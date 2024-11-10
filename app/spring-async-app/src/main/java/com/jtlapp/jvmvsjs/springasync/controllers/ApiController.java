@@ -1,9 +1,7 @@
 package com.jtlapp.jvmvsjs.springasync.controllers;
 
 import com.google.gson.JsonObject;
-import com.jtlapp.jvmvsjs.springasync.SpringAsyncApp;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
@@ -14,10 +12,8 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api")
 public class ApiController {
 
-    @Value("${application.name")
-    public String appName;
-    @Value("${application.version")
-    public String appVersion;
+    static final String appName = System.getenv("APP_NAME");;
+    static final String appVersion = System.getenv("APP_VERSION");;
 
     @Autowired
     private ScheduledExecutorService scheduler;

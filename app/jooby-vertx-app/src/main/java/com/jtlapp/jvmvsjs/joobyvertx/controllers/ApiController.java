@@ -12,7 +12,6 @@ import io.jooby.annotation.PathParam;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import java.util.concurrent.CompletableFuture;
@@ -23,13 +22,8 @@ import java.util.concurrent.TimeUnit;
 @Path("/api")
 public class ApiController {
 
-    @Inject
-    @Named("application.name")
-    String appName;
-
-    @Inject
-    @Named("application.version")
-    String appVersion;
+    static final String appName = System.getenv("APP_NAME");;
+    static final String appVersion = System.getenv("APP_VERSION");;
 
     @Inject
     ScheduledExecutorService scheduler;
