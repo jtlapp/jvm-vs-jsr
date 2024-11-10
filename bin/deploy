@@ -31,7 +31,10 @@ if [ "$CHART_NAME" == "client" ]; then
 
 else
 
-    if [[ "$CHART_NAME" =~ "spring-jdbc" ]]; then
+    if [ "$CHART_NAME" == "spring-jdbc-app" ]; then
+        echo "'spring-jdbc-app' is not a release name"
+        exit 1
+    elif [[ "$CHART_NAME" =~ "spring-jdbc" ]]; then
         push_image "spring-jdbc-app"
     elif [ "$CHART_NAME" != "backend-database" ]; then
         push_image "$CHART_NAME"
