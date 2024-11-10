@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	maxReservedPorts = 8
+	maxReservedPorts = 4
 )
 
 type PlatformConfig struct {

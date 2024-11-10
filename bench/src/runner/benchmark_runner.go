@@ -41,7 +41,9 @@ func (br *BenchmarkRunner) GetTestConfig() config.TestConfig {
 }
 
 func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
-	br.WaitForPortsToClear()
+	if err := br.waitForPortsToClear(); err != nil {
+		return nil, err
+	}
 
 	// Warm up the application, in case it does JIT.
 
@@ -108,17 +110,24 @@ func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
 }
 
 func (br *BenchmarkRunner) TestRate() (*vegeta.Metrics, error) {
-	br.WaitForPortsToClear()
+	if err := br.waitForPortsToClear(); err != nil {
+		return nil, err
+	}
 	return br.performRateTrial(br.testConfig.InitialRequestsPerSecond, br.testConfig.DurationSeconds)
 }
 
-func (br *BenchmarkRunner) WaitForPortsToClear() {
-	if !util.PortsAreReady(br.platformConfig.MaxReservedPorts) {
+func (br *BenchmarkRunner) waitForPortsToClear() error {
+	portsAreReady, err := util.PortsAreReady(br.platformConfig.MaxReservedPorts)
+	if err != nil {
+		return err
+	}
+	if !portsAreReady {
 		util.Log()
 		util.Log("Waiting for ports to clear...")
-		util.WaitForPortsToClear(br.platformConfig.MaxReservedPorts)
+		util.WaitForPortsToTimeout()
 		util.Log()
 	}
+	return nil
 }
 
 func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*vegeta.Metrics, error) {
@@ -139,6 +148,7 @@ func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*veg
 		br.logger.Log(res.Code, string(res.Body))
 		metrics.Add(res)
 	}
+	attacker.Stop()
 	metrics.Close()
 
 	testResults := &database.TestResults{
@@ -157,7 +167,7 @@ func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*veg
 
 func (br *BenchmarkRunner) waitBetweenTests() {
 	start := time.Now()
-	util.WaitForPortsToClear(br.platformConfig.MaxReservedPorts)
+	util.WaitForPortsToTimeout()
 	elapsed := time.Since(start)
 	minDuration := time.Duration(br.testConfig.MinWaitSeconds) * time.Second
 
