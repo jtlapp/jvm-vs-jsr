@@ -125,7 +125,6 @@ func (br *BenchmarkRunner) waitForPortsToClear() error {
 		util.Log()
 		util.Log("Waiting for ports to clear...")
 		util.WaitForPortsToTimeout()
-		util.Log()
 	}
 	return nil
 }
