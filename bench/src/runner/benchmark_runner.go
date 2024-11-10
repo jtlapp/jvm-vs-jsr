@@ -101,7 +101,7 @@ func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
 		Metrics:              br.successMetrics,
 	}
 	resources := util.NewResourceStatus()
-	err = br.resultsDB.SaveResults("det", &br.platformConfig, &br.testConfig, testResults, &resources)
+	err = br.resultsDB.SaveResults("found", &br.platformConfig, &br.testConfig, testResults, &resources)
 	if err != nil {
 		return nil, fmt.Errorf("error saving rate determination results: %v", err)
 	}
