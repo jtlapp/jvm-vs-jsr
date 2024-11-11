@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 
+	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
@@ -19,16 +20,16 @@ func DetermineRate(clientConfig config.ClientConfig, argsParser *ArgsParser) err
 		return err
 	}
 
-	testResults, err := benchmarkRunner.DetermineRate()
+	metrics, err := benchmarkRunner.DetermineRate()
 	if err != nil {
 		return err
 	}
 	util.Log()
-	testResults.Print()
+	printMetrics(metrics)
 	return nil
 }
 
-func TestRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
+func TryRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
 	resultsDB := database.NewResultsDatabase()
 	defer resultsDB.Close()
 
@@ -37,12 +38,12 @@ func TestRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
 		return err
 	}
 
-	metrics, err := benchmarkRunner.TestRate()
+	metrics, err := benchmarkRunner.TryRate()
 	if err != nil {
 		return err
 	}
 	util.Log()
-	runner.PrintMetrics(*metrics)
+	printMetrics(metrics)
 	return nil
 }
 
@@ -84,4 +85,15 @@ func createBenchmarkRunner(clientConfig config.ClientConfig, argsParser *ArgsPar
 	}
 
 	return runner.NewBenchmarkRunner(*platformConfig, *testConfig, &scenario, resultsDB)
+}
+
+func printMetrics(metrics *vegeta.Metrics) {
+	util.FLog("Steady state rate: %.1f", metrics.Rate)
+	util.FLog("Throughput: %f requests/sec", metrics.Throughput)
+	util.FLog("Requests: %d", metrics.Requests)
+	util.FLog("Success Percentage: %.2f%%", metrics.Success*100)
+	util.FLog("Average Latency: %s", metrics.Latencies.Mean)
+	util.FLog("99th Percentile Latency: %s", metrics.Latencies.P99)
+	util.FLog("Max Latency: %s", metrics.Latencies.Max)
+	util.FLog("Status Codes: %v", metrics.StatusCodes)
 }

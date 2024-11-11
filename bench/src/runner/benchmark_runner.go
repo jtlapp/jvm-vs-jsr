@@ -40,16 +40,20 @@ func (br *BenchmarkRunner) GetTestConfig() config.TestConfig {
 	return br.testConfig
 }
 
-func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
+func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 	if err := br.waitForPortsToClear(); err != nil {
 		return nil, err
+	}
+	runID, err := br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
+	if err != nil {
+		return nil, fmt.Errorf("error creating run: %v", err)
 	}
 
 	// Warm up the application, in case it does JIT.
 
 	util.Log()
 	util.Log("Warmup run (ignored)...")
-	_, err := br.performRateTrial(warmupRequestsPerSecond, warmupSeconds)
+	_, _, err = br.performRateTrial(0, warmupRequestsPerSecond, warmupSeconds)
 	if err != nil {
 		return nil, fmt.Errorf("error performing warmup trial: %v", err)
 	}
@@ -61,6 +65,8 @@ func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
 	currentRate := -1
 	nextRate := rateUpperBound
 	testsPerformed := 0
+	var bestTrialID int
+	var metrics *vegeta.Metrics
 	startTime := time.Now()
 
 	for currentRate != 0 && nextRate != currentRate {
@@ -73,7 +79,7 @@ func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
 
 		util.Log()
 		util.FLog("Testing %d requests/sec...", currentRate)
-		metrics, err := br.performRateTrial(currentRate, br.testConfig.DurationSeconds)
+		bestTrialID, metrics, err = br.performRateTrial(runID, currentRate, br.testConfig.DurationSeconds)
 		if err != nil {
 			return nil, fmt.Errorf("error performing rate trial: %v", err)
 		}
@@ -95,25 +101,38 @@ func (br *BenchmarkRunner) DetermineRate() (*database.TestResults, error) {
 		testsPerformed++
 	}
 
-	testResults := &database.TestResults{
-		TestsPerformed:       testsPerformed,
-		TotalDurationSeconds: int(time.Since(startTime).Seconds()),
-		Metrics:              br.successMetrics,
-	}
-	resources := util.NewResourceStatus()
-	err = br.resultsDB.SaveResults("found", &br.platformConfig, &br.testConfig, testResults, &resources)
+	totalDurationSeconds := int(time.Since(startTime).Seconds())
+	err = br.resultsDB.UpdateRun(runID, totalDurationSeconds, bestTrialID)
 	if err != nil {
-		return nil, fmt.Errorf("error saving rate determination results: %v", err)
+		return nil, fmt.Errorf("error updating multi-trial run: %v", err)
 	}
 
-	return testResults, nil
+	return metrics, nil
 }
 
-func (br *BenchmarkRunner) TestRate() (*vegeta.Metrics, error) {
-	if err := br.waitForPortsToClear(); err != nil {
+func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
+	var runID int
+
+	if err = br.waitForPortsToClear(); err != nil {
 		return nil, err
 	}
-	return br.performRateTrial(br.testConfig.InitialRequestsPerSecond, br.testConfig.DurationSeconds)
+	runID, err = br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
+	if err != nil {
+		return nil, fmt.Errorf("error creating single-trial run: %v", err)
+	}
+
+	var trialID int
+	trialID, metrics, err = br.performRateTrial(runID, br.testConfig.InitialRequestsPerSecond, br.testConfig.DurationSeconds)
+	if err != nil {
+		return nil, fmt.Errorf("error performing rate trial: %v", err)
+	}
+
+	err = br.resultsDB.UpdateRun(runID, br.testConfig.DurationSeconds, trialID)
+	if err != nil {
+		return nil, fmt.Errorf("error updating single-trial run: %v", err)
+	}
+
+	return metrics, err
 }
 
 func (br *BenchmarkRunner) waitForPortsToClear() error {
@@ -129,7 +148,7 @@ func (br *BenchmarkRunner) waitForPortsToClear() error {
 	return nil
 }
 
-func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*vegeta.Metrics, error) {
+func (br *BenchmarkRunner) performRateTrial(runID, rate, durationSeconds int) (int, *vegeta.Metrics, error) {
 
 	targetProvider := (*br.scenario).GetTargetProvider(br.platformConfig.BaseAppUrl)
 
@@ -150,18 +169,16 @@ func (br *BenchmarkRunner) performRateTrial(rate int, durationSeconds int) (*veg
 	attacker.Stop()
 	metrics.Close()
 
-	testResults := &database.TestResults{
-		TestsPerformed:       1,
-		TotalDurationSeconds: int(metrics.Duration.Seconds()),
-		Metrics:              metrics,
+	var trialID int
+	var err error
+	if runID != 0 {
+		resources := util.NewResourceStatus()
+		trialID, err = br.resultsDB.SaveTrial(runID, &metrics, &resources)
+		if err != nil {
+			return 0, nil, fmt.Errorf("error saving trial: %v", err)
+		}
 	}
-	resources := util.NewResourceStatus()
-	err := br.resultsDB.SaveResults("trial", &br.platformConfig, &br.testConfig, testResults, &resources)
-	if err != nil {
-		return nil, fmt.Errorf("error saving trial results: %v", err)
-	}
-
-	return &metrics, nil
+	return trialID, &metrics, nil
 }
 
 func (br *BenchmarkRunner) waitBetweenTests() {

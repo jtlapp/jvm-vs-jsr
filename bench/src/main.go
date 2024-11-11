@@ -61,8 +61,8 @@ func main() {
 		err = command.AssignQueries(argsParser)
 	case "run":
 		err = command.DetermineRate(clientConfig, argsParser)
-	case "test":
-		err = command.TestRate(clientConfig, argsParser)
+	case "try":
+		err = command.TryRate(clientConfig, argsParser)
 	case "status":
 		err = command.ShowStatus()
 	default:
@@ -98,8 +98,8 @@ func showUsage() {
 	fmt.Println("        Finds the highest constant/stable rate. The resulting rate is guaranteed")
 	fmt.Println("      	 to be error-free for the specified duration. Provide a rate guess to hasten")
 	fmt.Println("        convergence on the stable rate.")
-	fmt.Println("    test <scenario> [<attack-options>]")
-	fmt.Println("        Tests issuing requests at the given rate for the specified duration.")
+	fmt.Println("    try <scenario> [<attack-options>]")
+	fmt.Println("        Tries issuing requests at the given rate for the specified duration.")
 	fmt.Println("    status")
 	fmt.Println("        Prints the active ports, waiting ports, and file descriptors in use.")
 
