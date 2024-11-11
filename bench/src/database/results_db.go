@@ -11,6 +11,66 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
+const schemaSQL = `
+    CREATE TABLE runs (
+		"id" SERIAL PRIMARY KEY,
+		"createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+		"clientVersion" VARCHAR NOT NULL,
+		"appName" VARCHAR NOT NULL,
+		"appVersion" VARCHAR NOT NULL,
+		"appConfig" JSONB NOT NULL,
+		"cpusPerNode" INTEGER NOT NULL,
+		"scenarioName" VARCHAR NOT NULL,
+		"initialRequestsPerSecond" INTEGER NOT NULL,
+		"maxConnections" INTEGER NOT NULL,
+		"workerCount" INTEGER NOT NULL,
+		"cpusUsed" INTEGER NOT NULL,
+		"trialDurationSeconds" INTEGER NOT NULL,
+		"timeoutSeconds" INTEGER NOT NULL,
+		"minWaitSeconds" INTEGER NOT NULL,
+		"totalRunDurationSeconds" INTEGER NOT NULL,
+		"bestTrialID" INTEGER
+    );
+
+    CREATE INDEX idx_results_client_version ON runs("clientVersion");
+    CREATE INDEX idx_results_app_name ON runs("appName");
+    CREATE INDEX idx_results_app_version ON runs("appVersion");
+    CREATE INDEX idx_results_app_config ON runs USING GIN ("appConfig");
+    CREATE INDEX idx_results_scenario_name ON runs("scenarioName");
+
+    CREATE TABLE trials (
+		"id" SERIAL PRIMARY KEY,
+		"createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+		"runID" INTEGER NOT NULL,
+		"requestsPerSecond" DOUBLE PRECISION NOT NULL,
+		"percentSuccesfullyCompleting" DOUBLE PRECISION NOT NULL,
+		"successfulCompletesPerSecond" DOUBLE PRECISION NOT NULL,
+		"totalRequests" INTEGER NOT NULL,
+		"meanLatency" VARCHAR NOT NULL,
+		"maxLatency" VARCHAR NOT NULL,
+		"latency50thPercentile" VARCHAR NOT NULL,
+		"latency95thPercentile" VARCHAR NOT NULL,
+		"latency99thPercentile" VARCHAR NOT NULL,
+		"histogram" JSONB NOT NULL,
+		"statusCodes" JSONB NOT NULL,
+		"errorMessages" VARCHAR,
+		"availablePorts" INTEGER NOT NULL,
+		"fileDescriptors" INTEGER NOT NULL,
+		"remainingPortsActive" INTEGER NOT NULL,
+		"remainingPortsWaiting" INTEGER NOT NULL,
+		"remainingFDsInUse" INTEGER NOT NULL
+    );
+
+	ALTER TABLE runs 
+		ADD CONSTRAINT fk_runs_best_trial 
+		FOREIGN KEY ("bestTrialID") 
+		REFERENCES trials(id);
+
+	ALTER TABLE trials 
+		ADD CONSTRAINT fk_trials_run 
+		FOREIGN KEY ("runID") 
+		REFERENCES runs(id);`
+
 type ResultsDB struct {
 	Database
 }
@@ -22,6 +82,19 @@ func NewResultsDatabase() *ResultsDB {
 		PasswordEnvVar: "RESULTS_DATABASE_PASSWORD",
 	}
 	return &ResultsDB{*NewDatabase(&databaseConfig)}
+}
+
+func (rdb *ResultsDB) CreateTables() error {
+	pool, err := rdb.GetPool()
+	if err != nil {
+		return err
+	}
+
+	_, err = pool.Exec(context.Background(), schemaSQL)
+	if err != nil {
+		return fmt.Errorf("failed to create tables: %w", err)
+	}
+	return nil
 }
 
 func (rdb *ResultsDB) CreateRun(

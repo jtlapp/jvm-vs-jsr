@@ -55,6 +55,8 @@ func main() {
 	var err error
 
 	switch commandName {
+	case "setup-results":
+		err = command.SetupResultsDB()
 	case "setup-backend":
 		err = command.SetupBackendDB(argsParser)
 	case "assign-queries":
@@ -90,6 +92,8 @@ func showUsage() {
 	fmt.Printf("\nBenchmark tool for testing the performance of a web application (v%s).", version)
 
 	fmt.Println("\nCommands:")
+	fmt.Println("    setup-results")
+	fmt.Println("        Creates the results database tables on the client pod.")
 	fmt.Println("    setup-backend <scenario>")
 	fmt.Println("        Creates database tables and queries required for the test scenario.")
 	fmt.Println("    assign-queries <scenario>")

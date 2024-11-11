@@ -28,7 +28,9 @@ func NewBackendSetup(pool *pgxpool.Pool, impl BackendSetupImpl) *BackendSetup {
 }
 
 func (ds *BackendSetup) PopulateDatabase() error {
-	if err := DropTables(ds.pool); err != nil {
+	filter := func(name string) bool { return name != "shared_queries" }
+
+	if err := DropTables(ds.pool, filter); err != nil {
 		return err
 	}
 	if err := ds.impl.CreateTables(); err != nil {

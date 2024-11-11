@@ -7,22 +7,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func DropTables(dbPool *pgxpool.Pool) error {
-	rows, err := dbPool.Query(context.Background(),
-		"SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
+func DropTables(dbPool *pgxpool.Pool, filter func(string) bool) error {
+	tableNames, err := GetTableNames(dbPool)
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var tablename string
-		err = rows.Scan(&tablename)
-		if err != nil {
-			return err
-		}
-
-		if tablename != "shared_queries" {
+	for _, tablename := range tableNames {
+		if filter(tablename) {
 			query := fmt.Sprintf("DROP TABLE IF EXISTS %s CASCADE", tablename)
 			_, err = dbPool.Exec(context.Background(), query)
 			if err != nil {
@@ -37,4 +29,24 @@ func EmptyTable(dbPool *pgxpool.Pool, tableName string) error {
 	query := fmt.Sprintf("DELETE FROM %s", tableName)
 	_, err := dbPool.Exec(context.Background(), query)
 	return err
+}
+
+func GetTableNames(dbPool *pgxpool.Pool) ([]string, error) {
+	rows, err := dbPool.Query(context.Background(),
+		"SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tableNames []string
+	for rows.Next() {
+		var tableName string
+		err = rows.Scan(&tableName)
+		if err != nil {
+			return nil, err
+		}
+		tableNames = append(tableNames, tableName)
+	}
+	return tableNames, nil
 }

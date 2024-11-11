@@ -15,15 +15,6 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: client
 
-      # Uncomment this to completely re-install the client database.
-#      initContainers:
-#        - name: clear-data
-#          image: busybox
-#          command: [ 'sh', '-c', 'rm -rf /var/lib/postgresql/data/* && rmdir base || true' ]
-#          volumeMounts:
-#            - name: postgres-data
-#              mountPath: /var/lib/postgresql/data
-
       containers:
 
         - name: client
@@ -57,8 +48,6 @@ spec:
           ports:
             - containerPort: {{ .Values.global.client.database.port }}
           volumeMounts:
-            - name: client-sql-config
-              mountPath: /docker-entrypoint-initdb.d/
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
 
@@ -66,8 +55,4 @@ spec:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: client-postgres-volume-claim
-
-        - name: client-sql-config
-          configMap:
-            name: client-sql-config
 
