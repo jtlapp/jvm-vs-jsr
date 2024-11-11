@@ -60,44 +60,44 @@ func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 
 	// Find the highest rate that the system can handle without errors.
 
-	rateUpperBound := br.testConfig.InitialRequestsPerSecond
-	rateLowerBound := 0
-	currentRate := -1
-	nextRate := rateUpperBound
+	requestRateUpperBound := br.testConfig.InitialRequestsPerSecond
+	requestRateLowerBound := 0
+	currentRequestRate := -1
+	nextRequestRate := requestRateUpperBound
 	testsPerformed := 0
 	var bestTrialID int
 	var metrics *vegeta.Metrics
 	startTime := time.Now()
 
-	for currentRate != 0 && nextRate != currentRate {
+	for currentRequestRate != 0 && nextRequestRate != currentRequestRate {
 		br.waitBetweenTests()
 
-		currentRate = nextRate
-		if currentRate == rateLowerBound {
+		currentRequestRate = nextRequestRate
+		if currentRequestRate == requestRateLowerBound {
 			break
 		}
 
 		util.Log()
-		util.FLog("Testing %d requests/sec...", currentRate)
+		util.FLog("Testing %d requests/sec...", currentRequestRate)
 		var trialID int
-		trialID, metrics, err = br.performRateTrial(runID, currentRate, br.testConfig.DurationSeconds)
+		trialID, metrics, err = br.performRateTrial(runID, currentRequestRate, br.testConfig.DurationSeconds)
 		if err != nil {
 			return nil, fmt.Errorf("error performing rate trial: %v", err)
 		}
 		printTestStatus(metrics)
 
 		if metrics.Success < 1 {
-			rateUpperBound = currentRate
-			nextRate = (rateLowerBound + rateUpperBound) / 2
+			requestRateUpperBound = currentRequestRate
+			nextRequestRate = (requestRateLowerBound + requestRateUpperBound) / 2
 		} else {
 			bestTrialID = trialID
 			br.successMetrics = *metrics
-			rateLowerBound = currentRate
-			if currentRate == rateUpperBound {
-				rateUpperBound *= 2
-				nextRate = rateUpperBound
+			requestRateLowerBound = currentRequestRate
+			if currentRequestRate == requestRateUpperBound {
+				requestRateUpperBound *= 2
+				nextRequestRate = requestRateUpperBound
 			} else {
-				nextRate = (rateLowerBound + rateUpperBound) / 2
+				nextRequestRate = (requestRateLowerBound + requestRateUpperBound) / 2
 			}
 		}
 		testsPerformed++
