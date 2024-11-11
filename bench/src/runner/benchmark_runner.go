@@ -79,7 +79,8 @@ func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 
 		util.Log()
 		util.FLog("Testing %d requests/sec...", currentRate)
-		bestTrialID, metrics, err = br.performRateTrial(runID, currentRate, br.testConfig.DurationSeconds)
+		var trialID int
+		trialID, metrics, err = br.performRateTrial(runID, currentRate, br.testConfig.DurationSeconds)
 		if err != nil {
 			return nil, fmt.Errorf("error performing rate trial: %v", err)
 		}
@@ -89,6 +90,7 @@ func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 			rateUpperBound = currentRate
 			nextRate = (rateLowerBound + rateUpperBound) / 2
 		} else {
+			bestTrialID = trialID
 			br.successMetrics = *metrics
 			rateLowerBound = currentRate
 			if currentRate == rateUpperBound {
@@ -107,7 +109,7 @@ func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 		return nil, fmt.Errorf("error updating multi-trial run: %v", err)
 	}
 
-	return metrics, nil
+	return &br.successMetrics, nil
 }
 
 func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
