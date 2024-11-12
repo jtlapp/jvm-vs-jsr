@@ -22,7 +22,6 @@ type BenchmarkRunner struct {
 	testConfig     config.TestConfig
 	scenario       *scenarios.Scenario
 	resultsDB      *database.ResultsDB
-	successMetrics vegeta.Metrics
 	logger         *ResponseLogger
 }
 
@@ -58,13 +57,14 @@ func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 		return nil, fmt.Errorf("error performing warmup trial: %v", err)
 	}
 
-	// Find the highest rate that the system can handle without errors.
+	// Find the highest rate of successfully completing requests that the system
+	// can handle without any request errors or timeouts.
 
 	requestRateUpperBound := br.testConfig.InitialRequestsPerSecond
 	requestRateLowerBound := 0
+	var lowerBoundMetrics vegeta.Metrics
 	currentRequestRate := -1
 	nextRequestRate := requestRateUpperBound
-	testsPerformed := 0
 	var bestTrialID int
 	var metrics *vegeta.Metrics
 	startTime := time.Now()
@@ -86,12 +86,12 @@ func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 		}
 		printTestStatus(metrics)
 
-		if metrics.Success < 1 {
+		if metrics.Success < 1 || metrics.Throughput < lowerBoundMetrics.Throughput {
 			requestRateUpperBound = currentRequestRate
 			nextRequestRate = (requestRateLowerBound + requestRateUpperBound) / 2
 		} else {
 			bestTrialID = trialID
-			br.successMetrics = *metrics
+			lowerBoundMetrics = *metrics
 			requestRateLowerBound = currentRequestRate
 			if currentRequestRate == requestRateUpperBound {
 				requestRateUpperBound *= 2
@@ -100,7 +100,6 @@ func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 				nextRequestRate = (requestRateLowerBound + requestRateUpperBound) / 2
 			}
 		}
-		testsPerformed++
 	}
 
 	totalDurationSeconds := int(time.Since(startTime).Seconds())
@@ -109,7 +108,7 @@ func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 		return nil, fmt.Errorf("error updating multi-trial run: %v", err)
 	}
 
-	return &br.successMetrics, nil
+	return &lowerBoundMetrics, nil
 }
 
 func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
