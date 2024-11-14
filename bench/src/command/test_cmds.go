@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
 
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
@@ -34,7 +35,7 @@ const (
 
 var DetermineRate = newCommand(
 	"run",
-	"<scenario> [<attack-options>]",
+	"scenario> [<attack-options>]",
 	"Finds the highest constant/stable rate. The resulting rate is guaranteed "+
 		"to be error-free for the specified duration. Provide a rate guess to hasten "+
 		"convergence on the stable rate.",
@@ -64,7 +65,7 @@ var DetermineRate = newCommand(
 
 var TryRate = newCommand(
 	"try",
-	"<scenario> [<attack-options>]",
+	"scenario> [<attack-options>]",
 	"Tries issuing requests at the given rate for the specified duration.",
 	printOptions,
 	func(clientConfig config.ClientConfig) error {
@@ -171,18 +172,42 @@ func createBenchmarkRunner(
 }
 
 func printOptions() {
-	fmt.Printf("    -%s <number-of-CPUs\n", cpusOption)
-	fmt.Printf("        Number of CPUs (and workers) to use (default: all CPUs)\n")
-	fmt.Printf("    -%s <number-of-connections>\n", maxConnectionsOption)
-	fmt.Printf("        Maximum number of connections to use (default: unlimited)\n")
-	fmt.Printf("    -%s <requests-per-second>\n", rateOption)
-	fmt.Printf("        Rate to test or initial rate guess (default: %d)\n", defaultRate)
-	fmt.Printf("    -%s <seconds>\n", durationOption)
-	fmt.Printf("        Test duration or time over which rate must be error-free (default: %d)\n", defaultDuration)
-	fmt.Printf("    -%s <seconds>\n", timeoutOption)
-	fmt.Printf("        Request response timeout (default: %d)\n", defaultTimeout)
-	fmt.Printf("    -%s <seconds>\n", minWaitOption)
-	fmt.Printf("        Minimum wait time between tests (default: %d)\n", defaultMinWait)
+	usage.PrintOption(
+		cpusOption,
+		"number of CPUs",
+		"Number of CPUs (and workers) to use",
+		"all CPUs",
+	)
+	usage.PrintOption(
+		maxConnectionsOption,
+		"number of connections",
+		"Maximum number of connections to use",
+		"unlimited",
+	)
+	usage.PrintOption(
+		rateOption,
+		"requests per second",
+		"Rate to test or initial rate guess",
+		strconv.Itoa(defaultRate),
+	)
+	usage.PrintOption(
+		durationOption,
+		"seconds",
+		"Test duration or time over which rate must be error-free",
+		strconv.Itoa(defaultDuration),
+	)
+	usage.PrintOption(
+		timeoutOption,
+		"seconds",
+		"Request response timeout",
+		strconv.Itoa(defaultTimeout),
+	)
+	usage.PrintOption(
+		minWaitOption,
+		"seconds",
+		"Minimum wait time between tests",
+		strconv.Itoa(defaultMinWait),
+	)
 }
 
 func printMetrics(metrics *vegeta.Metrics) {
