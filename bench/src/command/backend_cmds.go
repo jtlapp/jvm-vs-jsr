@@ -3,37 +3,49 @@ package command
 import (
 	"fmt"
 
+	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
+	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 )
 
-func SetupBackendDB(argsParser *ArgsParser) error {
-	backendDB := database.NewBackendDatabase()
-	defer backendDB.Close()
+var SetupBackendDB = newCommand(
+	"setup-backend",
+	"<scenario>",
+	"Creates database tables and queries required for the test scenario.",
+	nil,
+	func(cfg config.ClientConfig) error {
+		backendDB := database.NewBackendDatabase()
+		defer backendDB.Close()
 
-	backendSetup, err := createBackendSetup(argsParser, backendDB)
-	if err != nil {
-		return err
-	}
-	if err = populateDatabase(backendSetup); err != nil {
-		return err
-	}
-	return assignSharedQueries(backendSetup)
-}
+		backendSetup, err := createBackendSetup(backendDB)
+		if err != nil {
+			return err
+		}
+		if err = populateDatabase(backendSetup); err != nil {
+			return err
+		}
+		return assignSharedQueries(backendSetup)
+	})
 
-func AssignQueries(argsParser *ArgsParser) error {
-	backendDB := database.NewBackendDatabase()
-	defer backendDB.Close()
+var AssignQueries = newCommand(
+	"assign-queries",
+	"<scenario>",
+	"Sets only the queries required for the test scenario.",
+	nil,
+	func(cfg config.ClientConfig) error {
+		backendDB := database.NewBackendDatabase()
+		defer backendDB.Close()
 
-	backendSetup, err := createBackendSetup(argsParser, backendDB)
-	if err != nil {
-		return err
-	}
-	return assignSharedQueries(backendSetup)
-}
+		backendSetup, err := createBackendSetup(backendDB)
+		if err != nil {
+			return err
+		}
+		return assignSharedQueries(backendSetup)
+	})
 
-func createBackendSetup(argsParser *ArgsParser, backendDB *database.BackendDB) (*database.BackendSetup, error) {
-	scenarioName, err := argsParser.GetScenarioName()
+func createBackendSetup(backendDB *database.BackendDB) (*database.BackendSetup, error) {
+	scenarioName, err := usage.GetScenarioName()
 	if err != nil {
 		return nil, err
 	}

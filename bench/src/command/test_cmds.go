@@ -1,9 +1,13 @@
 package command
 
 import (
+	"flag"
 	"fmt"
+	"os"
+	"runtime"
 
 	vegeta "github.com/tsenart/vegeta/lib"
+	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
@@ -11,65 +15,149 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
-func DetermineRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
-	resultsDB := database.NewResultsDatabase()
-	defer resultsDB.Close()
+const (
+	cpusOption           = "cpus"
+	maxConnectionsOption = "maxconns"
+	rateOption           = "rate"
+	durationOption       = "duration"
+	timeoutOption        = "timeout"
+	minWaitOption        = "minwait"
+)
 
-	benchmarkRunner, err := createBenchmarkRunner(clientConfig, argsParser, resultsDB)
+const (
+	defaultMaxConnections = 0
+	defaultRate           = 10
+	defaultDuration       = 5
+	defaultTimeout        = 10
+	defaultMinWait        = 0
+)
+
+var DetermineRate = newCommand(
+	"run",
+	"<scenario> [<attack-options>]",
+	"Finds the highest constant/stable rate. The resulting rate is guaranteed "+
+		"to be error-free for the specified duration. Provide a rate guess to hasten "+
+		"convergence on the stable rate.",
+	printOptions,
+	func(clientConfig config.ClientConfig) error {
+		testConfig, err := getTestConfig()
+		if err != nil {
+			return err
+		}
+
+		resultsDB := database.NewResultsDatabase()
+		defer resultsDB.Close()
+
+		benchmarkRunner, err := createBenchmarkRunner(clientConfig, testConfig, resultsDB)
+		if err != nil {
+			return err
+		}
+
+		metrics, err := benchmarkRunner.DetermineRate()
+		if err != nil {
+			return err
+		}
+		util.Log()
+		printMetrics(metrics)
+		return nil
+	})
+
+var TryRate = newCommand(
+	"try",
+	"<scenario> [<attack-options>]",
+	"Tries issuing requests at the given rate for the specified duration.",
+	printOptions,
+	func(clientConfig config.ClientConfig) error {
+		testConfig, err := getTestConfig()
+		if err != nil {
+			return err
+		}
+
+		resultsDB := database.NewResultsDatabase()
+		defer resultsDB.Close()
+
+		benchmarkRunner, err := createBenchmarkRunner(clientConfig, testConfig, resultsDB)
+		if err != nil {
+			return err
+		}
+
+		metrics, err := benchmarkRunner.TryRate()
+		if err != nil {
+			return err
+		}
+		util.Log()
+		printMetrics(metrics)
+		return nil
+	})
+
+var ShowStatus = newCommand(
+	"status",
+	"",
+	"Prints the active ports, waiting ports, and file descriptors in use.",
+	nil,
+	func(clientConfig config.ClientConfig) error {
+		resources := util.NewResourceStatus()
+		establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
+			resources.GetPercentages()
+		fmt.Printf("  active ports: %d of %d (%d%%)\n",
+			resources.EstablishedPortsCount, resources.TotalAvailablePorts,
+			uint(establishedPortsPercent+.5))
+		fmt.Printf("  waiting ports: %d of %d (%d%%)\n",
+			resources.TimeWaitPortsCount, resources.TotalAvailablePorts,
+			uint(timeWaitPortsPercent+.5))
+		fmt.Printf("  FDs in use: %d of %d (%d%%)\n",
+			resources.FDsInUseCount, resources.TotalFileDescriptors,
+			uint(fdsInUsePercent+.5))
+		return nil
+	})
+
+func getTestConfig() (*config.TestConfig, error) {
+	scenarioName, err := usage.GetScenarioName()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	metrics, err := benchmarkRunner.DetermineRate()
-	if err != nil {
-		return err
+	flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+
+	// I had difficulty getting option usage to print when needed, so not used.
+	cpusToUse := flagSet.Int(cpusOption, runtime.NumCPU(), "")
+	maxConnections := flagSet.Int(maxConnectionsOption, defaultMaxConnections, "")
+	rate := flagSet.Int(rateOption, defaultRate, "")
+	duration := flagSet.Int(durationOption, defaultDuration, "")
+	timeout := flagSet.Int(timeoutOption, defaultTimeout, "")
+	minWait := flagSet.Int(minWaitOption, defaultMinWait, "")
+
+	if len(os.Args) > 3 {
+		err := flagSet.Parse(os.Args[3:])
+		if err != nil {
+			return nil, usage.NewUsageError("%s", err.Error())
+		}
 	}
-	util.Log()
-	printMetrics(metrics)
-	return nil
+
+	return &config.TestConfig{
+		ScenarioName:             scenarioName,
+		CPUsToUse:                *cpusToUse,
+		WorkerCount:              *cpusToUse,
+		MaxConnections:           *maxConnections,
+		InitialRequestsPerSecond: *rate,
+		DurationSeconds:          *duration,
+		RequestTimeoutSeconds:    *timeout,
+		MinWaitSeconds:           *minWait,
+	}, nil
 }
 
-func TryRate(clientConfig config.ClientConfig, argsParser *ArgsParser) error {
-	resultsDB := database.NewResultsDatabase()
-	defer resultsDB.Close()
+func createBenchmarkRunner(
+	clientConfig config.ClientConfig,
+	testConfig *config.TestConfig,
+	resultsDB *database.ResultsDB,
+) (*runner.BenchmarkRunner, error) {
 
-	benchmarkRunner, err := createBenchmarkRunner(clientConfig, argsParser, resultsDB)
-	if err != nil {
-		return err
-	}
-
-	metrics, err := benchmarkRunner.TryRate()
-	if err != nil {
-		return err
-	}
-	util.Log()
-	printMetrics(metrics)
-	return nil
-}
-
-func ShowStatus() error {
-	resources := util.NewResourceStatus()
-	establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
-		resources.GetPercentages()
-	fmt.Printf("  active ports: %d of %d (%d%%)\n",
-		resources.EstablishedPortsCount, resources.TotalAvailablePorts,
-		uint(establishedPortsPercent+.5))
-	fmt.Printf("  waiting ports: %d of %d (%d%%)\n",
-		resources.TimeWaitPortsCount, resources.TotalAvailablePorts,
-		uint(timeWaitPortsPercent+.5))
-	fmt.Printf("  FDs in use: %d of %d (%d%%)\n",
-		resources.FDsInUseCount, resources.TotalFileDescriptors,
-		uint(fdsInUsePercent+.5))
-	return nil
-}
-
-func createBenchmarkRunner(clientConfig config.ClientConfig, argsParser *ArgsParser, resultsDB *database.ResultsDB) (*runner.BenchmarkRunner, error) {
 	platformConfig, err := config.GetPlatformConfig(clientConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	scenarioName, err := argsParser.GetScenarioName()
+	scenarioName, err := usage.GetScenarioName()
 	if err != nil {
 		return nil, err
 	}
@@ -79,12 +167,22 @@ func createBenchmarkRunner(clientConfig config.ClientConfig, argsParser *ArgsPar
 		return nil, err
 	}
 
-	testConfig, err := argsParser.GetTestConfig()
-	if err != nil {
-		return nil, err
-	}
-
 	return runner.NewBenchmarkRunner(*platformConfig, *testConfig, &scenario, resultsDB)
+}
+
+func printOptions() {
+	fmt.Printf("    -%s <number-of-CPUs\n", cpusOption)
+	fmt.Printf("        Number of CPUs (and workers) to use (default: all CPUs)\n")
+	fmt.Printf("    -%s <number-of-connections>\n", maxConnectionsOption)
+	fmt.Printf("        Maximum number of connections to use (default: unlimited)\n")
+	fmt.Printf("    -%s <requests-per-second>\n", rateOption)
+	fmt.Printf("        Rate to test or initial rate guess (default: %d)\n", defaultRate)
+	fmt.Printf("    -%s <seconds>\n", durationOption)
+	fmt.Printf("        Test duration or time over which rate must be error-free (default: %d)\n", defaultDuration)
+	fmt.Printf("    -%s <seconds>\n", timeoutOption)
+	fmt.Printf("        Request response timeout (default: %d)\n", defaultTimeout)
+	fmt.Printf("    -%s <seconds>\n", minWaitOption)
+	fmt.Printf("        Minimum wait time between tests (default: %d)\n", defaultMinWait)
 }
 
 func printMetrics(metrics *vegeta.Metrics) {

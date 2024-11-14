@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"slices"
 	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/command"
+	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
@@ -14,6 +16,7 @@ import (
 const (
 	version          = "0.1.0"
 	baseAppUrlEnvVar = "BASE_APP_URL"
+	helpOption       = "--help"
 )
 
 func main() {
@@ -28,13 +31,27 @@ func main() {
 		}
 	}
 
-	// Extract the command.
+	// Extract the command or show help.
 
-	if len(os.Args) == 1 {
+	if len(os.Args) == 1 || os.Args[1] == helpOption {
 		showUsage()
 		os.Exit(0)
 	}
 	commandName := os.Args[1]
+	command, err := command.Find(commandName)
+	if err != nil {
+		fail(err)
+	}
+
+	// Show command-specific help if requested.
+
+	index := slices.IndexFunc(os.Args, func(arg string) bool {
+		return arg == helpOption
+	})
+	if index != -1 {
+		command.PrintUsageWithOptions()
+		os.Exit(0)
+	}
 
 	// Log the command line.
 
@@ -42,7 +59,6 @@ func main() {
 	for _, arg := range os.Args[1:] {
 		commandLine += " " + arg
 	}
-
 	util.Log()
 	util.Log("========================================")
 	util.Log()
@@ -51,26 +67,7 @@ func main() {
 	// Execute the command.
 
 	clientConfig := config.ClientConfig{ClientVersion: version, BaseAppUrl: baseAppUrl}
-	argsParser := command.NewArgsParser(clientConfig)
-	var err error
-
-	switch commandName {
-	case "setup-results":
-		err = command.SetupResultsDB()
-	case "setup-backend":
-		err = command.SetupBackendDB(argsParser)
-	case "assign-queries":
-		err = command.AssignQueries(argsParser)
-	case "run":
-		err = command.DetermineRate(clientConfig, argsParser)
-	case "try":
-		err = command.TryRate(clientConfig, argsParser)
-	case "status":
-		err = command.ShowStatus()
-	default:
-		err = fmt.Errorf("invalid argument command '%s'", commandName)
-	}
-
+	err = command.Execute(clientConfig)
 	if err != nil {
 		fail(err)
 	}
@@ -80,8 +77,7 @@ func fail(err error) {
 	if err != nil {
 		msg := fmt.Sprintf("Error: %v", err)
 		util.Log(msg)
-		fmt.Fprintf(os.Stderr, "%s\n", msg)
-		if command.IsUsageError(err) {
+		if usage.IsUsageError(err) {
 			showUsage()
 		}
 		os.Exit(1)
@@ -89,41 +85,17 @@ func fail(err error) {
 }
 
 func showUsage() {
-	fmt.Printf("\nBenchmark tool for testing the performance of a web application (v%s).", version)
-
-	fmt.Println("\nCommands:")
-	fmt.Println("    setup-results")
-	fmt.Println("        Creates the results database tables on the client pod.")
-	fmt.Println("    setup-backend <scenario>")
-	fmt.Println("        Creates database tables and queries required for the test scenario.")
-	fmt.Println("    assign-queries <scenario>")
-	fmt.Println("        Sets only the queries required for the test scenario")
-	fmt.Println("    run <scenario> [<attack-options>]")
-	fmt.Println("        Finds the highest constant/stable rate. The resulting rate is guaranteed")
-	fmt.Println("      	 to be error-free for the specified duration. Provide a rate guess to hasten")
-	fmt.Println("        convergence on the stable rate.")
-	fmt.Println("    try <scenario> [<attack-options>]")
-	fmt.Println("        Tries issuing requests at the given rate for the specified duration.")
-	fmt.Println("    status")
-	fmt.Println("        Prints the active ports, waiting ports, and file descriptors in use.")
-
-	fmt.Println("\nAvailable scenarios:")
+	fmt.Println()
+	fmt.Printf("Benchmark tool for testing the performance of a web application (v%s).\n", version)
+	fmt.Println()
+	fmt.Println("Commands (use --help to see arguments):")
+	for _, cmd := range command.Commands {
+		cmd.PrintUsage()
+	}
+	fmt.Println()
+	fmt.Println("Available scenarios:")
 	for _, scenario := range scenarios.GetScenarios() {
 		fmt.Printf("    %s\n", scenario.GetName())
 	}
-
-	fmt.Println("\nAttack options:")
-	fmt.Println("    -cpus <number-of-CPUs>")
-	fmt.Println("        Number of CPUs (and workers) to use (default: all CPUs)")
-	fmt.Println("    -maxconns <number-of-connections>")
-	fmt.Println("        Maximum number of connections to use (default: unlimited)")
-	fmt.Println("    -rate <requests-per-second>")
-	fmt.Println("        Rate to test or initial rate guess (default: 10)")
-	fmt.Println("    -duration <seconds>")
-	fmt.Println("        Test duration or time over which rate must be error-free (default: 5)")
-	fmt.Println("    -timeout <seconds>")
-	fmt.Println("        Request response timeout (default 10)")
-	fmt.Println("    -minwait <seconds>")
-	fmt.Println("        Minimum wait time between tests (default 0)")
 	fmt.Println()
 }
