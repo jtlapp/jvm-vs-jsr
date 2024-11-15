@@ -44,7 +44,10 @@ var LoopDeterminingRates = newCommand(
 		"duration. Provide a rate guess to hasten convergence on the stable rate.",
 	printLoopOptions,
 	func(clientConfig config.ClientConfig) error {
-		runStats, err := performRuns(clientConfig, 1)
+		flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+		runCount := flagSet.Int(loopCount, defaultLoopCount, "")
+
+		runStats, err := performRuns(clientConfig, *runCount)
 		if err != nil {
 			return err
 		}

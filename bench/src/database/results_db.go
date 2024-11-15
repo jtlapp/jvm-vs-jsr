@@ -256,31 +256,32 @@ func (rdb *ResultsDB) GetTrials(
 
 	const query = `
 		SELECT
-			"requestsPerSecond",
-			"percentSuccesfullyCompleting",
-			"successfulCompletesPerSecond",
-			"totalRequests",
-			"meanLatency",
-			"maxLatency",
-			"latency50thPercentile",
-			"latency95thPercentile",
-			"latency99thPercentile",
-			"histogram",
-			"statusCodes",
-			"errorMessages"
-		FROM trials
-		WHERE "createdAt" > $1
-		  AND "appName" = $2
-		  AND "appVersion" = $3
-		  AND "appConfig" = $4
-		  AND "scenarioName" = $5
-		  AND "initialRequestsPerSecond" = $6
-		  AND "maxConnections" = $7
-		  AND "workerCount" = $8
-		  AND "cpusUsed" = $9
-		  AND "trialDurationSeconds" = $10
-		  AND "timeoutSeconds" = $11
-		  AND "minWaitSeconds" = $12`
+			t."requestsPerSecond",
+			t."percentSuccesfullyCompleting",
+			t."successfulCompletesPerSecond",
+			t."totalRequests",
+			t."meanLatency",
+			t."maxLatency",
+			t."latency50thPercentile",
+			t."latency95thPercentile",
+			t."latency99thPercentile",
+			t."histogram",
+			t."statusCodes",
+			t."errorMessages"
+		FROM trials t
+		JOIN runs r ON t."runID" = r."id"
+		WHERE r."createdAt" > $1
+		  AND r."appName" = $2
+		  AND r."appVersion" = $3
+		  AND r."appConfig" = $4
+		  AND r."scenarioName" = $5
+		  AND r."initialRequestsPerSecond" = $6
+		  AND r."maxConnections" = $7
+		  AND r."workerCount" = $8
+		  AND r."cpusUsed" = $9
+		  AND r."trialDurationSeconds" = $10
+		  AND r."timeoutSeconds" = $11
+		  AND r."minWaitSeconds" = $12`
 
 	rows, err := pool.Query(context.Background(), query,
 		sinceTime,                           // $1  - createdAt
