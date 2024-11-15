@@ -40,21 +40,55 @@ func (br *BenchmarkRunner) GetTestConfig() config.TestConfig {
 }
 
 func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
-	if err := br.waitForPortsToClear(); err != nil {
+	if err := br.performWarmupRun(); err != nil {
 		return nil, err
 	}
-	runID, err := br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
+	return br.performRateDetermination()
+}
+
+func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
+	var runID int
+
+	if err = br.waitForPortsToClear(); err != nil {
+		return nil, err
+	}
+	runID, err = br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
 	if err != nil {
-		return nil, fmt.Errorf("error creating run: %v", err)
+		return nil, fmt.Errorf("error creating single-trial run: %v", err)
 	}
 
-	// Warm up the application, in case it does JIT.
+	var trialID int
+	trialID, metrics, err = br.performRateTrial(runID, br.testConfig.InitialRequestsPerSecond, br.testConfig.DurationSeconds)
+	if err != nil {
+		return nil, fmt.Errorf("error performing rate trial: %v", err)
+	}
+
+	err = br.resultsDB.UpdateRun(runID, br.testConfig.DurationSeconds, trialID)
+	if err != nil {
+		return nil, fmt.Errorf("error updating single-trial run: %v", err)
+	}
+
+	return metrics, err
+}
+
+func (br *BenchmarkRunner) performWarmupRun() error {
+	if err := br.waitForPortsToClear(); err != nil {
+		return err
+	}
 
 	util.Log()
 	util.Log("Warmup run (ignored)...")
-	_, _, err = br.performRateTrial(0, warmupRequestsPerSecond, warmupSeconds)
+	_, _, err := br.performRateTrial(0, warmupRequestsPerSecond, warmupSeconds)
 	if err != nil {
-		return nil, fmt.Errorf("error performing warmup trial: %v", err)
+		return fmt.Errorf("error performing warmup trial: %v", err)
+	}
+	return nil
+}
+
+func (br *BenchmarkRunner) performRateDetermination() (*vegeta.Metrics, error) {
+	runID, err := br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
+	if err != nil {
+		return nil, fmt.Errorf("error creating run: %v", err)
 	}
 
 	// Find the highest rate of successfully completing requests that the system
@@ -111,44 +145,6 @@ func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
 	return &lowerBoundMetrics, nil
 }
 
-func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
-	var runID int
-
-	if err = br.waitForPortsToClear(); err != nil {
-		return nil, err
-	}
-	runID, err = br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
-	if err != nil {
-		return nil, fmt.Errorf("error creating single-trial run: %v", err)
-	}
-
-	var trialID int
-	trialID, metrics, err = br.performRateTrial(runID, br.testConfig.InitialRequestsPerSecond, br.testConfig.DurationSeconds)
-	if err != nil {
-		return nil, fmt.Errorf("error performing rate trial: %v", err)
-	}
-
-	err = br.resultsDB.UpdateRun(runID, br.testConfig.DurationSeconds, trialID)
-	if err != nil {
-		return nil, fmt.Errorf("error updating single-trial run: %v", err)
-	}
-
-	return metrics, err
-}
-
-func (br *BenchmarkRunner) waitForPortsToClear() error {
-	portsAreReady, err := util.PortsAreReady(br.platformConfig.MaxReservedPorts)
-	if err != nil {
-		return err
-	}
-	if !portsAreReady {
-		util.Log()
-		util.Log("Waiting for ports to clear...")
-		util.WaitForPortsToTimeout()
-	}
-	return nil
-}
-
 func (br *BenchmarkRunner) performRateTrial(runID, rate, durationSeconds int) (int, *vegeta.Metrics, error) {
 
 	targetProvider := (*br.scenario).GetTargetProvider(br.platformConfig.BaseAppUrl)
@@ -191,6 +187,19 @@ func (br *BenchmarkRunner) waitBetweenTests() {
 	if remainingTime := minDuration - elapsed; remainingTime > 0 {
 		time.Sleep(remainingTime)
 	}
+}
+
+func (br *BenchmarkRunner) waitForPortsToClear() error {
+	portsAreReady, err := util.PortsAreReady(br.platformConfig.MaxReservedPorts)
+	if err != nil {
+		return err
+	}
+	if !portsAreReady {
+		util.Log()
+		util.Log("Waiting for ports to clear...")
+		util.WaitForPortsToTimeout()
+	}
+	return nil
 }
 
 func printTestStatus(metrics *vegeta.Metrics) {
