@@ -39,9 +39,9 @@ const (
 var LoopDeterminingRates = newCommand(
 	"loop",
 	"<scenario> [-times <iterations>] [<attack-options>]",
-	"Finds the highest constant/stable rate. The resulting rate is guaranteed "+
-		"to be error-free for the specified duration. Provide a rate guess to hasten "+
-		"convergence on the stable rate.",
+	"Loops repeatedly performing tests to find the highest constant/stable rate. "+
+	    "The resulting rates are guaranteed to be error-free for the specified "+
+		"duration. Provide a rate guess to hasten convergence on the stable rate.",
 	printLoopOptions,
 	func(clientConfig config.ClientConfig) error {
 		runStats, err := performRuns(clientConfig, 1)
