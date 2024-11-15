@@ -62,6 +62,7 @@ var Commands = []Command{
 	SetupResultsDB,
 	SetupBackendDB,
 	AssignQueries,
+	LoopDeterminingRates,
 	DetermineRate,
 	TryRate,
 	ShowStatus,
