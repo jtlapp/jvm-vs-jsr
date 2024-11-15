@@ -62,7 +62,7 @@ func main() {
 	util.Log()
 	util.Log("========================================")
 	util.Log()
-	util.FLog("%s %s", time.Now().Format("2006-01-02 15:04:05"), commandLine)
+	util.Logf("%s %s", time.Now().Format("2006-01-02 15:04:05"), commandLine)
 
 	// Execute the command.
 

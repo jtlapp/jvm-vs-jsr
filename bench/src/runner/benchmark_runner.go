@@ -9,6 +9,7 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
+	"jvm-vs-jsr.jtlapp.com/benchmark/stats"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
@@ -39,11 +40,30 @@ func (br *BenchmarkRunner) GetTestConfig() config.TestConfig {
 	return br.testConfig
 }
 
-func (br *BenchmarkRunner) DetermineRate() (*vegeta.Metrics, error) {
+func (br *BenchmarkRunner) DetermineRate(runCount int) (*stats.RunStats, error) {
 	if err := br.performWarmupRun(); err != nil {
 		return nil, err
 	}
-	return br.performRateDetermination()
+
+	startTime := time.Now()
+
+	for i := 0; i < runCount; i++ {
+		err := br.performRateDetermination()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	trials, err := br.resultsDB.GetTrials(startTime, &br.platformConfig, &br.testConfig)
+	if err != nil {
+		return nil, fmt.Errorf("error getting trials: %v", err)
+	}
+
+	runStats, err := stats.CalculateRunStats(trials)
+	if err != nil {
+		return nil, fmt.Errorf("error calculating run stats: %v", err)
+	}
+	return &runStats, nil
 }
 
 func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
@@ -85,10 +105,10 @@ func (br *BenchmarkRunner) performWarmupRun() error {
 	return nil
 }
 
-func (br *BenchmarkRunner) performRateDetermination() (*vegeta.Metrics, error) {
+func (br *BenchmarkRunner) performRateDetermination() error {
 	runID, err := br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
 	if err != nil {
-		return nil, fmt.Errorf("error creating run: %v", err)
+		return fmt.Errorf("error creating run: %v", err)
 	}
 
 	// Find the highest rate of successfully completing requests that the system
@@ -112,11 +132,11 @@ func (br *BenchmarkRunner) performRateDetermination() (*vegeta.Metrics, error) {
 		}
 
 		util.Log()
-		util.FLog("Testing %d requests/sec...", currentRequestRate)
+		util.Logf("Testing %d requests/sec...", currentRequestRate)
 		var trialID int
 		trialID, metrics, err = br.performRateTrial(runID, currentRequestRate, br.testConfig.DurationSeconds)
 		if err != nil {
-			return nil, fmt.Errorf("error performing rate trial: %v", err)
+			return fmt.Errorf("error performing rate trial: %v", err)
 		}
 		printTestStatus(metrics)
 
@@ -139,10 +159,12 @@ func (br *BenchmarkRunner) performRateDetermination() (*vegeta.Metrics, error) {
 	totalDurationSeconds := int(time.Since(startTime).Seconds())
 	err = br.resultsDB.UpdateRun(runID, totalDurationSeconds, bestTrialID)
 	if err != nil {
-		return nil, fmt.Errorf("error updating multi-trial run: %v", err)
+		return fmt.Errorf("error updating multi-trial run: %v", err)
 	}
 
-	return &lowerBoundMetrics, nil
+	util.Log()
+	printRunMetrics(metrics)
+	return nil
 }
 
 func (br *BenchmarkRunner) performRateTrial(runID, rate, durationSeconds int) (int, *vegeta.Metrics, error) {
@@ -167,10 +189,13 @@ func (br *BenchmarkRunner) performRateTrial(runID, rate, durationSeconds int) (i
 	metrics.Close()
 
 	var trialID int
-	var err error
 	if runID != 0 {
 		resources := util.NewResourceStatus()
-		trialID, err = br.resultsDB.SaveTrial(runID, &metrics, &resources)
+		trialInfo, err := stats.NewTrialInfo(&metrics)
+		if err != nil {
+			panic(fmt.Errorf("failed to create trial info: %v", err))
+		}
+		trialID, err = br.resultsDB.SaveTrial(runID, trialInfo, &resources)
 		if err != nil {
 			return 0, nil, fmt.Errorf("error saving trial: %v", err)
 		}
@@ -202,6 +227,15 @@ func (br *BenchmarkRunner) waitForPortsToClear() error {
 	return nil
 }
 
+func printRunMetrics(metrics *vegeta.Metrics) {
+	util.Logf("Best rate: %.1f req/sec (successfully completing %.1f req/sec)", metrics.Rate, metrics.Throughput)
+	util.Log()
+	util.Logf("  Requests: %d", metrics.Requests)
+	util.Logf("  Average Latency: %s", metrics.Latencies.Mean)
+	util.Logf("  99th Percentile Latency: %s", metrics.Latencies.P99)
+	util.Logf("  Max Latency: %s", metrics.Latencies.Max)
+}
+
 func printTestStatus(metrics *vegeta.Metrics) {
 	resourceStatus := util.NewResourceStatus()
 	establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
@@ -212,7 +246,7 @@ func printTestStatus(metrics *vegeta.Metrics) {
 		errorMessages = "(none)"
 	}
 
-	util.FLog(
+	util.Logf(
 		"  %.1f%% successful (%.1f req/s): issued %.1f req/s, %d%% ports active, %d%% ports waiting, %d%% FDs, errors: %s",
 		metrics.Success*100,
 		metrics.Throughput,

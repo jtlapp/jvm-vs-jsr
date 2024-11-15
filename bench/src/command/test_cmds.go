@@ -13,10 +13,12 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
+	"jvm-vs-jsr.jtlapp.com/benchmark/stats"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
 const (
+	loopCount            = "times"
 	cpusOption           = "cpus"
 	maxConnectionsOption = "maxconns"
 	rateOption           = "rate"
@@ -26,6 +28,7 @@ const (
 )
 
 const (
+	defaultLoopCount      = 8
 	defaultMaxConnections = 0
 	defaultRate           = 10
 	defaultDuration       = 5
@@ -33,41 +36,41 @@ const (
 	defaultMinWait        = 0
 )
 
-var DetermineRate = newCommand(
-	"run",
-	"scenario> [<attack-options>]",
+var LoopDeterminingRates = newCommand(
+	"loop",
+	"<scenario> [-times <iterations>] [<attack-options>]",
 	"Finds the highest constant/stable rate. The resulting rate is guaranteed "+
 		"to be error-free for the specified duration. Provide a rate guess to hasten "+
 		"convergence on the stable rate.",
-	printOptions,
+	printLoopOptions,
 	func(clientConfig config.ClientConfig) error {
-		testConfig, err := getTestConfig()
+		runStats, err := performRuns(clientConfig, 1)
 		if err != nil {
 			return err
 		}
 
-		resultsDB := database.NewResultsDatabase()
-		defer resultsDB.Close()
-
-		benchmarkRunner, err := createBenchmarkRunner(clientConfig, testConfig, resultsDB)
-		if err != nil {
-			return err
-		}
-
-		metrics, err := benchmarkRunner.DetermineRate()
-		if err != nil {
-			return err
-		}
 		util.Log()
-		printMetrics(metrics)
+		runStats.Print()
 		return nil
+	})
+
+var DetermineRate = newCommand(
+	"run",
+	"<scenario> [<attack-options>]",
+	"Finds the highest constant/stable rate. The resulting rate is guaranteed "+
+		"to be error-free for the specified duration. Provide a rate guess to hasten "+
+		"convergence on the stable rate.",
+	printTrialOptions,
+	func(clientConfig config.ClientConfig) error {
+		_, err := performRuns(clientConfig, 1)
+		return err
 	})
 
 var TryRate = newCommand(
 	"try",
-	"scenario> [<attack-options>]",
+	"<scenario> [<attack-options>]",
 	"Tries issuing requests at the given rate for the specified duration.",
-	printOptions,
+	printTrialOptions,
 	func(clientConfig config.ClientConfig) error {
 		testConfig, err := getTestConfig()
 		if err != nil {
@@ -86,8 +89,9 @@ var TryRate = newCommand(
 		if err != nil {
 			return err
 		}
+
 		util.Log()
-		printMetrics(metrics)
+		printTrialMetrics(metrics)
 		return nil
 	})
 
@@ -111,6 +115,23 @@ var ShowStatus = newCommand(
 			uint(fdsInUsePercent+.5))
 		return nil
 	})
+
+func performRuns(clientConfig config.ClientConfig, runCount int) (*stats.RunStats, error) {
+	testConfig, err := getTestConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	resultsDB := database.NewResultsDatabase()
+	defer resultsDB.Close()
+
+	benchmarkRunner, err := createBenchmarkRunner(clientConfig, testConfig, resultsDB)
+	if err != nil {
+		return nil, err
+	}
+
+	return benchmarkRunner.DetermineRate(runCount)
+}
 
 func getTestConfig() (*config.TestConfig, error) {
 	scenarioName, err := usage.GetScenarioName()
@@ -171,7 +192,17 @@ func createBenchmarkRunner(
 	return runner.NewBenchmarkRunner(*platformConfig, *testConfig, &scenario, resultsDB)
 }
 
-func printOptions() {
+func printLoopOptions() {
+	usage.PrintOption(
+		loopCount,
+		"iterations",
+		"Number of times to run the rate determination benchmark",
+		strconv.Itoa(defaultLoopCount),
+	)
+	printTrialOptions()
+}
+
+func printTrialOptions() {
 	usage.PrintOption(
 		cpusOption,
 		"number of CPUs",
@@ -210,13 +241,13 @@ func printOptions() {
 	)
 }
 
-func printMetrics(metrics *vegeta.Metrics) {
-	util.FLog("Steady state rate: %.1f", metrics.Rate)
-	util.FLog("Throughput: %f requests/sec", metrics.Throughput)
-	util.FLog("Requests: %d", metrics.Requests)
-	util.FLog("Success Percentage: %.2f%%", metrics.Success*100)
-	util.FLog("Average Latency: %s", metrics.Latencies.Mean)
-	util.FLog("99th Percentile Latency: %s", metrics.Latencies.P99)
-	util.FLog("Max Latency: %s", metrics.Latencies.Max)
-	util.FLog("Status Codes: %v", metrics.StatusCodes)
+func printTrialMetrics(metrics *vegeta.Metrics) {
+	util.Logf("Steady state rate: %.1f req/sec", metrics.Rate)
+	util.Logf("Successful completions: %f req/sec", metrics.Throughput)
+	util.Logf("Requests: %d", metrics.Requests)
+	util.Logf("Success Percentage: %.2f%%", metrics.Success*100)
+	util.Logf("Average Latency: %s", metrics.Latencies.Mean)
+	util.Logf("99th Percentile Latency: %s", metrics.Latencies.P99)
+	util.Logf("Max Latency: %s", metrics.Latencies.Max)
+	util.Logf("Status Codes: %v", metrics.StatusCodes)
 }

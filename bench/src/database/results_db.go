@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strings"
+	"time"
 
-	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
+	"jvm-vs-jsr.jtlapp.com/benchmark/stats"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
@@ -182,21 +182,12 @@ func (rdb *ResultsDB) UpdateRun(runID int, totalDurationSeconds int, bestTrialID
 
 func (rdb *ResultsDB) SaveTrial(
 	runID int,
-	metrics *vegeta.Metrics,
+	trialInfo *stats.TrialInfo,
 	resources *util.ResourceStatus,
 ) (int, error) {
 	pool, err := rdb.GetPool()
 	if err != nil {
 		return 0, err
-	}
-
-	histogramJSON, err := json.Marshal(metrics.Histogram)
-	if err != nil {
-		return 0, fmt.Errorf("failed to marshal histogram: %w", err)
-	}
-	statusCodesJSON, err := json.Marshal(metrics.StatusCodes)
-	if err != nil {
-		return 0, fmt.Errorf("failed to marshal status codes: %w", err)
 	}
 
 	const query = `
@@ -227,28 +218,109 @@ func (rdb *ResultsDB) SaveTrial(
 
 	var trialID int
 	err = pool.QueryRow(context.Background(), query,
-		runID,                             // $1  - runID
-		metrics.Rate,                      // $2  - requestsPerSecond
-		metrics.Success,                   // $3  - percentSuccesfullyCompleting
-		metrics.Throughput,                // $4  - successfulCompletesPerSecond
-		metrics.Requests,                  // $5  - totalRequests
-		metrics.Latencies.Mean.String(),   // $6  - meanLatency
-		metrics.Latencies.Max.String(),    // $7  - maxLatency
-		metrics.Latencies.P50.String(),    // $8  - latency50thPercentile
-		metrics.Latencies.P95.String(),    // $9  - latency95thPercentile
-		metrics.Latencies.P99.String(),    // $10 - latency99thPercentile
-		histogramJSON,                     // $11 - histogram
-		statusCodesJSON,                   // $12 - statusCodes
-		strings.Join(metrics.Errors, ";"), // $13 - errorMessages
-		resources.TotalAvailablePorts,     // $14 - availablePorts
-		resources.TotalFileDescriptors,    // $15 - fileDescriptors
-		resources.EstablishedPortsCount,   // $16 - remainingPortsActive
-		resources.TimeWaitPortsCount,      // $17 - remainingPortsWaiting
-		resources.FDsInUseCount,           // $18 - remainingFDsInUse
+		runID,                                  // $1  - runID
+		trialInfo.RequestsPerSecond,            // $2
+		trialInfo.PercentSuccesfullyCompleting, // $3
+		trialInfo.SuccessfulCompletesPerSecond, // $4
+		trialInfo.TotalRequests,                // $5
+		trialInfo.MeanLatency,                  // $6
+		trialInfo.MaxLatency,                   // $7
+		trialInfo.Latency50thPercentile,        // $8
+		trialInfo.Latency95thPercentile,        // $9
+		trialInfo.Latency99thPercentile,        // $10
+		trialInfo.Histogram,                    // $11
+		trialInfo.StatusCodes,                  // $12
+		trialInfo.ErrorMessages,                // $13
+		resources.TotalAvailablePorts,          // $14 - availablePorts
+		resources.TotalFileDescriptors,         // $15 - fileDescriptors
+		resources.EstablishedPortsCount,        // $16 - remainingPortsActive
+		resources.TimeWaitPortsCount,           // $17 - remainingPortsWaiting
+		resources.FDsInUseCount,                // $18 - remainingFDsInUse
 	).Scan(&trialID)
 
 	if err != nil {
 		return 0, fmt.Errorf("failed to insert trial: %w", err)
 	}
 	return trialID, nil
+}
+
+func (rdb *ResultsDB) GetTrials(
+	sinceTime time.Time,
+	platformConfig *config.PlatformConfig,
+	testConfig *config.TestConfig,
+) ([]stats.TrialInfo, error) {
+	pool, err := rdb.GetPool()
+	if err != nil {
+		return nil, err
+	}
+
+	const query = `
+		SELECT
+			"requestsPerSecond",
+			"percentSuccesfullyCompleting",
+			"successfulCompletesPerSecond",
+			"totalRequests",
+			"meanLatency",
+			"maxLatency",
+			"latency50thPercentile",
+			"latency95thPercentile",
+			"latency99thPercentile",
+			"histogram",
+			"statusCodes",
+			"errorMessages"
+		FROM trials
+		WHERE "createdAt" > $1
+		  AND "appName" = $2
+		  AND "appVersion" = $3
+		  AND "appConfig" = $4
+		  AND "scenarioName" = $5
+		  AND "initialRequestsPerSecond" = $6
+		  AND "maxConnections" = $7
+		  AND "workerCount" = $8
+		  AND "cpusUsed" = $9
+		  AND "trialDurationSeconds" = $10
+		  AND "timeoutSeconds" = $11
+		  AND "minWaitSeconds" = $12`
+
+	rows, err := pool.Query(context.Background(), query,
+		sinceTime,                           // $1  - createdAt
+		platformConfig.AppName,              // $2  - appName
+		platformConfig.AppVersion,           // $3  - appVersion
+		platformConfig.AppConfig,            // $4  - appConfig
+		testConfig.ScenarioName,             // $5  - scenarioName
+		testConfig.InitialRequestsPerSecond, // $6  - initialRequestsPerSecond
+		testConfig.MaxConnections,           // $7  - maxConnections
+		testConfig.WorkerCount,              // $8  - workerCount
+		testConfig.CPUsToUse,                // $9  - cpusUsed
+		testConfig.DurationSeconds,          // $10 - trialDurationSeconds
+		testConfig.RequestTimeoutSeconds,    // $11 - timeoutSeconds
+		testConfig.MinWaitSeconds,           // $12 - minWaitSeconds
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var trials []stats.TrialInfo
+	for rows.Next() {
+		var trial stats.TrialInfo
+		err := rows.Scan(
+			&trial.RequestsPerSecond,
+			&trial.PercentSuccesfullyCompleting,
+			&trial.SuccessfulCompletesPerSecond,
+			&trial.TotalRequests,
+			&trial.MeanLatency,
+			&trial.MaxLatency,
+			&trial.Latency50thPercentile,
+			&trial.Latency95thPercentile,
+			&trial.Latency99thPercentile,
+			&trial.Histogram,
+			&trial.StatusCodes,
+			&trial.ErrorMessages,
+		)
+		if err != nil {
+			return nil, err
+		}
+		trials = append(trials, trial)
+	}
+	return trials, nil
 }

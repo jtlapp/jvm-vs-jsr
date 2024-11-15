@@ -9,7 +9,7 @@ const (
 	logfileName = "benchmark.log"
 )
 
-func FLog(format string, args ...interface{}) {
+func Logf(format string, args ...interface{}) {
 	line := fmt.Sprintf(format, args...)
 	Log(line)
 }
