@@ -269,8 +269,8 @@ func (rdb *ResultsDB) GetTrials(
 			t."statusCodes",
 			t."errorMessages"
 		FROM trials t
-		JOIN runs r ON t."runID" = r."id"
-		WHERE r."createdAt" > $1
+		JOIN runs r ON t.id = r."bestTrialID"
+		WHERE r."createdAt" >= $1
 		  AND r."appName" = $2
 		  AND r."appVersion" = $3
 		  AND r."appConfig" = $4
