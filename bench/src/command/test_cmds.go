@@ -42,7 +42,7 @@ const (
 
 var LoopDeterminingRates = newCommand(
 	"loop",
-	"<scenario> [-times <iterations>] [<attack-options>]",
+	"<scenario> [-times <iterations>] [<trial-options>]",
 	"Loops repeatedly performing tests to find the highest constant/stable rate. "+
 		"The resulting rates are guaranteed to be error-free for the specified "+
 		"duration. Provide a rate guess to hasten convergence on the stable rate.",
@@ -64,7 +64,7 @@ var LoopDeterminingRates = newCommand(
 
 var DetermineRate = newCommand(
 	"run",
-	"<scenario> [<attack-options>]",
+	"<scenario> [<trial-options>]",
 	"Finds the highest constant/stable rate. The resulting rate is guaranteed "+
 		"to be error-free for the specified duration. Provide a rate guess to hasten "+
 		"convergence on the stable rate.",
@@ -79,7 +79,7 @@ var DetermineRate = newCommand(
 
 var TryRate = newCommand(
 	"try",
-	"<scenario> [<attack-options>]",
+	"<scenario> [<trial-options>]",
 	"Tries issuing requests at the given rate for the specified duration.",
 	printTrialOptions,
 	func(clientConfig config.ClientConfig) error {
