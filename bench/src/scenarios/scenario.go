@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
+	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/dualsleep"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/orderitems"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/singlesleep"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/taggedints"
@@ -19,6 +20,7 @@ type Scenario interface {
 
 var scenariosSlice = []Scenario{
 	singlesleep.NewScenario(),
+	dualsleep.NewScenario(),
 	taggedints.NewScenario(),
 	orderitems.NewScenario(),
 }
