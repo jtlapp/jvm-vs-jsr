@@ -178,7 +178,7 @@ func (br *BenchmarkRunner) performRateDetermination(randomSeed int64) error {
 	}
 
 	util.Log()
-	printRunMetrics(metrics)
+	printRunMetrics(&lowerBoundMetrics)
 	return nil
 }
 
