@@ -8,30 +8,29 @@ import (
 )
 
 const (
-	randomSeed     = 123456
 	percentUpdates = 50
 )
 
-type BenchmarkTest struct {
+type BenchmarkTrial struct {
 	baseUrl string
 	randGen *rand.Rand
 }
 
-func NewBenchmarkTest(baseUrl string) *BenchmarkTest {
-	return &BenchmarkTest{
+func NewBenchmarkTrial(baseUrl string, randomSeed int64) *BenchmarkTrial {
+	return &BenchmarkTrial{
 		baseUrl: baseUrl,
 		randGen: rand.New(rand.NewSource(randomSeed)),
 	}
 }
 
-func (t *BenchmarkTest) getRequest() *vegeta.Target {
+func (t *BenchmarkTrial) getRequest() *vegeta.Target {
 	if t.randGen.Intn(100) < percentUpdates {
 		return t.getUpdateRequest()
 	}
 	return t.getSelectRequest()
 }
 
-func (t *BenchmarkTest) getUpdateRequest() *vegeta.Target {
+func (t *BenchmarkTrial) getUpdateRequest() *vegeta.Target {
 	userNumber := t.randGen.Intn(totalUsers) + 1
 	orderNumber := t.randGen.Intn(ordersPerUser) + 1
 
@@ -43,7 +42,7 @@ func (t *BenchmarkTest) getUpdateRequest() *vegeta.Target {
 	}
 }
 
-func (t *BenchmarkTest) getSelectRequest() *vegeta.Target {
+func (t *BenchmarkTrial) getSelectRequest() *vegeta.Target {
 	userNumber := t.randGen.Intn(totalUsers) + 1
 	orderNumber := t.randGen.Intn(ordersPerUser) + 1
 

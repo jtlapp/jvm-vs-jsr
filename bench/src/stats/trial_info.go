@@ -9,6 +9,7 @@ import (
 )
 
 type TrialInfo struct {
+	RandomSeed                   int64
 	RequestsPerSecond            float64
 	PercentSuccesfullyCompleting float64
 	SuccessfulCompletesPerSecond float64
@@ -23,7 +24,7 @@ type TrialInfo struct {
 	ErrorMessages                string
 }
 
-func NewTrialInfo(metrics *vegeta.Metrics) (*TrialInfo, error) {
+func NewTrialInfo(metrics *vegeta.Metrics, randomSeed int64) (*TrialInfo, error) {
 
 	histogramJSON, err := json.Marshal(metrics.Histogram)
 	if err != nil {
@@ -35,6 +36,7 @@ func NewTrialInfo(metrics *vegeta.Metrics) (*TrialInfo, error) {
 	}
 
 	return &TrialInfo{
+		RandomSeed:                   randomSeed,
 		RequestsPerSecond:            metrics.Rate,
 		PercentSuccesfullyCompleting: metrics.Success,
 		SuccessfulCompletesPerSecond: metrics.Throughput,

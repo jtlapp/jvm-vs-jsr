@@ -7,20 +7,20 @@ import (
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/orderitems"
-	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/sleep"
+	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/singlesleep"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios/taggedints"
 )
 
 type Scenario interface {
 	GetName() string
 	CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSetup, error)
-	GetTargetProvider(baseUrl string) func(*vegeta.Target) error
+	GetTargetProvider(baseUrl string, randomSeed int64) func(*vegeta.Target) error
 }
 
 var scenariosSlice = []Scenario{
-	&sleep.Scenario{},
-	&taggedints.Scenario{},
-	&orderitems.Scenario{},
+	singlesleep.NewScenario(),
+	taggedints.NewScenario(),
+	orderitems.NewScenario(),
 }
 
 func GetScenario(name string) (Scenario, error) {

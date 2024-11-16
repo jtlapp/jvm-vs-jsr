@@ -8,8 +8,12 @@ import (
 
 type Scenario struct{}
 
+func NewScenario() *Scenario {
+	return &Scenario{}
+}
+
 func (s *Scenario) GetName() string {
-	return "orderitems"
+	return "order-items"
 }
 
 func (s *Scenario) CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSetup, error) {
@@ -17,10 +21,10 @@ func (s *Scenario) CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSe
 	return backendSetup, nil
 }
 
-func (s *Scenario) GetTargetProvider(baseUrl string) func(*vegeta.Target) error {
-	test := NewBenchmarkTest(baseUrl)
+func (s *Scenario) GetTargetProvider(baseUrl string, randomSeed int64) func(*vegeta.Target) error {
+	trial := NewBenchmarkTrial(baseUrl, randomSeed)
 	return func(target *vegeta.Target) error {
-		*target = *test.getRequest()
+		*target = *trial.getRequest()
 		return nil
 	}
 }

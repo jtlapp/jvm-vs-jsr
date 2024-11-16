@@ -1,11 +1,17 @@
-package taggedints
+package singlesleep
 
 import (
-	"math/rand"
+	"bytes"
+	"errors"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
+)
+
+const (
+	sleepDuration = 1000
 )
 
 type Scenario struct{}
@@ -15,19 +21,20 @@ func NewScenario() *Scenario {
 }
 
 func (s *Scenario) GetName() string {
-	return "tagged-ints"
+	return "single-sleep"
 }
 
 func (s *Scenario) CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSetup, error) {
-	randGen := rand.New(rand.NewSource(randomSeed))
-	backendSetup := database.NewBackendSetup(dbPool, &SetupImpl{dbPool, randGen})
-	return backendSetup, nil
+	return nil, errors.New("this scenario has no backend setup")
 }
 
 func (s *Scenario) GetTargetProvider(baseUrl string, randomSeed int64) func(*vegeta.Target) error {
-	trial := NewBenchmarkTrial(baseUrl, randomSeed)
 	return func(target *vegeta.Target) error {
-		*target = *trial.getRequest()
+		*target = vegeta.Target{
+			Method: "GET",
+			URL:    fmt.Sprintf("%s/api/sleep/%d", baseUrl, sleepDuration),
+			Body:   bytes.NewBuffer(nil).Bytes(),
+		}
 		return nil
 	}
 }

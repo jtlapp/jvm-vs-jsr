@@ -6,6 +6,7 @@ type TestConfig struct {
 	WorkerCount              int
 	MaxConnections           int
 	InitialRequestsPerSecond int
+	InitialRandomSeed        int
 	DurationSeconds          int
 	RequestTimeoutSeconds    int
 	MinWaitSeconds           int

@@ -19,35 +19,40 @@ import (
 
 const (
 	loopCount            = "times"
+	resetRandomSeed      = "reset"
 	cpusOption           = "cpus"
 	maxConnectionsOption = "maxconns"
 	rateOption           = "rate"
 	durationOption       = "duration"
 	timeoutOption        = "timeout"
 	minWaitOption        = "minwait"
+	randomSeedOption     = "seed"
 )
 
 const (
-	defaultLoopCount      = 8
-	defaultMaxConnections = 0
-	defaultRate           = 10
-	defaultDuration       = 5
-	defaultTimeout        = 10
-	defaultMinWait        = 0
+	defaultLoopCount       = 8
+	defaultResetRandomSeed = false
+	defaultMaxConnections  = 0
+	defaultRate            = 10
+	defaultDuration        = 5
+	defaultTimeout         = 10
+	defaultMinWait         = 0
+	defaultRandomSeed      = 123456
 )
 
 var LoopDeterminingRates = newCommand(
 	"loop",
 	"<scenario> [-times <iterations>] [<attack-options>]",
 	"Loops repeatedly performing tests to find the highest constant/stable rate. "+
-	    "The resulting rates are guaranteed to be error-free for the specified "+
+		"The resulting rates are guaranteed to be error-free for the specified "+
 		"duration. Provide a rate guess to hasten convergence on the stable rate.",
 	printLoopOptions,
 	func(clientConfig config.ClientConfig) error {
 		flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 		runCount := flagSet.Int(loopCount, defaultLoopCount, "")
+		resetRandomSeed := flagSet.Bool(resetRandomSeed, defaultResetRandomSeed, "")
 
-		runStats, err := performRuns(clientConfig, *runCount)
+		runStats, err := performRuns(clientConfig, flagSet, runCount, resetRandomSeed)
 		if err != nil {
 			return err
 		}
@@ -65,7 +70,10 @@ var DetermineRate = newCommand(
 		"convergence on the stable rate.",
 	printTrialOptions,
 	func(clientConfig config.ClientConfig) error {
-		_, err := performRuns(clientConfig, 1)
+		flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+		runCount := 1
+		resetRandomSeed := false
+		_, err := performRuns(clientConfig, flagSet, &runCount, &resetRandomSeed)
 		return err
 	})
 
@@ -75,7 +83,9 @@ var TryRate = newCommand(
 	"Tries issuing requests at the given rate for the specified duration.",
 	printTrialOptions,
 	func(clientConfig config.ClientConfig) error {
-		testConfig, err := getTestConfig()
+		flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+
+		testConfig, err := getTestConfig(flagSet)
 		if err != nil {
 			return err
 		}
@@ -119,8 +129,14 @@ var ShowStatus = newCommand(
 		return nil
 	})
 
-func performRuns(clientConfig config.ClientConfig, runCount int) (*stats.RunStats, error) {
-	testConfig, err := getTestConfig()
+func performRuns(
+	clientConfig config.ClientConfig,
+	flagSet *flag.FlagSet,
+	runCount *int,
+	resetRandomSeed *bool,
+) (*stats.RunStats, error) {
+
+	testConfig, err := getTestConfig(flagSet)
 	if err != nil {
 		return nil, err
 	}
@@ -133,24 +149,22 @@ func performRuns(clientConfig config.ClientConfig, runCount int) (*stats.RunStat
 		return nil, err
 	}
 
-	return benchmarkRunner.DetermineRate(runCount)
+	return benchmarkRunner.DetermineRate(*runCount, *resetRandomSeed)
 }
 
-func getTestConfig() (*config.TestConfig, error) {
+func getTestConfig(flagSet *flag.FlagSet) (*config.TestConfig, error) {
 	scenarioName, err := usage.GetScenarioName()
 	if err != nil {
 		return nil, err
 	}
 
-	flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-
-	// I had difficulty getting option usage to print when needed, so not used.
 	cpusToUse := flagSet.Int(cpusOption, runtime.NumCPU(), "")
 	maxConnections := flagSet.Int(maxConnectionsOption, defaultMaxConnections, "")
 	rate := flagSet.Int(rateOption, defaultRate, "")
 	duration := flagSet.Int(durationOption, defaultDuration, "")
 	timeout := flagSet.Int(timeoutOption, defaultTimeout, "")
 	minWait := flagSet.Int(minWaitOption, defaultMinWait, "")
+	randomSeed := flagSet.Int(randomSeedOption, defaultRandomSeed, "")
 
 	if len(os.Args) > 3 {
 		err := flagSet.Parse(os.Args[3:])
@@ -165,6 +179,7 @@ func getTestConfig() (*config.TestConfig, error) {
 		WorkerCount:              *cpusToUse,
 		MaxConnections:           *maxConnections,
 		InitialRequestsPerSecond: *rate,
+		InitialRandomSeed:        *randomSeed,
 		DurationSeconds:          *duration,
 		RequestTimeoutSeconds:    *timeout,
 		MinWaitSeconds:           *minWait,
@@ -241,6 +256,13 @@ func printTrialOptions() {
 		"seconds",
 		"Minimum wait time between tests",
 		strconv.Itoa(defaultMinWait),
+	)
+	usage.PrintOption(
+		randomSeedOption,
+		"random seed",
+		"Random seed for randomizing requests (for supporting scenarios). When "+
+			"querying, set to 0 to query across all random seeds.",
+		strconv.Itoa(defaultRandomSeed),
 	)
 }
 

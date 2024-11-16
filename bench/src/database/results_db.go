@@ -22,6 +22,7 @@ const schemaSQL = `
 		"cpusPerNode" INTEGER NOT NULL,
 		"scenarioName" VARCHAR NOT NULL,
 		"initialRequestsPerSecond" INTEGER NOT NULL,
+		"initialRandomSeed" INTEGER NOT NULL,
 		"maxConnections" INTEGER NOT NULL,
 		"workerCount" INTEGER NOT NULL,
 		"cpusUsed" INTEGER NOT NULL,
@@ -42,6 +43,7 @@ const schemaSQL = `
 		"id" SERIAL PRIMARY KEY,
 		"createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
 		"runID" INTEGER NOT NULL,
+		"randomSeed" INTEGER NOT NULL,
 		"requestsPerSecond" DOUBLE PRECISION NOT NULL,
 		"percentSuccesfullyCompleting" DOUBLE PRECISION NOT NULL,
 		"successfulCompletesPerSecond" DOUBLE PRECISION NOT NULL,
@@ -120,6 +122,7 @@ func (rdb *ResultsDB) CreateRun(
 			"cpusPerNode",
 			"scenarioName",
 			"initialRequestsPerSecond",
+			"initialRandomSeed",
 			"maxConnections",
 			"workerCount",
 			"cpusUsed",
@@ -128,7 +131,7 @@ func (rdb *ResultsDB) CreateRun(
 			"minWaitSeconds",
 			"totalRunDurationSeconds"
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
 		)
 		RETURNING id`
 
@@ -141,13 +144,14 @@ func (rdb *ResultsDB) CreateRun(
 		platformConfig.CPUsPerNode,          // $5  - cpusPerNode
 		testConfig.ScenarioName,             // $6  - scenarioName
 		testConfig.InitialRequestsPerSecond, // $7  - initialRequestsPerSecond
-		testConfig.MaxConnections,           // $8  - maxConnections
-		testConfig.WorkerCount,              // $9  - workerCount
-		testConfig.CPUsToUse,                // $10 - cpusUsed
-		testConfig.DurationSeconds,          // $11 - trialDurationSeconds
-		testConfig.RequestTimeoutSeconds,    // $12 - timeoutSeconds
-		testConfig.MinWaitSeconds,           // $13 - minWaitSeconds
-		0,                                   // $14 - totalRunDurationSeconds (initialized to 0)
+		testConfig.InitialRandomSeed,        // $8  - initialRandomSeed
+		testConfig.MaxConnections,           // $9  - maxConnections
+		testConfig.WorkerCount,              // $10 - workerCount
+		testConfig.CPUsToUse,                // $11 - cpusUsed
+		testConfig.DurationSeconds,          // $12 - trialDurationSeconds
+		testConfig.RequestTimeoutSeconds,    // $13 - timeoutSeconds
+		testConfig.MinWaitSeconds,           // $14 - minWaitSeconds
+		0,                                   // $15 - totalRunDurationSeconds (initialized to 0)
 	).Scan(&runID)
 
 	if err != nil {
@@ -193,6 +197,7 @@ func (rdb *ResultsDB) SaveTrial(
 	const query = `
 		INSERT INTO trials (
 			"runID",
+			"randomSeed",
 			"requestsPerSecond",
 			"percentSuccesfullyCompleting",
 			"successfulCompletesPerSecond",
@@ -212,30 +217,31 @@ func (rdb *ResultsDB) SaveTrial(
 			"remainingFDsInUse"
 		) VALUES (
 			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-			$11, $12, $13, $14, $15, $16, $17, $18
+			$11, $12, $13, $14, $15, $16, $17, $18, $19
 		)
 		RETURNING id`
 
 	var trialID int
 	err = pool.QueryRow(context.Background(), query,
-		runID,                                  // $1  - runID
-		trialInfo.RequestsPerSecond,            // $2
-		trialInfo.PercentSuccesfullyCompleting, // $3
-		trialInfo.SuccessfulCompletesPerSecond, // $4
-		trialInfo.TotalRequests,                // $5
-		trialInfo.MeanLatency,                  // $6
-		trialInfo.MaxLatency,                   // $7
-		trialInfo.Latency50thPercentile,        // $8
-		trialInfo.Latency95thPercentile,        // $9
-		trialInfo.Latency99thPercentile,        // $10
-		trialInfo.Histogram,                    // $11
-		trialInfo.StatusCodes,                  // $12
-		trialInfo.ErrorMessages,                // $13
-		resources.TotalAvailablePorts,          // $14 - availablePorts
-		resources.TotalFileDescriptors,         // $15 - fileDescriptors
-		resources.EstablishedPortsCount,        // $16 - remainingPortsActive
-		resources.TimeWaitPortsCount,           // $17 - remainingPortsWaiting
-		resources.FDsInUseCount,                // $18 - remainingFDsInUse
+		runID,                                  // $1
+		trialInfo.RandomSeed,                   // $2
+		trialInfo.RequestsPerSecond,            // $3
+		trialInfo.PercentSuccesfullyCompleting, // $4
+		trialInfo.SuccessfulCompletesPerSecond, // $5
+		trialInfo.TotalRequests,                // $6
+		trialInfo.MeanLatency,                  // $7
+		trialInfo.MaxLatency,                   // $8
+		trialInfo.Latency50thPercentile,        // $9
+		trialInfo.Latency95thPercentile,        // $10
+		trialInfo.Latency99thPercentile,        // $11
+		trialInfo.Histogram,                    // $12
+		trialInfo.StatusCodes,                  // $13
+		trialInfo.ErrorMessages,                // $14
+		resources.TotalAvailablePorts,          // $15
+		resources.TotalFileDescriptors,         // $16
+		resources.EstablishedPortsCount,        // $17
+		resources.TimeWaitPortsCount,           // $18
+		resources.FDsInUseCount,                // $19
 	).Scan(&trialID)
 
 	if err != nil {
@@ -254,8 +260,9 @@ func (rdb *ResultsDB) GetTrials(
 		return nil, err
 	}
 
-	const query = `
+	var query = `
 		SELECT
+			t."RandomSeed",
 			t."requestsPerSecond",
 			t."percentSuccesfullyCompleting",
 			t."successfulCompletesPerSecond",
@@ -283,6 +290,12 @@ func (rdb *ResultsDB) GetTrials(
 		  AND r."timeoutSeconds" = $11
 		  AND r."minWaitSeconds" = $12`
 
+	if testConfig.InitialRandomSeed != 0 {
+		query += ` AND r."initialRandomSeed" = $13`
+	} else {
+		query += ` AND r."initialRandomSeed" >= 0`
+	}
+
 	rows, err := pool.Query(context.Background(), query,
 		sinceTime,                           // $1  - createdAt
 		platformConfig.AppName,              // $2  - appName
@@ -296,6 +309,7 @@ func (rdb *ResultsDB) GetTrials(
 		testConfig.DurationSeconds,          // $10 - trialDurationSeconds
 		testConfig.RequestTimeoutSeconds,    // $11 - timeoutSeconds
 		testConfig.MinWaitSeconds,           // $12 - minWaitSeconds
+		testConfig.InitialRandomSeed,        // $13 - initialRandomSeed
 	)
 	if err != nil {
 		return nil, err
