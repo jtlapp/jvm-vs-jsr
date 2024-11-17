@@ -59,10 +59,9 @@ func main() {
 	for _, arg := range os.Args[1:] {
 		commandLine += " " + arg
 	}
-	util.LogOnly("\n========================================")
 
-	util.Log()
-	util.Logf("%s %s", time.Now().Format("2006-01-02 15:04:05"), commandLine)
+	util.LogOnly("\n========================================")
+	util.LogfOnly("\n%s %s", time.Now().Format("2006-01-02 15:04:05"), commandLine)
 
 	// Execute the command.
 

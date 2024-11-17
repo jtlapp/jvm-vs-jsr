@@ -12,6 +12,7 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/stats"
+	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
 const (
@@ -109,6 +110,7 @@ var ShowStatistics = newCommand(
 		if err != nil {
 			return err
 		}
+		util.Log()
 		runStats.Print()
 		return nil
 	})

@@ -20,6 +20,11 @@ func Log(values ...interface{}) {
 	writeToLogFile(line)
 }
 
+func LogfOnly(format string, args ...interface{}) {
+	line := fmt.Sprintf(format, args...)
+	LogOnly(line)
+}
+
 func LogOnly(values ...interface{}) {
 	line := fmt.Sprint(values...)
 	writeToLogFile(line)
