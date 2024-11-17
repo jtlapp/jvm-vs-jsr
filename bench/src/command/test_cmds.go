@@ -236,7 +236,7 @@ func printTrialOptions() {
 	usage.PrintOption(
 		rateOption,
 		"requests per second",
-		"Rate to test or initial rate guess",
+		"Rate to test or initial rate guess. Ignored when querying for statistics.",
 		strconv.Itoa(defaultRate),
 	)
 	usage.PrintOption(
@@ -261,7 +261,7 @@ func printTrialOptions() {
 		randomSeedOption,
 		"random seed",
 		"Random seed for randomizing requests (for supporting scenarios). When "+
-			"querying, set to 0 to query across all random seeds.",
+			"querying for statistics, set to 0 to query across all random seeds.",
 		strconv.Itoa(defaultRandomSeed),
 	)
 }

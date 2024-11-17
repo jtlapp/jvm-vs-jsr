@@ -281,35 +281,33 @@ func (rdb *ResultsDB) GetTrials(
 		  AND r."appVersion" = $3
 		  AND r."appConfig" = $4
 		  AND r."scenarioName" = $5
-		  AND r."initialRequestsPerSecond" = $6
-		  AND r."maxConnections" = $7
-		  AND r."workerCount" = $8
-		  AND r."cpusUsed" = $9
-		  AND r."trialDurationSeconds" = $10
-		  AND r."timeoutSeconds" = $11
-		  AND r."minWaitSeconds" = $12`
+		  AND r."maxConnections" = $6
+		  AND r."workerCount" = $7
+		  AND r."cpusUsed" = $8
+		  AND r."trialDurationSeconds" = $9
+		  AND r."timeoutSeconds" = $10
+		  AND r."minWaitSeconds" = $11`
 
 	if testConfig.InitialRandomSeed != 0 {
-		query += ` AND r."initialRandomSeed" = $13`
+		query += ` AND r."initialRandomSeed" = $12`
 	} else {
 		// The seed is positive, so this uses all seeds.
-		query += ` AND r."initialRandomSeed" >= (-1 * $13)`
+		query += ` AND r."initialRandomSeed" >= (-1 * $12)`
 	}
 
 	rows, err := pool.Query(context.Background(), query,
-		sinceTime,                           // $1  - createdAt
-		platformConfig.AppName,              // $2  - appName
-		platformConfig.AppVersion,           // $3  - appVersion
-		platformConfig.AppConfig,            // $4  - appConfig
-		testConfig.ScenarioName,             // $5  - scenarioName
-		testConfig.InitialRequestsPerSecond, // $6  - initialRequestsPerSecond
-		testConfig.MaxConnections,           // $7  - maxConnections
-		testConfig.WorkerCount,              // $8  - workerCount
-		testConfig.CPUsToUse,                // $9  - cpusUsed
-		testConfig.DurationSeconds,          // $10 - trialDurationSeconds
-		testConfig.RequestTimeoutSeconds,    // $11 - timeoutSeconds
-		testConfig.MinWaitSeconds,           // $12 - minWaitSeconds
-		testConfig.InitialRandomSeed,        // $13 - initialRandomSeed
+		sinceTime,                        // $1  - createdAt
+		platformConfig.AppName,           // $2  - appName
+		platformConfig.AppVersion,        // $3  - appVersion
+		platformConfig.AppConfig,         // $4  - appConfig
+		testConfig.ScenarioName,          // $5  - scenarioName
+		testConfig.MaxConnections,        // $6  - maxConnections
+		testConfig.WorkerCount,           // $7  - workerCount
+		testConfig.CPUsToUse,             // $8  - cpusUsed
+		testConfig.DurationSeconds,       // $9 - trialDurationSeconds
+		testConfig.RequestTimeoutSeconds, // $10 - timeoutSeconds
+		testConfig.MinWaitSeconds,        // $11 - minWaitSeconds
+		testConfig.InitialRandomSeed,     // $12 - initialRandomSeed
 	)
 	if err != nil {
 		return nil, err
