@@ -66,6 +66,7 @@ var Commands = []Command{
 	DetermineRate,
 	TryRate,
 	ShowStatus,
+	ShowStatistics,
 }
 
 func Find(name string) (Command, error) {

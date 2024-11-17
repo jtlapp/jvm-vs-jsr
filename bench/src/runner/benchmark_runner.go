@@ -49,7 +49,7 @@ func (br *BenchmarkRunner) DetermineRate(runCount int, resetRandomSeed bool) (*s
 	startTime := time.Now()
 
 	for i := 0; i < runCount; i++ {
-		err := br.performRateDetermination(i + 1, randomSeed)
+		err := br.performRateDetermination(i+1, randomSeed)
 		if err != nil {
 			return nil, err
 		}

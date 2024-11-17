@@ -292,7 +292,8 @@ func (rdb *ResultsDB) GetTrials(
 	if testConfig.InitialRandomSeed != 0 {
 		query += ` AND r."initialRandomSeed" = $13`
 	} else {
-		query += ` AND r."initialRandomSeed" >= 0`
+		// The seed is positive, so this uses all seeds.
+		query += ` AND r."initialRandomSeed" >= -$13`
 	}
 
 	rows, err := pool.Query(context.Background(), query,
@@ -318,6 +319,7 @@ func (rdb *ResultsDB) GetTrials(
 	for rows.Next() {
 		var trial TrialInfo
 		err := rows.Scan(
+			&trial.RandomSeed,
 			&trial.RequestsPerSecond,
 			&trial.PercentSuccesfullyCompleting,
 			&trial.SuccessfulCompletesPerSecond,
