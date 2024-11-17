@@ -15,13 +15,17 @@ func Logf(format string, args ...interface{}) {
 }
 
 func Log(values ...interface{}) {
-	// Write the values as a line to stdout.
-
 	line := fmt.Sprint(values...)
 	fmt.Println(line)
+	writeToLogFile(line)
+}
 
-	// Write the values as a line to stdout.
+func LogOnly(values ...interface{}) {
+	line := fmt.Sprint(values...)
+	writeToLogFile(line)
+}
 
+func writeToLogFile(line string) {
 	file, err := os.OpenFile(logfileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic("failed to open log file")
