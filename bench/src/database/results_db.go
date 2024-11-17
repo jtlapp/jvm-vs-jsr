@@ -261,7 +261,7 @@ func (rdb *ResultsDB) GetTrials(
 
 	var query = `
 		SELECT
-			t."RandomSeed",
+			t."randomSeed",
 			t."requestsPerSecond",
 			t."percentSuccesfullyCompleting",
 			t."successfulCompletesPerSecond",
