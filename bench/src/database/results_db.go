@@ -293,7 +293,7 @@ func (rdb *ResultsDB) GetTrials(
 		query += ` AND r."initialRandomSeed" = $13`
 	} else {
 		// The seed is positive, so this uses all seeds.
-		query += ` AND r."initialRandomSeed" >= -$13`
+		query += ` AND r."initialRandomSeed" >= (-1 * $13)`
 	}
 
 	rows, err := pool.Query(context.Background(), query,

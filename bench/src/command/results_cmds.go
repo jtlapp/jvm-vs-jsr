@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
@@ -14,7 +16,7 @@ import (
 
 const (
 	sinceTime        = "since"
-	defaultSinceTime = "20y"
+	defaultSinceTime = "365d"
 )
 
 var SetupResultsDB = newCommand(
@@ -83,10 +85,21 @@ var ShowStatistics = newCommand(
 			return err
 		}
 
-		sinceTime, err := time.ParseDuration(*sinceDuration)
-		if err != nil {
-			return fmt.Errorf("failed to parse 'since' period: %v", err)
+		var sinceTime time.Duration
+		if strings.HasSuffix(*sinceDuration, "d") {
+			days, err := strconv.Atoi(strings.TrimSuffix(*sinceDuration, "d"))
+			if err != nil {
+				return fmt.Errorf("failed to parse 'since' period: %v", err)
+			}
+			sinceTime = time.Duration(days) * 24 * time.Hour
+		} else {
+			var err error
+			sinceTime, err = time.ParseDuration(*sinceDuration)
+			if err != nil {
+				return fmt.Errorf("failed to parse 'since' period: %v", err)
+			}
 		}
+
 		startTime := time.Now().Add(-sinceTime)
 
 		resultsDB := database.NewResultsDatabase()

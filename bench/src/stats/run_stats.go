@@ -29,6 +29,10 @@ func NewRunStats(
 		return nil, fmt.Errorf("error getting trials: %v", err)
 	}
 
+	if len(trials) == 0 {
+		return nil, fmt.Errorf("no trials found meeting these criteria")
+	}
+
 	runStats, err := CalculateRunStats(trials)
 	if err != nil {
 		return nil, fmt.Errorf("error calculating run stats: %v", err)
