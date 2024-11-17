@@ -2,6 +2,8 @@ package stats
 
 import (
 	"time"
+
+	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
 
 type LatencyStats struct {
@@ -20,7 +22,7 @@ type LatencyStats struct {
 	MaxTailRatio     float64 // Maximum (p99/p50) ratio
 }
 
-func CalculateLatencyStats(trials []TrialInfo) (LatencyStats, error) {
+func CalculateLatencyStats(trials []database.TrialInfo) (LatencyStats, error) {
 	stats := LatencyStats{}
 
 	if len(trials) == 0 {

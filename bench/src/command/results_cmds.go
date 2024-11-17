@@ -1,10 +1,20 @@
 package command
 
 import (
+	"flag"
 	"fmt"
+	"os"
+	"time"
 
+	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
+	"jvm-vs-jsr.jtlapp.com/benchmark/stats"
+)
+
+const (
+	sinceTime        = "since"
+	defaultSinceTime = "20y"
 )
 
 var SetupResultsDB = newCommand(
@@ -52,6 +62,53 @@ var SetupResultsDB = newCommand(
 		fmt.Println()
 		return nil
 	})
+
+var ShowStatistics = newCommand(
+	"stats",
+	"<scenario> [-since=period[d|h|m]] [<trial-options>]",
+	"Prints statistics for runs of the given scenario using the given trial "+
+		"options. If -since is provided, prints statistics only for trials "+
+		"completed since the given time duration.",
+	printStatisticsOptions,
+	func(clientConfig config.ClientConfig) error {
+		flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+		sinceDuration := flagSet.String(sinceTime, defaultSinceTime, "")
+
+		platformConfig, err := config.GetPlatformConfig(clientConfig)
+		if err != nil {
+			return err
+		}
+		testConfig, err := getTestConfig(flagSet)
+		if err != nil {
+			return err
+		}
+
+		sinceTime, err := time.ParseDuration(*sinceDuration)
+		if err != nil {
+			return fmt.Errorf("failed to parse 'since' period: %v", err)
+		}
+		startTime := time.Now().Add(-sinceTime)
+
+		resultsDB := database.NewResultsDatabase()
+		defer resultsDB.Close()
+
+		runStats, err := stats.NewRunStats(resultsDB, startTime, platformConfig, testConfig)
+		if err != nil {
+			return err
+		}
+		runStats.Print()
+		return nil
+	})
+
+func printStatisticsOptions() {
+	usage.PrintOption(
+		sinceTime,
+		"since period",
+		"How far back to look for trials. Suffix with 'd' for days, 'h' for hours, or 'm' for minutes.",
+		defaultSinceTime,
+	)
+	printTrialOptions()
+}
 
 func confirmWithUser(message string) bool {
 	fmt.Printf("%s (Y/n): ", message)

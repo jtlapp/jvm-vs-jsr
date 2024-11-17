@@ -49,7 +49,7 @@ func (br *BenchmarkRunner) DetermineRate(runCount int, resetRandomSeed bool) (*s
 	startTime := time.Now()
 
 	for i := 0; i < runCount; i++ {
-		err := br.performRateDetermination(randomSeed)
+		err := br.performRateDetermination(i + 1, randomSeed)
 		if err != nil {
 			return nil, err
 		}
@@ -58,16 +58,7 @@ func (br *BenchmarkRunner) DetermineRate(runCount int, resetRandomSeed bool) (*s
 		}
 	}
 
-	trials, err := br.resultsDB.GetTrials(startTime, &br.platformConfig, &br.testConfig)
-	if err != nil {
-		return nil, fmt.Errorf("error getting trials: %v", err)
-	}
-
-	runStats, err := stats.CalculateRunStats(trials)
-	if err != nil {
-		return nil, fmt.Errorf("error calculating run stats: %v", err)
-	}
-	return &runStats, nil
+	return stats.NewRunStats(br.resultsDB, startTime, &br.platformConfig, &br.testConfig)
 }
 
 func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
@@ -119,7 +110,7 @@ func (br *BenchmarkRunner) performWarmupRun() error {
 	return nil
 }
 
-func (br *BenchmarkRunner) performRateDetermination(randomSeed int64) error {
+func (br *BenchmarkRunner) performRateDetermination(iteration int, randomSeed int64) error {
 	runID, err := br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
 	if err != nil {
 		return fmt.Errorf("error creating run: %v", err)
@@ -146,7 +137,7 @@ func (br *BenchmarkRunner) performRateDetermination(randomSeed int64) error {
 		}
 
 		util.Log()
-		util.Logf("Testing %d requests/sec...", currentRequestRate)
+		util.Logf("(%d) Testing %d requests/sec...", iteration, currentRequestRate)
 		var trialID int
 		trialID, metrics, err = br.performRateTrial(
 			runID, currentRequestRate, randomSeed, br.testConfig.DurationSeconds)
@@ -212,7 +203,7 @@ func (br *BenchmarkRunner) performRateTrial(
 	var trialID int
 	if runID != 0 {
 		resources := util.NewResourceStatus()
-		trialInfo, err := stats.NewTrialInfo(&metrics, randomSeed)
+		trialInfo, err := database.NewTrialInfo(&metrics, randomSeed)
 		if err != nil {
 			panic(fmt.Errorf("failed to create trial info: %v", err))
 		}

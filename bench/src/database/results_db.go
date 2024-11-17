@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
-	"jvm-vs-jsr.jtlapp.com/benchmark/stats"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
@@ -186,7 +185,7 @@ func (rdb *ResultsDB) UpdateRun(runID int, totalDurationSeconds int, bestTrialID
 
 func (rdb *ResultsDB) SaveTrial(
 	runID int,
-	trialInfo *stats.TrialInfo,
+	trialInfo *TrialInfo,
 	resources *util.ResourceStatus,
 ) (int, error) {
 	pool, err := rdb.GetPool()
@@ -254,7 +253,7 @@ func (rdb *ResultsDB) GetTrials(
 	sinceTime time.Time,
 	platformConfig *config.PlatformConfig,
 	testConfig *config.TestConfig,
-) ([]stats.TrialInfo, error) {
+) ([]TrialInfo, error) {
 	pool, err := rdb.GetPool()
 	if err != nil {
 		return nil, err
@@ -315,9 +314,9 @@ func (rdb *ResultsDB) GetTrials(
 		return nil, err
 	}
 
-	var trials []stats.TrialInfo
+	var trials []TrialInfo
 	for rows.Next() {
-		var trial stats.TrialInfo
+		var trial TrialInfo
 		err := rows.Scan(
 			&trial.RequestsPerSecond,
 			&trial.PercentSuccesfullyCompleting,

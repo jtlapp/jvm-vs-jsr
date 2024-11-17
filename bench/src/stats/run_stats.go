@@ -1,20 +1,42 @@
 package stats
 
 import (
+	"fmt"
+	"time"
+
+	"jvm-vs-jsr.jtlapp.com/benchmark/config"
+	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
-// RunStats combines all statistics for a set of trials
 type RunStats struct {
 	TrialCount                   int
 	RequestsPerSecond            ValueStats
 	SuccessfulCompletesPerSecond ValueStats
-	SuccessRate                  ValueStats // Stats for PercentSuccessfullyCompleting
+	SuccessRate                  ValueStats
 	Latency                      LatencyStats
 }
 
-// CalculateRunStats computes comprehensive statistics for a slice of trials
-func CalculateRunStats(trials []TrialInfo) (RunStats, error) {
+func NewRunStats(
+	resultsDB *database.ResultsDB,
+	startTime time.Time,
+	platformConfig *config.PlatformConfig,
+	testConfig *config.TestConfig,
+) (*RunStats, error) {
+
+	trials, err := resultsDB.GetTrials(startTime, platformConfig, testConfig)
+	if err != nil {
+		return nil, fmt.Errorf("error getting trials: %v", err)
+	}
+
+	runStats, err := CalculateRunStats(trials)
+	if err != nil {
+		return nil, fmt.Errorf("error calculating run stats: %v", err)
+	}
+	return &runStats, nil
+}
+
+func CalculateRunStats(trials []database.TrialInfo) (RunStats, error) {
 	stats := RunStats{TrialCount: len(trials)}
 
 	// Extract slices for value-based statistics

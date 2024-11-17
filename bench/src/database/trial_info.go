@@ -1,4 +1,4 @@
-package stats
+package database
 
 import (
 	"encoding/json"
