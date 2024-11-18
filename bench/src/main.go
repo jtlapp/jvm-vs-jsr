@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/command"
+	cmd "jvm-vs-jsr.jtlapp.com/benchmark/command"
 	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
@@ -38,7 +39,7 @@ func main() {
 		os.Exit(0)
 	}
 	commandName := os.Args[1]
-	command, err := command.Find(commandName)
+	command, err := cmd.Find(commandName)
 	if err != nil {
 		fail(err)
 	}
@@ -66,7 +67,11 @@ func main() {
 	// Execute the command.
 
 	clientConfig := config.ClientConfig{ClientVersion: version, BaseAppUrl: baseAppUrl}
-	err = command.Execute(clientConfig)
+	commandConfig, err := command.ParseArgs()
+	if err != nil {
+		fail(err)
+	}
+	err = command.Execute(clientConfig, *commandConfig)
 	if err != nil {
 		fail(err)
 	}

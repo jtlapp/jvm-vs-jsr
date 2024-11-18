@@ -5,6 +5,12 @@ go 1.23.2
 require (
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/tsenart/vegeta v12.7.0+incompatible
+	gopkg.in/yaml.v3 v3.0.1
+)
+
+require (
+	github.com/kr/text v0.2.0 // indirect
+	github.com/rogpeppe/go-internal v1.13.1 // indirect
 )
 
 require (

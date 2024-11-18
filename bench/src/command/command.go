@@ -1,7 +1,9 @@
 package command
 
 import (
+	"flag"
 	"fmt"
+	"os"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
@@ -11,23 +13,43 @@ type Command interface {
 	Name() string
 	ArgsUsage() string
 	Description() string
-	Execute(clientConfig config.ClientConfig) error
+	ParseArgs() (*usage.CommandConfig, error)
+	Execute(config.ClientConfig, usage.CommandConfig) error
 	PrintUsage()
 	PrintUsageWithOptions()
 }
 
 type baseCommand struct {
-	name         string
-	argsUsage    string
-	description  string
-	printOptions func()
-	execute      func(config.ClientConfig) error
+	name        string
+	argsUsage   string
+	description string
+	addOptions  func(*usage.CommandConfig, *flag.FlagSet)
+	execute     func(config.ClientConfig, usage.CommandConfig) error
 }
 
-func (c *baseCommand) Name() string                          { return c.name }
-func (c *baseCommand) ArgsUsage() string                     { return c.argsUsage }
-func (c *baseCommand) Description() string                   { return c.description }
-func (c *baseCommand) Execute(cfg config.ClientConfig) error { return c.execute(cfg) }
+func (c *baseCommand) Name() string        { return c.name }
+func (c *baseCommand) ArgsUsage() string   { return c.argsUsage }
+func (c *baseCommand) Description() string { return c.description }
+
+func (c *baseCommand) ParseArgs() (*usage.CommandConfig, error) {
+	commandConfig := usage.CommandConfig{}
+	if (*c).addOptions != nil {
+		flagSet := flag.NewFlagSet(c.name, flag.ExitOnError)
+		(*c).addOptions(&commandConfig, flagSet)
+		err := usage.ParseFlagsWithFileDefaults(flagSet, os.Args[1:])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &commandConfig, nil
+}
+
+func (c *baseCommand) Execute(
+	clientConfig config.ClientConfig,
+	commandConfig usage.CommandConfig,
+) error {
+	return c.execute(clientConfig, commandConfig)
+}
 
 func (c *baseCommand) PrintUsage() {
 	fmt.Printf("    %s %s\n", c.Name(), c.ArgsUsage())
@@ -37,24 +59,29 @@ func (c *baseCommand) PrintUsage() {
 func (c *baseCommand) PrintUsageWithOptions() {
 	fmt.Println("Usage:")
 	c.PrintUsage()
-	if c.printOptions != nil {
+
+	if c.addOptions != nil {
 		fmt.Println("Options:")
-		c.printOptions()
+		flagSet := flag.NewFlagSet(c.Name(), flag.ExitOnError)
+		commandConfig := usage.CommandConfig{}
+		c.addOptions(&commandConfig, flagSet)
+		_ = flagSet.Parse([]string{"--help"})
 	}
 	fmt.Println()
 }
 
 func newCommand(
 	name, argsUsage, description string,
-	printOptions func(),
-	execute func(config.ClientConfig) error) Command {
+	addOptions func(*usage.CommandConfig, *flag.FlagSet),
+	execute func(config.ClientConfig, usage.CommandConfig) error,
+) Command {
 
 	return &baseCommand{
-		name:         name,
-		argsUsage:    argsUsage,
-		description:  description,
-		printOptions: printOptions,
-		execute:      execute,
+		name:        name,
+		argsUsage:   argsUsage,
+		description: description,
+		addOptions:  addOptions,
+		execute:     execute,
 	}
 }
 

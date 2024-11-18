@@ -3,7 +3,6 @@ package command
 import (
 	"flag"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -15,17 +14,12 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
-const (
-	sinceTime        = "since"
-	defaultSinceTime = "365d"
-)
-
 var SetupResultsDB = newCommand(
 	"setup-results",
 	"",
 	"Creates the results database tables on the client pod.",
 	nil,
-	func(cfg config.ClientConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
 
@@ -72,36 +66,35 @@ var ShowStatistics = newCommand(
 	"Prints statistics for runs of the given scenario using the given trial "+
 		"options. If -since is provided, prints statistics only for trials "+
 		"completed since the given time duration.",
-	printStatisticsOptions,
-	func(clientConfig config.ClientConfig) error {
-		flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-		sinceDuration := flagSet.String(sinceTime, defaultSinceTime, "")
+	addStatisticsOptions,
+	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
 
 		platformConfig, err := config.GetPlatformConfig(clientConfig)
 		if err != nil {
 			return err
 		}
-		testConfig, err := getTestConfig(flagSet)
+		testConfig, err := getTestConfig(commandConfig)
 		if err != nil {
 			return err
 		}
 
-		var sinceTime time.Duration
-		if strings.HasSuffix(*sinceDuration, "d") {
-			days, err := strconv.Atoi(strings.TrimSuffix(*sinceDuration, "d"))
+		var sinceArg = *commandConfig.SincePeriod
+		var sinceDuration time.Duration
+		if strings.HasSuffix(sinceArg, "d") {
+			days, err := strconv.Atoi(strings.TrimSuffix(sinceArg, "d"))
 			if err != nil {
 				return fmt.Errorf("failed to parse 'since' period: %v", err)
 			}
-			sinceTime = time.Duration(days) * 24 * time.Hour
+			sinceDuration = time.Duration(days) * 24 * time.Hour
 		} else {
 			var err error
-			sinceTime, err = time.ParseDuration(*sinceDuration)
+			sinceDuration, err = time.ParseDuration(sinceArg)
 			if err != nil {
 				return fmt.Errorf("failed to parse 'since' period: %v", err)
 			}
 		}
 
-		startTime := time.Now().Add(-sinceTime)
+		startTime := time.Now().Add(-sinceDuration)
 
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
@@ -115,14 +108,10 @@ var ShowStatistics = newCommand(
 		return nil
 	})
 
-func printStatisticsOptions() {
-	usage.PrintOption(
-		sinceTime,
-		"since period",
-		"How far back to look for trials. Suffix with 'd' for days, 'h' for hours, or 'm' for minutes.",
-		defaultSinceTime,
-	)
-	printTrialOptions()
+func addStatisticsOptions(commandConfig *usage.CommandConfig, flagSet *flag.FlagSet) {
+	commandConfig.SincePeriod = flagSet.String("sincePeriod", "356d",
+		"How far back to look for trials. Suffix with 'd' for days, 'h' for hours, or 'm' for minutes.")
+	addTrialOptions(commandConfig, flagSet)
 }
 
 func confirmWithUser(message string) bool {

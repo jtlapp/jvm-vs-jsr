@@ -14,11 +14,13 @@ var SetupBackendDB = newCommand(
 	"<scenario>",
 	"Creates database tables and queries required for the test scenario.",
 	nil,
-	func(cfg config.ClientConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
 		backendDB := database.NewBackendDatabase()
 		defer backendDB.Close()
 
-		backendSetup, err := createBackendSetup(backendDB)
+		scenarioName := *commandConfig.ScenarioName
+
+		backendSetup, err := createBackendSetup(scenarioName, backendDB)
 		if err != nil {
 			return err
 		}
@@ -33,22 +35,23 @@ var AssignQueries = newCommand(
 	"<scenario>",
 	"Sets only the queries required for the test scenario.",
 	nil,
-	func(cfg config.ClientConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
 		backendDB := database.NewBackendDatabase()
 		defer backendDB.Close()
 
-		backendSetup, err := createBackendSetup(backendDB)
+		scenarioName := *commandConfig.ScenarioName
+
+		backendSetup, err := createBackendSetup(scenarioName, backendDB)
 		if err != nil {
 			return err
 		}
 		return assignSharedQueries(backendSetup)
 	})
 
-func createBackendSetup(backendDB *database.BackendDB) (*database.BackendSetup, error) {
-	scenarioName, err := usage.GetScenarioName()
-	if err != nil {
-		return nil, err
-	}
+func createBackendSetup(
+	scenarioName string,
+	backendDB *database.BackendDB,
+) (*database.BackendSetup, error) {
 
 	scenario, err := scenarios.GetScenario(scenarioName)
 	if err != nil {

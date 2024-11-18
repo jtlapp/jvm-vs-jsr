@@ -3,9 +3,7 @@ package command
 import (
 	"flag"
 	"fmt"
-	"os"
 	"runtime"
-	"strconv"
 
 	vegeta "github.com/tsenart/vegeta/lib"
 	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
@@ -17,42 +15,23 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
-const (
-	loopCount            = "times"
-	resetRandomSeed      = "reset"
-	cpusOption           = "cpus"
-	maxConnectionsOption = "maxconns"
-	rateOption           = "rate"
-	durationOption       = "duration"
-	timeoutOption        = "timeout"
-	minWaitOption        = "minwait"
-	randomSeedOption     = "seed"
-)
-
-const (
-	defaultLoopCount       = 8
-	defaultResetRandomSeed = false
-	defaultMaxConnections  = 0
-	defaultRate            = 10
-	defaultDuration        = 5
-	defaultTimeout         = 10
-	defaultMinWait         = 0
-	defaultRandomSeed      = 123456
-)
-
 var LoopDeterminingRates = newCommand(
 	"loop",
 	"<scenario> [-times <iterations>] [<trial-options>]",
 	"Loops repeatedly performing tests to find the highest constant/stable rate. "+
 		"The resulting rates are guaranteed to be error-free for the specified "+
 		"duration. Provide a rate guess to hasten convergence on the stable rate.",
-	printLoopOptions,
-	func(clientConfig config.ClientConfig) error {
-		flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-		runCount := flagSet.Int(loopCount, defaultLoopCount, "")
-		resetRandomSeed := flagSet.Bool(resetRandomSeed, defaultResetRandomSeed, "")
+	addLoopOptions,
+	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
 
-		runStats, err := performRuns(clientConfig, flagSet, runCount, resetRandomSeed)
+		testConfig, err := getTestConfig(commandConfig)
+		if err != nil {
+			return err
+		}
+		runCount := *commandConfig.LoopCount
+		resetRandomSeed := *commandConfig.ResetRandomSeed
+
+		runStats, err := performRuns(clientConfig, *testConfig, runCount, resetRandomSeed)
 		if err != nil {
 			return err
 		}
@@ -68,12 +47,17 @@ var DetermineRate = newCommand(
 	"Finds the highest constant/stable rate. The resulting rate is guaranteed "+
 		"to be error-free for the specified duration. Provide a rate guess to hasten "+
 		"convergence on the stable rate.",
-	printTrialOptions,
-	func(clientConfig config.ClientConfig) error {
-		flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	addTrialOptions,
+	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
+
+		testConfig, err := getTestConfig(commandConfig)
+		if err != nil {
+			return err
+		}
 		runCount := 1
 		resetRandomSeed := false
-		_, err := performRuns(clientConfig, flagSet, &runCount, &resetRandomSeed)
+
+		_, err = performRuns(clientConfig, *testConfig, runCount, resetRandomSeed)
 		return err
 	})
 
@@ -81,11 +65,10 @@ var TryRate = newCommand(
 	"try",
 	"<scenario> [<trial-options>]",
 	"Tries issuing requests at the given rate for the specified duration.",
-	printTrialOptions,
-	func(clientConfig config.ClientConfig) error {
-		flagSet := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	addTrialOptions,
+	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
 
-		testConfig, err := getTestConfig(flagSet)
+		testConfig, err := getTestConfig(commandConfig)
 		if err != nil {
 			return err
 		}
@@ -93,7 +76,7 @@ var TryRate = newCommand(
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
 
-		benchmarkRunner, err := createBenchmarkRunner(clientConfig, testConfig, resultsDB)
+		benchmarkRunner, err := createBenchmarkRunner(clientConfig, *testConfig, resultsDB)
 		if err != nil {
 			return err
 		}
@@ -113,7 +96,7 @@ var ShowStatus = newCommand(
 	"",
 	"Prints the active ports, waiting ports, and file descriptors in use.",
 	nil,
-	func(clientConfig config.ClientConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
 		resources := util.NewResourceStatus()
 		establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
 			resources.GetPercentages()
@@ -131,15 +114,10 @@ var ShowStatus = newCommand(
 
 func performRuns(
 	clientConfig config.ClientConfig,
-	flagSet *flag.FlagSet,
-	runCount *int,
-	resetRandomSeed *bool,
+	testConfig config.TestConfig,
+	runCount int,
+	resetRandomSeed bool,
 ) (*stats.RunStats, error) {
-
-	testConfig, err := getTestConfig(flagSet)
-	if err != nil {
-		return nil, err
-	}
 
 	resultsDB := database.NewResultsDatabase()
 	defer resultsDB.Close()
@@ -149,46 +127,68 @@ func performRuns(
 		return nil, err
 	}
 
-	return benchmarkRunner.DetermineRate(*runCount, *resetRandomSeed)
+	return benchmarkRunner.DetermineRate(runCount, resetRandomSeed)
 }
 
-func getTestConfig(flagSet *flag.FlagSet) (*config.TestConfig, error) {
-	scenarioName, err := usage.GetScenarioName()
-	if err != nil {
-		return nil, err
-	}
+func addLoopOptions(config *usage.CommandConfig, flagSet *flag.FlagSet) {
+	config.LoopCount = flagSet.Int("runCount", 8,
+		"Number of times to run the rate determination benchmark")
 
-	cpusToUse := flagSet.Int(cpusOption, runtime.NumCPU(), "")
-	maxConnections := flagSet.Int(maxConnectionsOption, defaultMaxConnections, "")
-	rate := flagSet.Int(rateOption, defaultRate, "")
-	duration := flagSet.Int(durationOption, defaultDuration, "")
-	timeout := flagSet.Int(timeoutOption, defaultTimeout, "")
-	minWait := flagSet.Int(minWaitOption, defaultMinWait, "")
-	randomSeed := flagSet.Int(randomSeedOption, defaultRandomSeed, "")
+	config.ResetRandomSeed = flagSet.Bool("resetSeedBetweenTests", false,
+		"Reset the random seed for each run")
 
-	if len(os.Args) > 3 {
-		err := flagSet.Parse(os.Args[3:])
-		if err != nil {
-			return nil, usage.NewUsageError("%s", err.Error())
-		}
+	addTrialOptions(config, flagSet)
+}
+
+func addTrialOptions(config *usage.CommandConfig, flagSet *flag.FlagSet) {
+	config.ScenarioName = flagSet.String("testScenario", "",
+		"Name of scenario to test (REQUIRED)")
+
+	config.CPUsToUse = flagSet.Int("cpusToUse", runtime.NumCPU(),
+		"Number of CPUs (and workers) to use")
+
+	config.MaxConnections = flagSet.Int("maxConnections", 0,
+		"Maximum number of connections to use (default 0, meaning unlimited)")
+
+	config.InitialRequestsPerSecond = flagSet.Int("initialRate", 10,
+		"Rate to test or initial rate guess in requests/second. Ignored when querying for statistics.")
+
+	config.DurationSeconds = flagSet.Int("testDuration", 5,
+		"Test duration in seconds. Time over which rate must be error-free.")
+
+	config.RequestTimeoutSeconds = flagSet.Int("requestTimeout", 10,
+		"Request response timeout in seconds.")
+
+	config.MinWaitSeconds = flagSet.Int("minWaitBetweenTests", 0,
+		"Minimum wait time between tests in seconds (default 0)")
+
+	config.InitialRandomSeed = flagSet.Int("seed", 123456,
+		"Random seed for randomizing requests (in supporting scenarios). When "+
+			"querying for statistics, set to 0 to query across all random seeds.")
+}
+
+func getTestConfig(commandConfig usage.CommandConfig) (*config.TestConfig, error) {
+	scenarioName := *commandConfig.ScenarioName
+	if scenarioName == "" {
+		return nil, usage.NewUsageError("scenario name is required")
 	}
 
 	return &config.TestConfig{
 		ScenarioName:             scenarioName,
-		CPUsToUse:                *cpusToUse,
-		WorkerCount:              *cpusToUse,
-		MaxConnections:           *maxConnections,
-		InitialRequestsPerSecond: *rate,
-		InitialRandomSeed:        *randomSeed,
-		DurationSeconds:          *duration,
-		RequestTimeoutSeconds:    *timeout,
-		MinWaitSeconds:           *minWait,
+		CPUsToUse:                *commandConfig.CPUsToUse,
+		WorkerCount:              *commandConfig.CPUsToUse,
+		MaxConnections:           *commandConfig.MaxConnections,
+		InitialRequestsPerSecond: *commandConfig.InitialRequestsPerSecond,
+		InitialRandomSeed:        *commandConfig.InitialRandomSeed,
+		DurationSeconds:          *commandConfig.DurationSeconds,
+		RequestTimeoutSeconds:    *commandConfig.RequestTimeoutSeconds,
+		MinWaitSeconds:           *commandConfig.MinWaitSeconds,
 	}, nil
 }
 
 func createBenchmarkRunner(
 	clientConfig config.ClientConfig,
-	testConfig *config.TestConfig,
+	testConfig config.TestConfig,
 	resultsDB *database.ResultsDB,
 ) (*runner.BenchmarkRunner, error) {
 
@@ -197,73 +197,12 @@ func createBenchmarkRunner(
 		return nil, err
 	}
 
-	scenarioName, err := usage.GetScenarioName()
+	scenario, err := scenarios.GetScenario(testConfig.ScenarioName)
 	if err != nil {
 		return nil, err
 	}
 
-	scenario, err := scenarios.GetScenario(scenarioName)
-	if err != nil {
-		return nil, err
-	}
-
-	return runner.NewBenchmarkRunner(*platformConfig, *testConfig, &scenario, resultsDB)
-}
-
-func printLoopOptions() {
-	usage.PrintOption(
-		loopCount,
-		"iterations",
-		"Number of times to run the rate determination benchmark",
-		strconv.Itoa(defaultLoopCount),
-	)
-	printTrialOptions()
-}
-
-func printTrialOptions() {
-	usage.PrintOption(
-		cpusOption,
-		"number of CPUs",
-		"Number of CPUs (and workers) to use",
-		"all CPUs",
-	)
-	usage.PrintOption(
-		maxConnectionsOption,
-		"number of connections",
-		"Maximum number of connections to use",
-		"unlimited",
-	)
-	usage.PrintOption(
-		rateOption,
-		"requests per second",
-		"Rate to test or initial rate guess. Ignored when querying for statistics.",
-		strconv.Itoa(defaultRate),
-	)
-	usage.PrintOption(
-		durationOption,
-		"seconds",
-		"Test duration or time over which rate must be error-free",
-		strconv.Itoa(defaultDuration),
-	)
-	usage.PrintOption(
-		timeoutOption,
-		"seconds",
-		"Request response timeout",
-		strconv.Itoa(defaultTimeout),
-	)
-	usage.PrintOption(
-		minWaitOption,
-		"seconds",
-		"Minimum wait time between tests",
-		strconv.Itoa(defaultMinWait),
-	)
-	usage.PrintOption(
-		randomSeedOption,
-		"random seed",
-		"Random seed for randomizing requests (for supporting scenarios). When "+
-			"querying for statistics, set to 0 to query across all random seeds.",
-		strconv.Itoa(defaultRandomSeed),
-	)
+	return runner.NewBenchmarkRunner(*platformConfig, testConfig, &scenario, resultsDB)
 }
 
 func printTrialMetrics(metrics *vegeta.Metrics) {
