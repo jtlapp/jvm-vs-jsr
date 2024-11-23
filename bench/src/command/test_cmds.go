@@ -17,7 +17,7 @@ import (
 
 var LoopDeterminingRates = newCommand(
 	"loop",
-	"<scenario> [-times <iterations>] [<trial-options>]",
+	"-scenario=<scenario> [-times <iterations>] [<trial-options>]",
 	"Loops repeatedly performing tests to find the highest constant/stable rate. "+
 		"The resulting rates are guaranteed to be error-free for the specified "+
 		"duration. Provide a rate guess to hasten convergence on the stable rate.",
@@ -43,7 +43,7 @@ var LoopDeterminingRates = newCommand(
 
 var DetermineRate = newCommand(
 	"run",
-	"<scenario> [<trial-options>]",
+	"-scenario=<scenario> [<trial-options>]",
 	"Finds the highest constant/stable rate. The resulting rate is guaranteed "+
 		"to be error-free for the specified duration. Provide a rate guess to hasten "+
 		"convergence on the stable rate.",
@@ -63,7 +63,7 @@ var DetermineRate = newCommand(
 
 var TryRate = newCommand(
 	"try",
-	"<scenario> [<trial-options>]",
+	"-scenario=<scenario> [<trial-options>]",
 	"Tries issuing requests at the given rate for the specified duration.",
 	addTrialOptions,
 	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
@@ -141,7 +141,7 @@ func addLoopOptions(config *usage.CommandConfig, flagSet *flag.FlagSet) {
 }
 
 func addTrialOptions(config *usage.CommandConfig, flagSet *flag.FlagSet) {
-	config.ScenarioName = flagSet.String("testScenario", "",
+	config.ScenarioName = flagSet.String("scenario", "",
 		"Name of scenario to test (REQUIRED)")
 
 	config.CPUsToUse = flagSet.Int("cpusToUse", runtime.NumCPU(),

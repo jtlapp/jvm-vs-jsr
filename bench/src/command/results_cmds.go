@@ -62,7 +62,7 @@ var SetupResultsDB = newCommand(
 
 var ShowStatistics = newCommand(
 	"stats",
-	"<scenario> [-since=period[d|h|m]] [<trial-options>]",
+	"-scenario=<scenario> [-since=period[d|h|m]] [<trial-options>]",
 	"Prints statistics for runs of the given scenario using the given trial "+
 		"options. If -since is provided, prints statistics only for trials "+
 		"completed since the given time duration.",

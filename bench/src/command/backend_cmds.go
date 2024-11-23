@@ -11,7 +11,7 @@ import (
 
 var SetupBackendDB = newCommand(
 	"setup-backend",
-	"<scenario>",
+	"-scenario=<scenario>",
 	"Creates database tables and queries required for the test scenario.",
 	nil,
 	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
@@ -32,7 +32,7 @@ var SetupBackendDB = newCommand(
 
 var AssignQueries = newCommand(
 	"assign-queries",
-	"<scenario>",
+	"-scenario=<scenario>",
 	"Sets only the queries required for the test scenario.",
 	nil,
 	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {

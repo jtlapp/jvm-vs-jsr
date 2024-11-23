@@ -36,7 +36,7 @@ func (c *baseCommand) ParseArgs() (*usage.CommandConfig, error) {
 	if (*c).addOptions != nil {
 		flagSet := flag.NewFlagSet(c.name, flag.ExitOnError)
 		(*c).addOptions(&commandConfig, flagSet)
-		err := usage.ParseFlagsWithFileDefaults(flagSet, os.Args[1:])
+		err := usage.ParseFlagsWithFileDefaults(flagSet, os.Args[2:])
 		if err != nil {
 			return nil, err
 		}
@@ -108,14 +108,14 @@ func Find(name string) (Command, error) {
 
 func installCustomUsageOutput(fs *flag.FlagSet) {
 	var indent = "    "
-    fs.Usage = func() {
-        fs.VisitAll(func(f *flag.Flag) {
+	fs.Usage = func() {
+		fs.VisitAll(func(f *flag.Flag) {
 			fmt.Printf("%s-%s", indent, f.Name)
 			valueDescriptor, flagUsage := flag.UnquoteUsage(f)
 			if len(valueDescriptor) > 0 {
 				fmt.Print(" " + valueDescriptor)
 			}
 			fmt.Printf("\n%s%s%s\n", indent, indent, flagUsage)
-        })
-    }
+		})
+	}
 }

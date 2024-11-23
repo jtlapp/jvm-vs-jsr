@@ -16,7 +16,7 @@ const (
 
 func ParseFlagsWithFileDefaults(fs *flag.FlagSet, args []string) error {
 	configFile := fs.String(fileFlag, noFile, "path to YAML config file providing default values")
-	
+
 	if err := fs.Parse(args); err != nil {
 		return fmt.Errorf("error parsing flags: %w", err)
 	}
@@ -46,6 +46,20 @@ func ParseFlagsWithFileDefaults(fs *flag.FlagSet, args []string) error {
 				}
 			}
 		})
+
+		configString := ""
+		fs.VisitAll(func(f *flag.Flag) {
+			if f.Name != fileFlag {
+				_, ok := configFileMap[f.Name]
+				if providedAsArg[f.Name] || ok {
+					if configString != "" {
+						configString += ", "
+					}
+					configString += fmt.Sprintf("%s=%s", f.Name, f.Value.String())
+				}
+			}
+		})
+		util.Logf("[%s]\n", configString)
 	}
 	return nil
 }

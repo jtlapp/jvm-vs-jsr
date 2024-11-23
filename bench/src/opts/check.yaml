@@ -1,0 +1,8 @@
+# options for performing a quick check of the system
+
+initialRate: 500
+testDuration: 10
+requestTimeout: 5
+seed: 123456
+runCount: 2
+resetSeedBetweenTests: true
