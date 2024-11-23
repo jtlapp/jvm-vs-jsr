@@ -63,9 +63,10 @@ func (c *baseCommand) PrintUsageWithOptions() {
 	if c.addOptions != nil {
 		fmt.Println("Options:")
 		flagSet := flag.NewFlagSet(c.Name(), flag.ExitOnError)
+		installCustomUsageOutput(flagSet)
 		commandConfig := usage.CommandConfig{}
 		c.addOptions(&commandConfig, flagSet)
-		_ = flagSet.Parse([]string{"--help"})
+		flagSet.Usage()
 	}
 	fmt.Println()
 }
@@ -103,4 +104,18 @@ func Find(name string) (Command, error) {
 		}
 	}
 	return nil, usage.NewUsageError("unknown command: %s", name)
+}
+
+func installCustomUsageOutput(fs *flag.FlagSet) {
+	var indent = "    "
+    fs.Usage = func() {
+        fs.VisitAll(func(f *flag.Flag) {
+			fmt.Printf("%s-%s", indent, f.Name)
+			valueDescriptor, flagUsage := flag.UnquoteUsage(f)
+			if len(valueDescriptor) > 0 {
+				fmt.Print(" " + valueDescriptor)
+			}
+			fmt.Printf("\n%s%s%s\n", indent, indent, flagUsage)
+        })
+    }
 }

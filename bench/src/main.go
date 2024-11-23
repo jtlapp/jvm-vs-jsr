@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"strings"
 	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/command"
@@ -17,7 +18,7 @@ import (
 const (
 	version          = "0.1.0"
 	baseAppUrlEnvVar = "BASE_APP_URL"
-	helpOption       = "--help"
+	helpOption       = "-help"
 )
 
 func main() {
@@ -47,7 +48,7 @@ func main() {
 	// Show command-specific help if requested.
 
 	index := slices.IndexFunc(os.Args, func(arg string) bool {
-		return arg == helpOption
+		return strings.HasSuffix(arg, helpOption)
 	})
 	if index != -1 {
 		command.PrintUsageWithOptions()

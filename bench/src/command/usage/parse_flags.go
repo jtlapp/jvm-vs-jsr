@@ -16,6 +16,7 @@ const (
 
 func ParseFlagsWithFileDefaults(fs *flag.FlagSet, args []string) error {
 	configFile := fs.String(fileFlag, noFile, "path to YAML config file providing default values")
+	
 	if err := fs.Parse(args); err != nil {
 		return fmt.Errorf("error parsing flags: %w", err)
 	}
