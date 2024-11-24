@@ -152,6 +152,15 @@ func addTrialOptions(config *config.CommandConfig, flagSet *flag.FlagSet) {
 		"Random seed for randomizing requests (in supporting scenarios). When "+
 			"querying for statistics, set to 0 to query across all random seeds.")
 
+	config.LongSleepMillis = flagSet.Int("longSleepMillis", 400,
+		"Duration of a long sleep request (in sleep scenarios)")
+
+	config.ShortSleepMillis = flagSet.Int("shortSleepMillis", 100,
+		"Duration of a short sleep request (in sleep scenarios)")
+
+	config.PercentLongRequests = flagSet.Int("percentLongRequests", 20,
+		"Percentage of requests that are long sleep requests (in sleep scenarios)")
+
 	config.ConfigFile = cli.AllowConfigFile(flagSet)
 }
 

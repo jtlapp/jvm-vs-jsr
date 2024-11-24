@@ -6,3 +6,6 @@ requestTimeout: 5
 seed: 123456
 runCount: 2
 resetSeedBetweenTests: true
+longSleepMillis: 400
+shortSleepMillis: 100
+percentLongRequests: 20

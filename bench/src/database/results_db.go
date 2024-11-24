@@ -27,6 +27,9 @@ const schemaSQL = `
 		"trialDurationSeconds" INTEGER NOT NULL,
 		"timeoutSeconds" INTEGER NOT NULL,
 		"minWaitSeconds" INTEGER NOT NULL,
+		"longSleepMillis" INTEGER,
+		"shortSleepMillis" INTEGER,
+		"percentLongRequests" INTEGER,
 		"totalRunDurationSeconds" INTEGER NOT NULL,
 		"bestTrialID" INTEGER
     );
@@ -125,28 +128,34 @@ func (rdb *ResultsDB) CreateRun(
 			"trialDurationSeconds",
 			"timeoutSeconds",
 			"minWaitSeconds",
+			"longSleepMillis",
+			"shortSleepMillis",
+			"percentLongRequests",
 			"totalRunDurationSeconds"
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
 		)
 		RETURNING id`
 
 	var runID int
 	err = pool.QueryRow(context.Background(), query,
-		platformConfig.AppName,                 // $1  - appName
-		platformConfig.AppVersion,              // $2  - appVersion
-		appConfigJSON,                          // $3  - appConfig
-		platformConfig.CPUsPerNode,             // $4  - cpusPerNode
-		commandConfig.ScenarioName,             // $5  - scenarioName
-		commandConfig.InitialRequestsPerSecond, // $6  - initialRequestsPerSecond
-		commandConfig.InitialRandomSeed,        // $7  - initialRandomSeed
-		commandConfig.MaxConnections,           // $8  - maxConnections
-		commandConfig.WorkerCount,              // $9 - workerCount
-		commandConfig.CPUsToUse,                // $10 - cpusUsed
-		commandConfig.DurationSeconds,          // $11 - trialDurationSeconds
-		commandConfig.RequestTimeoutSeconds,    // $12 - timeoutSeconds
-		commandConfig.MinWaitSeconds,           // $13 - minWaitSeconds
-		0,                                      // $14 - totalRunDurationSeconds (initialized to 0)
+		platformConfig.AppName,                  // $1  - appName
+		platformConfig.AppVersion,               // $2  - appVersion
+		appConfigJSON,                           // $3  - appConfig
+		platformConfig.CPUsPerNode,              // $4  - cpusPerNode
+		*commandConfig.ScenarioName,             // $5  - scenarioName
+		*commandConfig.InitialRequestsPerSecond, // $6  - initialRequestsPerSecond
+		*commandConfig.InitialRandomSeed,        // $7  - initialRandomSeed
+		*commandConfig.MaxConnections,           // $8  - maxConnections
+		*commandConfig.WorkerCount,              // $9 - workerCount
+		*commandConfig.CPUsToUse,                // $10 - cpusUsed
+		*commandConfig.DurationSeconds,          // $11 - trialDurationSeconds
+		*commandConfig.RequestTimeoutSeconds,    // $12 - timeoutSeconds
+		*commandConfig.MinWaitSeconds,           // $13 - minWaitSeconds
+		*commandConfig.LongSleepMillis,          // $14 - longSleepMillis
+		*commandConfig.ShortSleepMillis,         // $15 - shortSleepMillis
+		*commandConfig.PercentLongRequests,      //	$16 - percentLongRequests
+		0,                                       // $17 - totalRunDurationSeconds (initialized to 0)
 	).Scan(&runID)
 
 	if err != nil {
@@ -282,13 +291,16 @@ func (rdb *ResultsDB) GetTrials(
 		  AND r."cpusUsed" = $8
 		  AND r."trialDurationSeconds" = $9
 		  AND r."timeoutSeconds" = $10
-		  AND r."minWaitSeconds" = $11`
+		  AND r."minWaitSeconds" = $11
+		  AND r."longSleepMillis" = $12
+		  AND r."shortSleepMillis" = $13
+		  AND r."percentLongRequests" = $14`
 
 	if *commandConfig.InitialRandomSeed != 0 {
-		query += ` AND r."initialRandomSeed" = $12`
+		query += ` AND r."initialRandomSeed" = $15`
 	} else {
 		// The seed is positive, so this uses all seeds.
-		query += ` AND r."initialRandomSeed" >= (-1 * $12)`
+		query += ` AND r."initialRandomSeed" >= (-1 * $15)`
 	}
 
 	rows, err := pool.Query(context.Background(), query,
@@ -303,7 +315,10 @@ func (rdb *ResultsDB) GetTrials(
 		*commandConfig.DurationSeconds,       // $9 - trialDurationSeconds
 		*commandConfig.RequestTimeoutSeconds, // $10 - timeoutSeconds
 		*commandConfig.MinWaitSeconds,        // $11 - minWaitSeconds
-		*commandConfig.InitialRandomSeed,     // $12 - initialRandomSeed
+		*commandConfig.LongSleepMillis,       // $12 - longSleepMillis
+		*commandConfig.ShortSleepMillis,      // $13 - shortSleepMillis
+		*commandConfig.PercentLongRequests,   // $14 - percentLongRequests
+		*commandConfig.InitialRandomSeed,     // $15 - initialRandomSeed
 	)
 	if err != nil {
 		return nil, err
