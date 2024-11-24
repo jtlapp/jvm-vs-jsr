@@ -10,28 +10,16 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/command"
 	cmd "jvm-vs-jsr.jtlapp.com/benchmark/command"
 	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
-	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
 const (
-	version          = "0.1.0"
-	baseAppUrlEnvVar = "BASE_APP_URL"
-	helpOption       = "-help"
+	version    = "0.1.0"
+	helpOption = "-help"
 )
 
 func main() {
-
-	// Extract environment variables.
-
-	baseAppUrl := os.Getenv(baseAppUrlEnvVar)
-	if baseAppUrl == "" {
-		err := fmt.Errorf("%s environment variable is required", baseAppUrlEnvVar)
-		if err != nil {
-			fail(err)
-		}
-	}
 
 	// Extract the command or show help.
 
@@ -67,12 +55,11 @@ func main() {
 
 	// Execute the command.
 
-	clientConfig := config.ClientConfig{ClientVersion: version, BaseAppUrl: baseAppUrl}
 	commandConfig, err := command.ParseArgs()
 	if err != nil {
 		fail(err)
 	}
-	err = command.Execute(clientConfig, *commandConfig)
+	err = command.Execute(*commandConfig)
 	if err != nil {
 		fail(err)
 	}

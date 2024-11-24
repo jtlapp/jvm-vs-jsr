@@ -18,7 +18,7 @@ var SetupResultsDB = newCommand(
 	"",
 	"Creates the results database tables on the client pod.",
 	nil,
-	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
+	func(commandConfig config.CommandConfig) error {
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
 
@@ -66,9 +66,9 @@ var ShowStatistics = newCommand(
 		"options. If -since is provided, prints statistics only for trials "+
 		"completed since the given time duration.",
 	addStatisticsOptions,
-	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
+	func(commandConfig config.CommandConfig) error {
 
-		platformConfig, err := config.GetPlatformConfig(clientConfig)
+		platformConfig, err := config.GetPlatformConfig()
 		if err != nil {
 			return err
 		}

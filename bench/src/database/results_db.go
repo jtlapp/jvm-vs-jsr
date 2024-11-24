@@ -14,7 +14,6 @@ const schemaSQL = `
     CREATE TABLE runs (
 		"id" SERIAL PRIMARY KEY,
 		"createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
-		"clientVersion" VARCHAR NOT NULL,
 		"appName" VARCHAR NOT NULL,
 		"appVersion" VARCHAR NOT NULL,
 		"appConfig" JSONB NOT NULL,
@@ -32,7 +31,6 @@ const schemaSQL = `
 		"bestTrialID" INTEGER
     );
 
-    CREATE INDEX idx_results_client_version ON runs("clientVersion");
     CREATE INDEX idx_results_app_name ON runs("appName");
     CREATE INDEX idx_results_app_version ON runs("appVersion");
     CREATE INDEX idx_results_app_config ON runs USING GIN ("appConfig");
@@ -114,7 +112,6 @@ func (rdb *ResultsDB) CreateRun(
 
 	const query = `
 		INSERT INTO runs (
-			"clientVersion",
 			"appName",
 			"appVersion",
 			"appConfig",
@@ -130,27 +127,26 @@ func (rdb *ResultsDB) CreateRun(
 			"minWaitSeconds",
 			"totalRunDurationSeconds"
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
 		)
 		RETURNING id`
 
 	var runID int
 	err = pool.QueryRow(context.Background(), query,
-		platformConfig.ClientVersion,        // $1  - clientVersion
-		platformConfig.AppName,              // $2  - appName
-		platformConfig.AppVersion,           // $3  - appVersion
-		appConfigJSON,                       // $4  - appConfig
-		platformConfig.CPUsPerNode,          // $5  - cpusPerNode
-		testConfig.ScenarioName,             // $6  - scenarioName
-		testConfig.InitialRequestsPerSecond, // $7  - initialRequestsPerSecond
-		testConfig.InitialRandomSeed,        // $8  - initialRandomSeed
-		testConfig.MaxConnections,           // $9  - maxConnections
-		testConfig.WorkerCount,              // $10 - workerCount
-		testConfig.CPUsToUse,                // $11 - cpusUsed
-		testConfig.DurationSeconds,          // $12 - trialDurationSeconds
-		testConfig.RequestTimeoutSeconds,    // $13 - timeoutSeconds
-		testConfig.MinWaitSeconds,           // $14 - minWaitSeconds
-		0,                                   // $15 - totalRunDurationSeconds (initialized to 0)
+		platformConfig.AppName,              // $1  - appName
+		platformConfig.AppVersion,           // $2  - appVersion
+		appConfigJSON,                       // $3  - appConfig
+		platformConfig.CPUsPerNode,          // $4  - cpusPerNode
+		testConfig.ScenarioName,             // $5  - scenarioName
+		testConfig.InitialRequestsPerSecond, // $6  - initialRequestsPerSecond
+		testConfig.InitialRandomSeed,        // $7  - initialRandomSeed
+		testConfig.MaxConnections,           // $8  - maxConnections
+		testConfig.WorkerCount,              // $9 - workerCount
+		testConfig.CPUsToUse,                // $10 - cpusUsed
+		testConfig.DurationSeconds,          // $11 - trialDurationSeconds
+		testConfig.RequestTimeoutSeconds,    // $12 - timeoutSeconds
+		testConfig.MinWaitSeconds,           // $13 - minWaitSeconds
+		0,                                   // $14 - totalRunDurationSeconds (initialized to 0)
 	).Scan(&runID)
 
 	if err != nil {

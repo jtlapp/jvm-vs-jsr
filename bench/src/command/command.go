@@ -14,7 +14,7 @@ type Command interface {
 	ArgsUsage() string
 	Description() string
 	ParseArgs() (*config.CommandConfig, error)
-	Execute(config.ClientConfig, config.CommandConfig) error
+	Execute(config.CommandConfig) error
 	PrintUsage()
 	PrintUsageWithOptions()
 }
@@ -24,7 +24,7 @@ type baseCommand struct {
 	argsUsage   string
 	description string
 	addOptions  func(*config.CommandConfig, *flag.FlagSet)
-	execute     func(config.ClientConfig, config.CommandConfig) error
+	execute     func(config.CommandConfig) error
 }
 
 func (c *baseCommand) Name() string        { return c.name }
@@ -45,11 +45,8 @@ func (c *baseCommand) ParseArgs() (*config.CommandConfig, error) {
 	return &commandConfig, nil
 }
 
-func (c *baseCommand) Execute(
-	clientConfig config.ClientConfig,
-	commandConfig config.CommandConfig,
-) error {
-	return c.execute(clientConfig, commandConfig)
+func (c *baseCommand) Execute(commandConfig config.CommandConfig) error {
+	return c.execute(commandConfig)
 }
 
 func (c *baseCommand) PrintUsage() {
@@ -75,7 +72,7 @@ func (c *baseCommand) PrintUsageWithOptions() {
 func newCommand(
 	name, argsUsage, description string,
 	addOptions func(*config.CommandConfig, *flag.FlagSet),
-	execute func(config.ClientConfig, config.CommandConfig) error,
+	execute func(config.CommandConfig) error,
 ) Command {
 
 	return &baseCommand{

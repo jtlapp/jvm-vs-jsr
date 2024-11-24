@@ -1,15 +1,18 @@
 package config
 
 import (
+	"fmt"
+	"os"
 	"runtime"
 )
 
 const (
+	baseAppUrlEnvVar = "BASE_APP_URL"
 	maxReservedPorts = 4
 )
 
 type PlatformConfig struct {
-	ClientConfig
+	BaseAppUrl       string
 	AppName          string
 	AppVersion       string
 	AppConfig        map[string]interface{}
@@ -17,14 +20,23 @@ type PlatformConfig struct {
 	MaxReservedPorts uint
 }
 
-func GetPlatformConfig(clientConfig ClientConfig) (*PlatformConfig, error) {
-	appInfo, err := GetAppInfo(clientConfig.BaseAppUrl)
+func GetPlatformConfig() (*PlatformConfig, error) {
+
+	baseAppUrl := os.Getenv(baseAppUrlEnvVar)
+	if baseAppUrl == "" {
+		err := fmt.Errorf("%s environment variable is required", baseAppUrlEnvVar)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	appInfo, err := GetAppInfo(baseAppUrl)
 	if err != nil {
 		return nil, err
 	}
 
 	return &PlatformConfig{
-		ClientConfig:     clientConfig,
+		BaseAppUrl:       baseAppUrl,
 		AppName:          appInfo.AppName,
 		AppVersion:       appInfo.AppVersion,
 		AppConfig:        appInfo.AppConfig,

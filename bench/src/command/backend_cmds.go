@@ -13,7 +13,7 @@ var SetupBackendDB = newCommand(
 	"-scenario=<scenario>",
 	"Creates database tables and queries required for the test scenario.",
 	nil,
-	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
+	func(commandConfig config.CommandConfig) error {
 		backendDB := database.NewBackendDatabase()
 		defer backendDB.Close()
 

@@ -22,7 +22,7 @@ var LoopDeterminingRates = newCommand(
 		"The resulting rates are guaranteed to be error-free for the specified "+
 		"duration. Provide a rate guess to hasten convergence on the stable rate.",
 	addLoopOptions,
-	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
+	func(commandConfig config.CommandConfig) error {
 
 		testConfig, err := getTestConfig(commandConfig)
 		if err != nil {
@@ -31,7 +31,7 @@ var LoopDeterminingRates = newCommand(
 		runCount := *commandConfig.LoopCount
 		resetRandomSeed := *commandConfig.ResetRandomSeed
 
-		runStats, err := performRuns(clientConfig, *testConfig, &commandConfig, runCount, resetRandomSeed)
+		runStats, err := performRuns(*testConfig, &commandConfig, runCount, resetRandomSeed)
 		if err != nil {
 			return err
 		}
@@ -48,7 +48,7 @@ var DetermineRate = newCommand(
 		"to be error-free for the specified duration. Provide a rate guess to hasten "+
 		"convergence on the stable rate.",
 	addTrialOptions,
-	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
+	func(commandConfig config.CommandConfig) error {
 
 		testConfig, err := getTestConfig(commandConfig)
 		if err != nil {
@@ -57,7 +57,7 @@ var DetermineRate = newCommand(
 		runCount := 1
 		resetRandomSeed := false
 
-		_, err = performRuns(clientConfig, *testConfig, &commandConfig, runCount, resetRandomSeed)
+		_, err = performRuns(*testConfig, &commandConfig, runCount, resetRandomSeed)
 		return err
 	})
 
@@ -66,7 +66,7 @@ var TryRate = newCommand(
 	"-scenario=<scenario> [<trial-options>]",
 	"Tries issuing requests at the given rate for the specified duration.",
 	addTrialOptions,
-	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
+	func(commandConfig config.CommandConfig) error {
 
 		testConfig, err := getTestConfig(commandConfig)
 		if err != nil {
@@ -76,8 +76,7 @@ var TryRate = newCommand(
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
 
-		benchmarkRunner, err :=
-			createBenchmarkRunner(clientConfig, *testConfig, &commandConfig, resultsDB)
+		benchmarkRunner, err := createBenchmarkRunner(*testConfig, &commandConfig, resultsDB)
 		if err != nil {
 			return err
 		}
@@ -97,7 +96,7 @@ var ShowStatus = newCommand(
 	"",
 	"Prints the active ports, waiting ports, and file descriptors in use.",
 	nil,
-	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
+	func(commandConfig config.CommandConfig) error {
 		resources := util.NewResourceStatus()
 		establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
 			resources.GetPercentages()
@@ -114,7 +113,6 @@ var ShowStatus = newCommand(
 	})
 
 func performRuns(
-	clientConfig config.ClientConfig,
 	testConfig config.TestConfig,
 	commandConfig *config.CommandConfig,
 	runCount int,
@@ -124,8 +122,7 @@ func performRuns(
 	resultsDB := database.NewResultsDatabase()
 	defer resultsDB.Close()
 
-	benchmarkRunner, err :=
-		createBenchmarkRunner(clientConfig, testConfig, commandConfig, resultsDB)
+	benchmarkRunner, err := createBenchmarkRunner(testConfig, commandConfig, resultsDB)
 	if err != nil {
 		return nil, err
 	}
@@ -190,13 +187,12 @@ func getTestConfig(commandConfig config.CommandConfig) (*config.TestConfig, erro
 }
 
 func createBenchmarkRunner(
-	clientConfig config.ClientConfig,
 	testConfig config.TestConfig,
 	commandConfig *config.CommandConfig,
 	resultsDB *database.ResultsDB,
 ) (*runner.BenchmarkRunner, error) {
 
-	platformConfig, err := config.GetPlatformConfig(clientConfig)
+	platformConfig, err := config.GetPlatformConfig()
 	if err != nil {
 		return nil, err
 	}
