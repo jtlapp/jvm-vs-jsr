@@ -98,7 +98,7 @@ func (rdb *ResultsDB) CreateTables() error {
 
 func (rdb *ResultsDB) CreateRun(
 	platformConfig *config.PlatformConfig,
-	testConfig *config.TestConfig,
+	commandConfig *config.CommandConfig,
 ) (int, error) {
 	pool, err := rdb.GetPool()
 	if err != nil {
@@ -137,15 +137,15 @@ func (rdb *ResultsDB) CreateRun(
 		platformConfig.AppVersion,           // $2  - appVersion
 		appConfigJSON,                       // $3  - appConfig
 		platformConfig.CPUsPerNode,          // $4  - cpusPerNode
-		testConfig.ScenarioName,             // $5  - scenarioName
-		testConfig.InitialRequestsPerSecond, // $6  - initialRequestsPerSecond
-		testConfig.InitialRandomSeed,        // $7  - initialRandomSeed
-		testConfig.MaxConnections,           // $8  - maxConnections
-		testConfig.WorkerCount,              // $9 - workerCount
-		testConfig.CPUsToUse,                // $10 - cpusUsed
-		testConfig.DurationSeconds,          // $11 - trialDurationSeconds
-		testConfig.RequestTimeoutSeconds,    // $12 - timeoutSeconds
-		testConfig.MinWaitSeconds,           // $13 - minWaitSeconds
+		commandConfig.ScenarioName,             // $5  - scenarioName
+		commandConfig.InitialRequestsPerSecond, // $6  - initialRequestsPerSecond
+		commandConfig.InitialRandomSeed,        // $7  - initialRandomSeed
+		commandConfig.MaxConnections,           // $8  - maxConnections
+		commandConfig.WorkerCount,              // $9 - workerCount
+		commandConfig.CPUsToUse,                // $10 - cpusUsed
+		commandConfig.DurationSeconds,          // $11 - trialDurationSeconds
+		commandConfig.RequestTimeoutSeconds,    // $12 - timeoutSeconds
+		commandConfig.MinWaitSeconds,           // $13 - minWaitSeconds
 		0,                                   // $14 - totalRunDurationSeconds (initialized to 0)
 	).Scan(&runID)
 
@@ -248,7 +248,7 @@ func (rdb *ResultsDB) SaveTrial(
 func (rdb *ResultsDB) GetTrials(
 	sinceTime time.Time,
 	platformConfig *config.PlatformConfig,
-	testConfig *config.TestConfig,
+	commandConfig *config.CommandConfig,
 ) ([]TrialInfo, error) {
 	pool, err := rdb.GetPool()
 	if err != nil {
@@ -284,7 +284,7 @@ func (rdb *ResultsDB) GetTrials(
 		  AND r."timeoutSeconds" = $10
 		  AND r."minWaitSeconds" = $11`
 
-	if testConfig.InitialRandomSeed != 0 {
+	if *commandConfig.InitialRandomSeed != 0 {
 		query += ` AND r."initialRandomSeed" = $12`
 	} else {
 		// The seed is positive, so this uses all seeds.
@@ -296,14 +296,14 @@ func (rdb *ResultsDB) GetTrials(
 		platformConfig.AppName,           // $2  - appName
 		platformConfig.AppVersion,        // $3  - appVersion
 		platformConfig.AppConfig,         // $4  - appConfig
-		testConfig.ScenarioName,          // $5  - scenarioName
-		testConfig.MaxConnections,        // $6  - maxConnections
-		testConfig.WorkerCount,           // $7  - workerCount
-		testConfig.CPUsToUse,             // $8  - cpusUsed
-		testConfig.DurationSeconds,       // $9 - trialDurationSeconds
-		testConfig.RequestTimeoutSeconds, // $10 - timeoutSeconds
-		testConfig.MinWaitSeconds,        // $11 - minWaitSeconds
-		testConfig.InitialRandomSeed,     // $12 - initialRandomSeed
+		*commandConfig.ScenarioName,          // $5  - scenarioName
+		*commandConfig.MaxConnections,        // $6  - maxConnections
+		*commandConfig.WorkerCount,           // $7  - workerCount
+		*commandConfig.CPUsToUse,             // $8  - cpusUsed
+		*commandConfig.DurationSeconds,       // $9 - trialDurationSeconds
+		*commandConfig.RequestTimeoutSeconds, // $10 - timeoutSeconds
+		*commandConfig.MinWaitSeconds,        // $11 - minWaitSeconds
+		*commandConfig.InitialRandomSeed,     // $12 - initialRandomSeed
 	)
 	if err != nil {
 		return nil, err

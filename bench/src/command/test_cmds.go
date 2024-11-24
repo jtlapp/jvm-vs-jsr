@@ -6,7 +6,6 @@ import (
 	"runtime"
 
 	vegeta "github.com/tsenart/vegeta/lib"
-	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
@@ -24,14 +23,10 @@ var LoopDeterminingRates = newCommand(
 	addLoopOptions,
 	func(commandConfig config.CommandConfig) error {
 
-		testConfig, err := getTestConfig(commandConfig)
-		if err != nil {
-			return err
-		}
 		runCount := *commandConfig.LoopCount
 		resetRandomSeed := *commandConfig.ResetRandomSeed
 
-		runStats, err := performRuns(*testConfig, &commandConfig, runCount, resetRandomSeed)
+		runStats, err := performRuns(&commandConfig, runCount, resetRandomSeed)
 		if err != nil {
 			return err
 		}
@@ -50,14 +45,10 @@ var DetermineRate = newCommand(
 	addTrialOptions,
 	func(commandConfig config.CommandConfig) error {
 
-		testConfig, err := getTestConfig(commandConfig)
-		if err != nil {
-			return err
-		}
 		runCount := 1
 		resetRandomSeed := false
 
-		_, err = performRuns(*testConfig, &commandConfig, runCount, resetRandomSeed)
+		_, err := performRuns(&commandConfig, runCount, resetRandomSeed)
 		return err
 	})
 
@@ -68,15 +59,10 @@ var TryRate = newCommand(
 	addTrialOptions,
 	func(commandConfig config.CommandConfig) error {
 
-		testConfig, err := getTestConfig(commandConfig)
-		if err != nil {
-			return err
-		}
-
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
 
-		benchmarkRunner, err := createBenchmarkRunner(*testConfig, &commandConfig, resultsDB)
+		benchmarkRunner, err := createBenchmarkRunner(&commandConfig, resultsDB)
 		if err != nil {
 			return err
 		}
@@ -113,7 +99,6 @@ var ShowStatus = newCommand(
 	})
 
 func performRuns(
-	testConfig config.TestConfig,
 	commandConfig *config.CommandConfig,
 	runCount int,
 	resetRandomSeed bool,
@@ -122,7 +107,7 @@ func performRuns(
 	resultsDB := database.NewResultsDatabase()
 	defer resultsDB.Close()
 
-	benchmarkRunner, err := createBenchmarkRunner(testConfig, commandConfig, resultsDB)
+	benchmarkRunner, err := createBenchmarkRunner(commandConfig, resultsDB)
 	if err != nil {
 		return nil, err
 	}
@@ -167,27 +152,7 @@ func addTrialOptions(config *config.CommandConfig, flagSet *flag.FlagSet) {
 			"querying for statistics, set to 0 to query across all random seeds.")
 }
 
-func getTestConfig(commandConfig config.CommandConfig) (*config.TestConfig, error) {
-	scenarioName := *commandConfig.ScenarioName
-	if scenarioName == "" {
-		return nil, usage.NewUsageError("scenario name is required")
-	}
-
-	return &config.TestConfig{
-		ScenarioName:             scenarioName,
-		CPUsToUse:                *commandConfig.CPUsToUse,
-		WorkerCount:              *commandConfig.CPUsToUse,
-		MaxConnections:           *commandConfig.MaxConnections,
-		InitialRequestsPerSecond: *commandConfig.InitialRequestsPerSecond,
-		InitialRandomSeed:        *commandConfig.InitialRandomSeed,
-		DurationSeconds:          *commandConfig.DurationSeconds,
-		RequestTimeoutSeconds:    *commandConfig.RequestTimeoutSeconds,
-		MinWaitSeconds:           *commandConfig.MinWaitSeconds,
-	}, nil
-}
-
 func createBenchmarkRunner(
-	testConfig config.TestConfig,
 	commandConfig *config.CommandConfig,
 	resultsDB *database.ResultsDB,
 ) (*runner.BenchmarkRunner, error) {
@@ -197,7 +162,7 @@ func createBenchmarkRunner(
 		return nil, err
 	}
 
-	scenario, err := scenarios.GetScenario(testConfig.ScenarioName)
+	scenario, err := scenarios.GetScenario(*commandConfig.ScenarioName)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +171,7 @@ func createBenchmarkRunner(
 
 	return runner.NewBenchmarkRunner(
 		*platformConfig,
-		testConfig,
+		*commandConfig,
 		*scenarioConfig,
 		&scenario,
 		resultsDB)

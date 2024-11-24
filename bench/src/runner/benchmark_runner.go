@@ -20,7 +20,7 @@ const (
 
 type BenchmarkRunner struct {
 	platformConfig config.PlatformConfig
-	testConfig     config.TestConfig
+	commandConfig     config.CommandConfig
 	scenarioConfig config.ScenarioConfig
 	scenario       *scenarios.Scenario
 	resultsDB      *database.ResultsDB
@@ -29,7 +29,7 @@ type BenchmarkRunner struct {
 
 func NewBenchmarkRunner(
 	platformConfig config.PlatformConfig,
-	testConfig config.TestConfig,
+	commandConfig config.CommandConfig,
 	scenarioConfig config.ScenarioConfig,
 	scenario *scenarios.Scenario,
 	resultsDB *database.ResultsDB,
@@ -37,7 +37,7 @@ func NewBenchmarkRunner(
 
 	return &BenchmarkRunner{
 		platformConfig: platformConfig,
-		testConfig:     testConfig,
+		commandConfig:     commandConfig,
 		scenarioConfig: scenarioConfig,
 		scenario:       scenario,
 		resultsDB:      resultsDB,
@@ -45,16 +45,12 @@ func NewBenchmarkRunner(
 	}, nil
 }
 
-func (br *BenchmarkRunner) GetTestConfig() config.TestConfig {
-	return br.testConfig
-}
-
 func (br *BenchmarkRunner) DetermineRate(runCount int, resetRandomSeed bool) (*stats.RunStats, error) {
 	if err := br.performWarmupRun(); err != nil {
 		return nil, err
 	}
 
-	randomSeed := int64(br.testConfig.InitialRandomSeed)
+	randomSeed := int64(*br.commandConfig.InitialRandomSeed)
 	startTime := time.Now()
 
 	for i := 0; i < runCount; i++ {
@@ -67,7 +63,7 @@ func (br *BenchmarkRunner) DetermineRate(runCount int, resetRandomSeed bool) (*s
 		}
 	}
 
-	return stats.NewRunStats(br.resultsDB, startTime, &br.platformConfig, &br.testConfig)
+	return stats.NewRunStats(br.resultsDB, startTime, &br.platformConfig, &br.commandConfig)
 }
 
 func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
@@ -76,7 +72,7 @@ func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
 	if err = br.waitForPortsToClear(); err != nil {
 		return nil, err
 	}
-	runID, err = br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
+	runID, err = br.resultsDB.CreateRun(&br.platformConfig, &br.commandConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error creating single-trial run: %v", err)
 	}
@@ -84,15 +80,15 @@ func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
 	var trialID int
 	trialID, metrics, err = br.performRateTrial(
 		runID,
-		br.testConfig.InitialRequestsPerSecond,
-		int64(br.testConfig.InitialRandomSeed),
-		br.testConfig.DurationSeconds,
+		*br.commandConfig.InitialRequestsPerSecond,
+		int64(*br.commandConfig.InitialRandomSeed),
+		*br.commandConfig.DurationSeconds,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error performing rate trial: %v", err)
 	}
 
-	err = br.resultsDB.UpdateRun(runID, br.testConfig.DurationSeconds, trialID)
+	err = br.resultsDB.UpdateRun(runID, *br.commandConfig.DurationSeconds, trialID)
 	if err != nil {
 		return nil, fmt.Errorf("error updating single-trial run: %v", err)
 	}
@@ -110,7 +106,7 @@ func (br *BenchmarkRunner) performWarmupRun() error {
 	_, _, err := br.performRateTrial(
 		0,
 		warmupRequestsPerSecond,
-		int64(br.testConfig.InitialRandomSeed),
+		int64(*br.commandConfig.InitialRandomSeed),
 		warmupSeconds,
 	)
 	if err != nil {
@@ -120,7 +116,7 @@ func (br *BenchmarkRunner) performWarmupRun() error {
 }
 
 func (br *BenchmarkRunner) performRateDetermination(iteration int, randomSeed int64) error {
-	runID, err := br.resultsDB.CreateRun(&br.platformConfig, &br.testConfig)
+	runID, err := br.resultsDB.CreateRun(&br.platformConfig, &br.commandConfig)
 	if err != nil {
 		return fmt.Errorf("error creating run: %v", err)
 	}
@@ -128,7 +124,7 @@ func (br *BenchmarkRunner) performRateDetermination(iteration int, randomSeed in
 	// Find the highest rate of successfully completing requests that the system
 	// can handle without any request errors or timeouts.
 
-	requestRateUpperBound := br.testConfig.InitialRequestsPerSecond
+	requestRateUpperBound := *br.commandConfig.InitialRequestsPerSecond
 	requestRateLowerBound := 0
 	var lowerBoundMetrics vegeta.Metrics
 	currentRequestRate := -1
@@ -149,7 +145,7 @@ func (br *BenchmarkRunner) performRateDetermination(iteration int, randomSeed in
 		util.Logf("(%d) Testing %d requests/sec...", iteration, currentRequestRate)
 		var trialID int
 		trialID, metrics, err = br.performRateTrial(
-			runID, currentRequestRate, randomSeed, br.testConfig.DurationSeconds)
+			runID, currentRequestRate, randomSeed, *br.commandConfig.DurationSeconds)
 		if err != nil {
 			return fmt.Errorf("error performing rate trial: %v", err)
 		}
@@ -193,9 +189,9 @@ func (br *BenchmarkRunner) performRateTrial(
 		br.platformConfig.BaseAppUrl, randomSeed, br.scenarioConfig)
 
 	attacker := vegeta.NewAttacker(
-		vegeta.Workers(uint64(br.testConfig.WorkerCount)),
-		vegeta.Connections(br.testConfig.MaxConnections),
-		vegeta.Timeout(time.Duration(br.testConfig.RequestTimeoutSeconds)*time.Second),
+		vegeta.Workers(uint64(*br.commandConfig.WorkerCount)),
+		vegeta.Connections(*br.commandConfig.MaxConnections),
+		vegeta.Timeout(time.Duration(*br.commandConfig.RequestTimeoutSeconds)*time.Second),
 		vegeta.KeepAlive(true),
 	)
 	rateLimiter := vegeta.Rate{Freq: rate, Per: time.Second}
@@ -228,7 +224,7 @@ func (br *BenchmarkRunner) waitBetweenTests() {
 	start := time.Now()
 	util.WaitForPortsToTimeout()
 	elapsed := time.Since(start)
-	minDuration := time.Duration(br.testConfig.MinWaitSeconds) * time.Second
+	minDuration := time.Duration(*br.commandConfig.MinWaitSeconds) * time.Second
 
 	if remainingTime := minDuration - elapsed; remainingTime > 0 {
 		time.Sleep(remainingTime)

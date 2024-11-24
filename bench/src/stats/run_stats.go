@@ -21,10 +21,10 @@ func NewRunStats(
 	resultsDB *database.ResultsDB,
 	startTime time.Time,
 	platformConfig *config.PlatformConfig,
-	testConfig *config.TestConfig,
+	commandConfig *config.CommandConfig,
 ) (*RunStats, error) {
 
-	trials, err := resultsDB.GetTrials(startTime, platformConfig, testConfig)
+	trials, err := resultsDB.GetTrials(startTime, platformConfig, commandConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error getting trials: %v", err)
 	}

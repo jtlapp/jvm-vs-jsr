@@ -72,10 +72,6 @@ var ShowStatistics = newCommand(
 		if err != nil {
 			return err
 		}
-		testConfig, err := getTestConfig(commandConfig)
-		if err != nil {
-			return err
-		}
 
 		var sinceArg = *commandConfig.SincePeriod
 		var sinceDuration time.Duration
@@ -98,7 +94,7 @@ var ShowStatistics = newCommand(
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
 
-		runStats, err := stats.NewRunStats(resultsDB, startTime, platformConfig, testConfig)
+		runStats, err := stats.NewRunStats(resultsDB, startTime, platformConfig, &commandConfig)
 		if err != nil {
 			return err
 		}
