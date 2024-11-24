@@ -167,12 +167,9 @@ func createBenchmarkRunner(
 		return nil, err
 	}
 
-	scenarioConfig := config.NewScenarioConfig(commandConfig)
-
 	return runner.NewBenchmarkRunner(
 		*platformConfig,
 		*commandConfig,
-		*scenarioConfig,
 		&scenario,
 		resultsDB)
 }

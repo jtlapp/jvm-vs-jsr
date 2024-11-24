@@ -26,9 +26,9 @@ func (s *Scenario) CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSe
 }
 
 func (s *Scenario) GetTargetProvider(
+	config config.CommandConfig,
 	baseUrl string,
 	randomSeed int64,
-	config config.ScenarioConfig,
 ) func(*vegeta.Target) error {
 
 	trial := NewBenchmarkTrial(baseUrl, randomSeed)

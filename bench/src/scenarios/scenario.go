@@ -15,9 +15,9 @@ type Scenario interface {
 	GetName() string
 	CreateBackendSetup(dbPool *pgxpool.Pool) (*database.BackendSetup, error)
 	GetTargetProvider(
+		config config.CommandConfig,
 		baseUrl string,
 		randomSeed int64,
-		config config.ScenarioConfig,
 	) func(*vegeta.Target) error
 }
 

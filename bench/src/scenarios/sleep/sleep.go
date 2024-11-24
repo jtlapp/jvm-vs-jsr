@@ -33,19 +33,19 @@ func (s *SleepScenario) CreateBackendSetup(dbPool *pgxpool.Pool) (*database.Back
 }
 
 func (s *SleepScenario) GetTargetProvider(
+	config config.CommandConfig,
 	baseUrl string,
 	randomSeed int64,
-	config config.ScenarioConfig,
 ) func(*vegeta.Target) error {
 
 	randGen := rand.New(rand.NewSource(int64(randomSeed)))
 
 	return func(target *vegeta.Target) error {
 		var sleepDuration int
-		if randGen.Intn(100) < config.PercentLongRequests {
-			sleepDuration = config.LongSleepMillis
+		if randGen.Intn(100) < *config.PercentLongRequests {
+			sleepDuration = *config.LongSleepMillis
 		} else {
-			sleepDuration = config.ShortSleepMillis
+			sleepDuration = *config.ShortSleepMillis
 		}
 		*target = vegeta.Target{
 			Method: "GET",
