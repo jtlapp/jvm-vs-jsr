@@ -29,7 +29,6 @@ func NewCommand(
 	addOptions func(*config.CommandConfig, *flag.FlagSet),
 	execute func(config.CommandConfig) error,
 ) Command {
-
 	return &baseCommand{
 		name:        name,
 		argsUsage:   argsUsage,
@@ -59,7 +58,7 @@ func (c *baseCommand) ParseArgs(postParseHook PostParseHookType) (*config.Comman
 	}
 	flagSet := flag.NewFlagSet(c.name, flag.ExitOnError)
 	(*c).addOptions(&commandConfig, flagSet)
-	flagsUsed, err := parseFlagsWithFileDefaults(flagSet, os.Args[2:])
+	flagsUsed, err := parseFlagsWithFileDefaults(*commandConfig.ConfigFile, flagSet, os.Args[2:])
 	if err != nil {
 		return nil, err
 	}
@@ -93,10 +92,14 @@ func (c *baseCommand) PrintUsageWithOptions() {
 	fmt.Println()
 }
 
-func installCustomUsageOutput(fs *flag.FlagSet) {
+func AllowConfigFile(flagSet *flag.FlagSet) *string {
+	return flagSet.String(fileFlag, noFile, "path to YAML config file providing default values")
+}
+
+func installCustomUsageOutput(flagSet *flag.FlagSet) {
 	var indent = "    "
-	fs.Usage = func() {
-		fs.VisitAll(func(f *flag.Flag) {
+	flagSet.Usage = func() {
+		flagSet.VisitAll(func(f *flag.Flag) {
 			fmt.Printf("%s-%s", indent, f.Name)
 			valueDescriptor, flagUsage := flag.UnquoteUsage(f)
 			if len(valueDescriptor) > 0 {
@@ -107,25 +110,24 @@ func installCustomUsageOutput(fs *flag.FlagSet) {
 	}
 }
 
-func parseFlagsWithFileDefaults(fs *flag.FlagSet, args []string) ([]string, error) {
-	configFile := fs.String(fileFlag, noFile, "path to YAML config file providing default values")
+func parseFlagsWithFileDefaults(configFile string, flagSet *flag.FlagSet, args []string) ([]string, error) {
 	flagsUsed := make([]string, 0)
 
-	if err := fs.Parse(args); err != nil {
+	if err := flagSet.Parse(args); err != nil {
 		return nil, fmt.Errorf("error parsing flags: %w", err)
 	}
 
-	if *configFile == noFile {
-		fs.VisitAll(func(f *flag.Flag) {
+	if configFile == noFile {
+		flagSet.VisitAll(func(f *flag.Flag) {
 			flagsUsed = append(flagsUsed, f.Name)
 		})
 	} else {
 		providedAsArg := make(map[string]bool)
-		fs.Visit(func(f *flag.Flag) {
+		flagSet.Visit(func(f *flag.Flag) {
 			providedAsArg[f.Name] = true
 		})
 
-		configFileBytes, err := os.ReadFile(*configFile)
+		configFileBytes, err := os.ReadFile(configFile)
 		if err != nil {
 			return nil, fmt.Errorf("error reading config file: %w", err)
 		}
@@ -136,7 +138,7 @@ func parseFlagsWithFileDefaults(fs *flag.FlagSet, args []string) ([]string, erro
 		}
 
 		var fileFlagErr error
-		fs.VisitAll(func(f *flag.Flag) {
+		flagSet.VisitAll(func(f *flag.Flag) {
 			if f.Name != fileFlag && !providedAsArg[f.Name] {
 				if val, ok := configFileMap[f.Name]; ok {
 					if err = f.Value.Set(fmt.Sprint(val)); err != nil {
@@ -149,7 +151,7 @@ func parseFlagsWithFileDefaults(fs *flag.FlagSet, args []string) ([]string, erro
 			return nil, fileFlagErr
 		}
 
-		fs.VisitAll(func(f *flag.Flag) {
+		flagSet.VisitAll(func(f *flag.Flag) {
 			if f.Name != fileFlag {
 				_, ok := configFileMap[f.Name]
 				if providedAsArg[f.Name] || ok {

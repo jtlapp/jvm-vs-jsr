@@ -151,6 +151,8 @@ func addTrialOptions(config *config.CommandConfig, flagSet *flag.FlagSet) {
 	config.InitialRandomSeed = flagSet.Int("seed", 123456,
 		"Random seed for randomizing requests (in supporting scenarios). When "+
 			"querying for statistics, set to 0 to query across all random seeds.")
+
+	cli.AllowConfigFile(flagSet)
 }
 
 func createBenchmarkRunner(

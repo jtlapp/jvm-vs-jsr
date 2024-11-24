@@ -1,6 +1,7 @@
 package config
 
 type CommandConfig struct {
+	ConfigFile               *string
 	ScenarioName             *string
 	LongSleepMillis          *int
 	ShortSleepMillis         *int
