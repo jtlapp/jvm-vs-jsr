@@ -1,14 +1,15 @@
-package command
+package cmd
 
 import (
 	"fmt"
 
+	"jvm-vs-jsr.jtlapp.com/benchmark/cli"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 )
 
-var SetupBackendDB = newCommand(
+var SetupBackendDB = cli.NewCommand(
 	"setup-backend",
 	"-scenario=<scenario>",
 	"Creates database tables and queries required for the test scenario.",

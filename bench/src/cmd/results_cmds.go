@@ -1,4 +1,4 @@
-package command
+package cmd
 
 import (
 	"flag"
@@ -7,13 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"jvm-vs-jsr.jtlapp.com/benchmark/cli"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/stats"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
-var SetupResultsDB = newCommand(
+var SetupResultsDB = cli.NewCommand(
 	"setup-results",
 	"",
 	"Creates the results database tables on the client pod.",
@@ -59,7 +60,7 @@ var SetupResultsDB = newCommand(
 		return nil
 	})
 
-var ShowStatistics = newCommand(
+var ShowStatistics = cli.NewCommand(
 	"stats",
 	"-scenario=<scenario> [-since=period[d|h|m]] [<trial-options>]",
 	"Prints statistics for runs of the given scenario using the given trial "+

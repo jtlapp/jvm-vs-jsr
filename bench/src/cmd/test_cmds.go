@@ -1,4 +1,4 @@
-package command
+package cmd
 
 import (
 	"flag"
@@ -6,6 +6,7 @@ import (
 	"runtime"
 
 	vegeta "github.com/tsenart/vegeta/lib"
+	"jvm-vs-jsr.jtlapp.com/benchmark/cli"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/runner"
@@ -14,7 +15,7 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
 )
 
-var LoopDeterminingRates = newCommand(
+var LoopDeterminingRates = cli.NewCommand(
 	"loop",
 	"-scenario=<scenario> [-times <iterations>] [<trial-options>]",
 	"Loops repeatedly performing tests to find the highest constant/stable rate. "+
@@ -36,7 +37,7 @@ var LoopDeterminingRates = newCommand(
 		return nil
 	})
 
-var DetermineRate = newCommand(
+var DetermineRate = cli.NewCommand(
 	"run",
 	"-scenario=<scenario> [<trial-options>]",
 	"Finds the highest constant/stable rate. The resulting rate is guaranteed "+
@@ -52,7 +53,7 @@ var DetermineRate = newCommand(
 		return err
 	})
 
-var TryRate = newCommand(
+var TryRate = cli.NewCommand(
 	"try",
 	"-scenario=<scenario> [<trial-options>]",
 	"Tries issuing requests at the given rate for the specified duration.",
@@ -77,7 +78,7 @@ var TryRate = newCommand(
 		return nil
 	})
 
-var ShowStatus = newCommand(
+var ShowStatus = cli.NewCommand(
 	"status",
 	"",
 	"Prints the active ports, waiting ports, and file descriptors in use.",
