@@ -13,7 +13,7 @@ type CommandConfig struct {
 	InitialRandomSeed        *int
 	DurationSeconds          *int
 	RequestTimeoutSeconds    *int
-	MinWaitSeconds           *int
+	MinSecondsBetweenTests   *int
 	LoopCount                *int
 	ResetRandomSeed          *bool
 	SincePeriod              *string

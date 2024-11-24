@@ -136,16 +136,16 @@ func addTrialOptions(config *config.CommandConfig, flagSet *flag.FlagSet) {
 	config.MaxConnections = flagSet.Int("maxConnections", 0,
 		"Maximum number of connections to use (default 0, meaning unlimited)")
 
-	config.InitialRequestsPerSecond = flagSet.Int("initialRate", 10,
+	config.InitialRequestsPerSecond = flagSet.Int("initialRequestsPerSecond", 10,
 		"Rate to test or initial rate guess in requests/second. Ignored when querying for statistics.")
 
-	config.DurationSeconds = flagSet.Int("testDuration", 5,
+	config.DurationSeconds = flagSet.Int("testDurationSeconds", 5,
 		"Test duration in seconds. Time over which rate must be error-free.")
 
-	config.RequestTimeoutSeconds = flagSet.Int("requestTimeout", 10,
+	config.RequestTimeoutSeconds = flagSet.Int("requestTimeoutSeconds", 10,
 		"Request response timeout in seconds.")
 
-	config.MinWaitSeconds = flagSet.Int("minWaitBetweenTests", 0,
+	config.MinSecondsBetweenTests = flagSet.Int("minSecondsBetweenTests", 0,
 		"Minimum wait time between tests in seconds (default 0)")
 
 	config.InitialRandomSeed = flagSet.Int("seed", 123456,

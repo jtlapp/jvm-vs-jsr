@@ -1,8 +1,8 @@
 # options for testing consistency across runs
 
-initialRate: 500
-testDuration: 180
-requestTimeout: 5
+initialRequestsPerSecond: 500
+testDurationSeconds: 180
+requestTimeoutSeconds: 5
 seed: 123456
 runCount: 8
 resetSeedBetweenTests: true

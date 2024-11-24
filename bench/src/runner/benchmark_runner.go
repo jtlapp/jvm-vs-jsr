@@ -221,7 +221,7 @@ func (br *BenchmarkRunner) waitBetweenTests() {
 	start := time.Now()
 	util.WaitForPortsToTimeout()
 	elapsed := time.Since(start)
-	minDuration := time.Duration(*br.commandConfig.MinWaitSeconds) * time.Second
+	minDuration := time.Duration(*br.commandConfig.MinSecondsBetweenTests) * time.Second
 
 	if remainingTime := minDuration - elapsed; remainingTime > 0 {
 		time.Sleep(remainingTime)

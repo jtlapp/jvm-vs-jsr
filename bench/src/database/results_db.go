@@ -151,7 +151,7 @@ func (rdb *ResultsDB) CreateRun(
 		*commandConfig.CPUsToUse,                // $10 - cpusUsed
 		*commandConfig.DurationSeconds,          // $11 - trialDurationSeconds
 		*commandConfig.RequestTimeoutSeconds,    // $12 - timeoutSeconds
-		*commandConfig.MinWaitSeconds,           // $13 - minWaitSeconds
+		*commandConfig.MinSecondsBetweenTests,   // $13 - minWaitSeconds
 		*commandConfig.LongSleepMillis,          // $14 - longSleepMillis
 		*commandConfig.ShortSleepMillis,         // $15 - shortSleepMillis
 		*commandConfig.PercentLongRequests,      //	$16 - percentLongRequests
@@ -304,21 +304,21 @@ func (rdb *ResultsDB) GetTrials(
 	}
 
 	rows, err := pool.Query(context.Background(), query,
-		sinceTime,                            // $1  - createdAt
-		platformConfig.AppName,               // $2  - appName
-		platformConfig.AppVersion,            // $3  - appVersion
-		platformConfig.AppConfig,             // $4  - appConfig
-		*commandConfig.ScenarioName,          // $5  - scenarioName
-		*commandConfig.MaxConnections,        // $6  - maxConnections
-		*commandConfig.WorkerCount,           // $7  - workerCount
-		*commandConfig.CPUsToUse,             // $8  - cpusUsed
-		*commandConfig.DurationSeconds,       // $9 - trialDurationSeconds
-		*commandConfig.RequestTimeoutSeconds, // $10 - timeoutSeconds
-		*commandConfig.MinWaitSeconds,        // $11 - minWaitSeconds
-		*commandConfig.LongSleepMillis,       // $12 - longSleepMillis
-		*commandConfig.ShortSleepMillis,      // $13 - shortSleepMillis
-		*commandConfig.PercentLongRequests,   // $14 - percentLongRequests
-		*commandConfig.InitialRandomSeed,     // $15 - initialRandomSeed
+		sinceTime,                             // $1  - createdAt
+		platformConfig.AppName,                // $2  - appName
+		platformConfig.AppVersion,             // $3  - appVersion
+		platformConfig.AppConfig,              // $4  - appConfig
+		*commandConfig.ScenarioName,           // $5  - scenarioName
+		*commandConfig.MaxConnections,         // $6  - maxConnections
+		*commandConfig.WorkerCount,            // $7  - workerCount
+		*commandConfig.CPUsToUse,              // $8  - cpusUsed
+		*commandConfig.DurationSeconds,        // $9 - trialDurationSeconds
+		*commandConfig.RequestTimeoutSeconds,  // $10 - timeoutSeconds
+		*commandConfig.MinSecondsBetweenTests, // $11 - minWaitSeconds
+		*commandConfig.LongSleepMillis,        // $12 - longSleepMillis
+		*commandConfig.ShortSleepMillis,       // $13 - shortSleepMillis
+		*commandConfig.PercentLongRequests,    // $14 - percentLongRequests
+		*commandConfig.InitialRandomSeed,      // $15 - initialRandomSeed
 	)
 	if err != nil {
 		return nil, err
