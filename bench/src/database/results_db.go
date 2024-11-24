@@ -133,10 +133,10 @@ func (rdb *ResultsDB) CreateRun(
 
 	var runID int
 	err = pool.QueryRow(context.Background(), query,
-		platformConfig.AppName,              // $1  - appName
-		platformConfig.AppVersion,           // $2  - appVersion
-		appConfigJSON,                       // $3  - appConfig
-		platformConfig.CPUsPerNode,          // $4  - cpusPerNode
+		platformConfig.AppName,                 // $1  - appName
+		platformConfig.AppVersion,              // $2  - appVersion
+		appConfigJSON,                          // $3  - appConfig
+		platformConfig.CPUsPerNode,             // $4  - cpusPerNode
 		commandConfig.ScenarioName,             // $5  - scenarioName
 		commandConfig.InitialRequestsPerSecond, // $6  - initialRequestsPerSecond
 		commandConfig.InitialRandomSeed,        // $7  - initialRandomSeed
@@ -146,7 +146,7 @@ func (rdb *ResultsDB) CreateRun(
 		commandConfig.DurationSeconds,          // $11 - trialDurationSeconds
 		commandConfig.RequestTimeoutSeconds,    // $12 - timeoutSeconds
 		commandConfig.MinWaitSeconds,           // $13 - minWaitSeconds
-		0,                                   // $14 - totalRunDurationSeconds (initialized to 0)
+		0,                                      // $14 - totalRunDurationSeconds (initialized to 0)
 	).Scan(&runID)
 
 	if err != nil {
@@ -292,10 +292,10 @@ func (rdb *ResultsDB) GetTrials(
 	}
 
 	rows, err := pool.Query(context.Background(), query,
-		sinceTime,                        // $1  - createdAt
-		platformConfig.AppName,           // $2  - appName
-		platformConfig.AppVersion,        // $3  - appVersion
-		platformConfig.AppConfig,         // $4  - appConfig
+		sinceTime,                            // $1  - createdAt
+		platformConfig.AppName,               // $2  - appName
+		platformConfig.AppVersion,            // $3  - appVersion
+		platformConfig.AppConfig,             // $4  - appConfig
 		*commandConfig.ScenarioName,          // $5  - scenarioName
 		*commandConfig.MaxConnections,        // $6  - maxConnections
 		*commandConfig.WorkerCount,           // $7  - workerCount

@@ -20,7 +20,7 @@ const (
 
 type BenchmarkRunner struct {
 	platformConfig config.PlatformConfig
-	commandConfig     config.CommandConfig
+	commandConfig  config.CommandConfig
 	scenarioConfig config.ScenarioConfig
 	scenario       *scenarios.Scenario
 	resultsDB      *database.ResultsDB
@@ -37,7 +37,7 @@ func NewBenchmarkRunner(
 
 	return &BenchmarkRunner{
 		platformConfig: platformConfig,
-		commandConfig:     commandConfig,
+		commandConfig:  commandConfig,
 		scenarioConfig: scenarioConfig,
 		scenario:       scenario,
 		resultsDB:      resultsDB,
