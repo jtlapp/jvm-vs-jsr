@@ -1,10 +1,9 @@
 package com.jtlapp.jvmvsjs.springjdbc.config;
 
-import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryDB;
-import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.jtlapp.jvmvsjs.jdbcquery.Database;
 
 @Configuration
 public class AppConfig {
@@ -19,12 +18,7 @@ public class AppConfig {
     private String password;
 
     @Bean
-    public SharedQueryDB getSharedQueryDB() {
-        return new SharedQueryDB(databaseURL, username, password);
-    }
-
-    @Bean
-    public SharedQueryRepo getSharedQueryRepo() {
-        return new SharedQueryRepo();
+    public Database database() {
+        return new Database(databaseURL, username, password);
     }
 }

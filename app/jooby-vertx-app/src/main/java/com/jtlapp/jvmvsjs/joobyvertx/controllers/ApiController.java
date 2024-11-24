@@ -1,16 +1,12 @@
 package com.jtlapp.jvmvsjs.joobyvertx.controllers;
 
 import com.google.gson.JsonObject;
-import com.jtlapp.jvmvsjs.vertxquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.vertxquery.Database;
 import com.jtlapp.jvmvsjs.vertxquery.VertxUtil;
 import io.jooby.Context;
 import io.jooby.StatusCode;
-import io.jooby.annotation.GET;
-import io.jooby.annotation.POST;
-import io.jooby.annotation.Path;
-import io.jooby.annotation.PathParam;
+import io.jooby.annotation.*;
 import io.vertx.core.Future;
-import io.vertx.sqlclient.Pool;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -29,10 +25,7 @@ public class ApiController {
     ScheduledExecutorService scheduler;
 
     @Inject
-    SharedQueryRepo sharedQueryRepo;
-
-    @Inject
-    Pool pgPool;
+    Database db;
 
     @GET("/info")
     public CompletableFuture<String> info() {
@@ -43,31 +36,30 @@ public class ApiController {
         return CompletableFuture.completedFuture(gson.toString());
     }
 
-    @POST("/query/{queryName}")
-    public CompletableFuture<String> query(
-            @PathParam String queryName, String jsonBody, Context ctx
-    ) {
-        var vertxFuture = sharedQueryRepo.get(queryName)
-                .flatMap(sq -> sq.executeUsingGson(pgPool, jsonBody))
-                .recover(e -> {
-                    ctx.setResponseCode(StatusCode.SERVER_ERROR);
-                    return Future.succeededFuture(toErrorJson(queryName, e));
-                });
-        return VertxUtil.toCompletableFuture(vertxFuture);
-    }
-
-    @GET("/sleep/{millis}")
-    public CompletableFuture<String> sleep(@PathParam int millis) {
+    @GET("/app-sleep")
+    public CompletableFuture<String> appSleep(@QueryParam int millis) {
         var future = new CompletableFuture<String>();
 
         scheduler.schedule(() ->
-                future.complete(""), millis, TimeUnit.MILLISECONDS);
+                future.complete("{}"), millis, TimeUnit.MILLISECONDS);
 
         return future;
     }
 
-    private String toErrorJson(String queryName, Throwable e) {
-        return String.format("{\"query\": \"%s\", \"error\": \"%s: %s\"}",
-                queryName, e.getClass().getSimpleName(), e.getMessage());
+    @GET("/pg-sleep")
+    public CompletableFuture<String> pgSleep(@QueryParam int millis, Context ctx
+    ) {
+        var vertxFuture = db.issueSleepQuery(millis)
+                .map(result -> "{}")
+                .recover(e -> {
+                    ctx.setResponseCode(StatusCode.SERVER_ERROR);
+                    return Future.succeededFuture(toErrorJson("pg-sleep", e));
+                });
+        return VertxUtil.toCompletableFuture(vertxFuture);
+    }
+
+    private String toErrorJson(String endpoint, Throwable e) {
+        return String.format("{\"endpoint\": \"%s\", \"error\": \"%s: %s\"}",
+        endpoint, e.getClass().getSimpleName(), e.getMessage());
     }
 }

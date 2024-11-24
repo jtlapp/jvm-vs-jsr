@@ -1,6 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyvertx.config;
 
-import com.jtlapp.jvmvsjs.vertxquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.vertxquery.Database;
 import io.avaje.inject.Bean;
 import io.avaje.inject.External;
 import io.avaje.inject.Factory;
@@ -47,7 +47,7 @@ public class AppConfig {
     }
 
     @Bean
-    public SharedQueryRepo sharedQueryRepo(Pool pgPool) {
-        return new SharedQueryRepo(pgPool);
+    public Database database(Pool pgPool) {
+        return new Database(pgPool);
     }
 }

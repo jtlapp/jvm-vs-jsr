@@ -31,7 +31,7 @@ var LoopDeterminingRates = newCommand(
 		runCount := *commandConfig.LoopCount
 		resetRandomSeed := *commandConfig.ResetRandomSeed
 
-		runStats, err := performRuns(clientConfig, *testConfig, runCount, resetRandomSeed)
+		runStats, err := performRuns(clientConfig, *testConfig, &commandConfig, runCount, resetRandomSeed)
 		if err != nil {
 			return err
 		}
@@ -57,7 +57,7 @@ var DetermineRate = newCommand(
 		runCount := 1
 		resetRandomSeed := false
 
-		_, err = performRuns(clientConfig, *testConfig, runCount, resetRandomSeed)
+		_, err = performRuns(clientConfig, *testConfig, &commandConfig, runCount, resetRandomSeed)
 		return err
 	})
 
@@ -76,7 +76,8 @@ var TryRate = newCommand(
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
 
-		benchmarkRunner, err := createBenchmarkRunner(clientConfig, *testConfig, resultsDB)
+		benchmarkRunner, err :=
+			createBenchmarkRunner(clientConfig, *testConfig, &commandConfig, resultsDB)
 		if err != nil {
 			return err
 		}
@@ -115,6 +116,7 @@ var ShowStatus = newCommand(
 func performRuns(
 	clientConfig config.ClientConfig,
 	testConfig config.TestConfig,
+	commandConfig *usage.CommandConfig,
 	runCount int,
 	resetRandomSeed bool,
 ) (*stats.RunStats, error) {
@@ -122,7 +124,8 @@ func performRuns(
 	resultsDB := database.NewResultsDatabase()
 	defer resultsDB.Close()
 
-	benchmarkRunner, err := createBenchmarkRunner(clientConfig, testConfig, resultsDB)
+	benchmarkRunner, err :=
+		createBenchmarkRunner(clientConfig, testConfig, commandConfig, resultsDB)
 	if err != nil {
 		return nil, err
 	}
@@ -189,6 +192,7 @@ func getTestConfig(commandConfig usage.CommandConfig) (*config.TestConfig, error
 func createBenchmarkRunner(
 	clientConfig config.ClientConfig,
 	testConfig config.TestConfig,
+	commandConfig *usage.CommandConfig,
 	resultsDB *database.ResultsDB,
 ) (*runner.BenchmarkRunner, error) {
 
@@ -202,7 +206,14 @@ func createBenchmarkRunner(
 		return nil, err
 	}
 
-	return runner.NewBenchmarkRunner(*platformConfig, testConfig, &scenario, resultsDB)
+	scenarioConfig := config.NewScenarioConfig(commandConfig)
+
+	return runner.NewBenchmarkRunner(
+		*platformConfig,
+		testConfig,
+		*scenarioConfig,
+		&scenario,
+		resultsDB)
 }
 
 func printTrialMetrics(metrics *vegeta.Metrics) {

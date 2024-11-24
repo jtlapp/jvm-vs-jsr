@@ -33,6 +33,7 @@ func (c *baseCommand) Description() string { return c.description }
 
 func (c *baseCommand) ParseArgs() (*usage.CommandConfig, error) {
 	commandConfig := usage.CommandConfig{}
+
 	if (*c).addOptions != nil {
 		flagSet := flag.NewFlagSet(c.name, flag.ExitOnError)
 		(*c).addOptions(&commandConfig, flagSet)
@@ -89,7 +90,6 @@ func newCommand(
 var Commands = []Command{
 	SetupResultsDB,
 	SetupBackendDB,
-	AssignQueries,
 	LoopDeterminingRates,
 	DetermineRate,
 	TryRate,

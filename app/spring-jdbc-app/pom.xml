@@ -32,7 +32,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.jtlapp.jvmvsjs</groupId>
-			<artifactId>jdbc-query-lib</artifactId>
+			<artifactId>jdbc-lib</artifactId>
 		</dependency>
 	</dependencies>
 

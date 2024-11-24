@@ -21,15 +21,24 @@ const (
 type BenchmarkRunner struct {
 	platformConfig config.PlatformConfig
 	testConfig     config.TestConfig
+	scenarioConfig config.ScenarioConfig
 	scenario       *scenarios.Scenario
 	resultsDB      *database.ResultsDB
 	logger         *ResponseLogger
 }
 
-func NewBenchmarkRunner(platformConfig config.PlatformConfig, testConfig config.TestConfig, scenario *scenarios.Scenario, resultsDB *database.ResultsDB) (*BenchmarkRunner, error) {
+func NewBenchmarkRunner(
+	platformConfig config.PlatformConfig,
+	testConfig config.TestConfig,
+	scenarioConfig config.ScenarioConfig,
+	scenario *scenarios.Scenario,
+	resultsDB *database.ResultsDB,
+) (*BenchmarkRunner, error) {
+
 	return &BenchmarkRunner{
 		platformConfig: platformConfig,
 		testConfig:     testConfig,
+		scenarioConfig: scenarioConfig,
 		scenario:       scenario,
 		resultsDB:      resultsDB,
 		logger:         NewResponseLogger(),
@@ -181,7 +190,7 @@ func (br *BenchmarkRunner) performRateTrial(
 ) (int, *vegeta.Metrics, error) {
 
 	targetProvider := (*br.scenario).GetTargetProvider(
-		br.platformConfig.BaseAppUrl, randomSeed)
+		br.platformConfig.BaseAppUrl, randomSeed, br.scenarioConfig)
 
 	attacker := vegeta.NewAttacker(
 		vegeta.Workers(uint64(br.testConfig.WorkerCount)),

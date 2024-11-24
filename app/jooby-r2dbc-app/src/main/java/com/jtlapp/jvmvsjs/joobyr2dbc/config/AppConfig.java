@@ -1,6 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyr2dbc.config;
 
-import com.jtlapp.jvmvsjs.r2dbcquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.r2dbcquery.Database;
 import io.avaje.inject.Bean;
 import io.avaje.inject.External;
 import io.avaje.inject.Factory;
@@ -42,12 +42,8 @@ public class AppConfig {
     }
 
     @Bean
-    public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {
-        return DatabaseClient.create(connectionFactory);
-    }
-
-    @Bean
-    public SharedQueryRepo sharedQueryRepo(DatabaseClient databaseClient) {
-        return new SharedQueryRepo(databaseClient);
+    public Database database(ConnectionFactory connectionFactory) {
+        var client = DatabaseClient.create(connectionFactory);
+        return new Database(client);
     }
 }

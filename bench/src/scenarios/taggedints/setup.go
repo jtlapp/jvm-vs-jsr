@@ -5,7 +5,6 @@ import (
 	"math/rand"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
 
 const (
@@ -47,21 +46,6 @@ func (s *SetupImpl) PopulateTables() error {
 		}
 	}
 	return nil
-}
-
-func (s *SetupImpl) GetSharedQueries() []database.SharedQuery {
-	return []database.SharedQuery{
-		{
-			Name:    "taggedints_sumInts",
-			Query:   `SELECT SUM(int) AS sum FROM tagged_ints WHERE tag1=${tag1} AND tag2=${tag2}`,
-			Returns: "rows",
-		},
-		{
-			Name:    "taggedints_getInt",
-			Query:   `SELECT int FROM tagged_ints WHERE id=${id}`,
-			Returns: "rows",
-		},
-	}
 }
 
 // Use the local random generator for tag creation

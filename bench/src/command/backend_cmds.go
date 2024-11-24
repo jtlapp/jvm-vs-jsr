@@ -24,28 +24,7 @@ var SetupBackendDB = newCommand(
 		if err != nil {
 			return err
 		}
-		if err = populateDatabase(backendSetup); err != nil {
-			return err
-		}
-		return assignSharedQueries(backendSetup)
-	})
-
-var AssignQueries = newCommand(
-	"assign-queries",
-	"-scenario=<scenario>",
-	"Sets only the queries required for the test scenario.",
-	nil,
-	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
-		backendDB := database.NewBackendDatabase()
-		defer backendDB.Close()
-
-		scenarioName := *commandConfig.ScenarioName
-
-		backendSetup, err := createBackendSetup(scenarioName, backendDB)
-		if err != nil {
-			return err
-		}
-		return assignSharedQueries(backendSetup)
+		return populateDatabase(backendSetup)
 	})
 
 func createBackendSetup(
@@ -73,13 +52,6 @@ func createBackendSetup(
 func populateDatabase(backendSetup *database.BackendSetup) error {
 	if err := backendSetup.PopulateDatabase(); err != nil {
 		return fmt.Errorf("failed to populate database: %v", err)
-	}
-	return nil
-}
-
-func assignSharedQueries(backendSetup *database.BackendSetup) error {
-	if err := backendSetup.AssignSharedQueries(); err != nil {
-		return fmt.Errorf("failed to assign shared queries: %v", err)
 	}
 	return nil
 }

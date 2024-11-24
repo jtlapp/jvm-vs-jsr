@@ -2,6 +2,9 @@ package usage
 
 type CommandConfig struct {
 	ScenarioName             *string
+	LongSleepMillis          *int
+	ShortSleepMillis         *int
+	PercentLongRequests      *int
 	CPUsToUse                *int
 	WorkerCount              *int
 	MaxConnections           *int

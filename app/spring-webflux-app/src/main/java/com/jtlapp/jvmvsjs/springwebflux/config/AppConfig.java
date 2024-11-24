@@ -1,6 +1,6 @@
 package com.jtlapp.jvmvsjs.springwebflux.config;
 
-import com.jtlapp.jvmvsjs.r2dbcquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.r2dbcquery.Database;
 import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,12 +30,8 @@ public class AppConfig {
     // Spring Boot automatically provides the ConnectionFactory based on the
     // spring.r2dbc.{url, username, password} application properties.
     @Bean
-    public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {
-        return DatabaseClient.create(connectionFactory);
-    }
-
-    @Bean
-    public SharedQueryRepo sharedQueryRepo(DatabaseClient databaseClient) {
-        return new SharedQueryRepo(databaseClient);
+    public Database database(ConnectionFactory connectionFactory) {
+        var client =  DatabaseClient.create(connectionFactory);
+        return new Database(client);
     }
 }

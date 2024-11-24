@@ -27,12 +27,12 @@ public class ApiController {
         return CompletableFuture.completedFuture(gson.toString());
     }
 
-    @GetMapping("/sleep/{millis}")
-    public CompletableFuture<String> sleep(@PathVariable(name = "millis") int millis) {
+    @GetMapping("/app-sleep")
+    public CompletableFuture<String> appSleep(@RequestParam int millis) {
         var future = new CompletableFuture<String>();
 
         scheduler.schedule(() -> {
-            future.complete("");
+            future.complete("{}");
         }, millis, TimeUnit.MILLISECONDS);
 
         return future;

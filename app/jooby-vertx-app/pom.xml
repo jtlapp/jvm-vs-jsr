@@ -31,7 +31,7 @@
     </dependency>
     <dependency>
       <groupId>com.jtlapp.jvmvsjs</groupId>
-      <artifactId>vertx-query-lib</artifactId>
+      <artifactId>vertx-lib</artifactId>
     </dependency>
   </dependencies>
 

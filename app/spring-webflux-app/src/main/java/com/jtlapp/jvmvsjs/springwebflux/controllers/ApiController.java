@@ -1,11 +1,10 @@
 package com.jtlapp.jvmvsjs.springwebflux.controllers;
 
 import com.google.gson.JsonObject;
-import com.jtlapp.jvmvsjs.r2dbcquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.r2dbcquery.Database;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -23,10 +22,7 @@ public class ApiController {
     private ScheduledExecutorService scheduler;
 
     @Autowired
-    private DatabaseClient db;
-
-    @Autowired
-    private SharedQueryRepo sharedQueryRepo;
+    private Database db;
 
     @GetMapping("/info")
     public Mono<String> info() {
@@ -35,30 +31,26 @@ public class ApiController {
         gson.addProperty("appVersion", appVersion);
         gson.add("appConfig", new JsonObject());
         return Mono.just(gson.toString());
-    }  
-
-    @PostMapping("/query/{queryName}")
-    public Mono<ResponseEntity<String>> query(
-            @PathVariable(name = "queryName") String queryName,
-            @RequestBody String jsonBody
-    ) {
-        return sharedQueryRepo.get(queryName)
-                .flatMap(sq -> sq.executeUsingGson(db, jsonBody))
-                .map(json -> ResponseEntity.ok().body(json))
-                .onErrorResume(e -> Mono.just(ResponseEntity
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(toErrorJson(queryName, e))));
     }
 
-    @GetMapping("/sleep/{millis}")
-    public Mono<String> sleep(@PathVariable(name = "millis") int millis) {
+    @GetMapping("/app-sleep")
+    public Mono<String> appSleep(@RequestParam int millis) {
         return Mono.create(sink ->
                 scheduler.schedule(() -> sink.success(""), millis, TimeUnit.MILLISECONDS)
         );
     }
 
-    private String toErrorJson(String queryName, Throwable e) {
-        return String.format("{\"query\": \"%s\", \"error\": \"%s: %s\"}",
-                queryName, e.getClass().getSimpleName(), e.getMessage());
+    @GetMapping("/pg-sleep")
+    public Mono<ResponseEntity<String>> pgSleep(@RequestParam int millis) {
+        return db.issueSleepQuery(millis)
+                .thenReturn(ResponseEntity.ok().body("{}"))
+                .onErrorResume(e -> Mono.just(ResponseEntity
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(toErrorJson("pg-sleep", e))));
+    }
+
+    private String toErrorJson(String endpoint, Throwable e) {
+        return String.format("{\"endpoint\": \"%s\", \"error\": \"%s: %s\"}",
+                endpoint, e.getClass().getSimpleName(), e.getMessage());
     }
 }

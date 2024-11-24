@@ -1,14 +1,13 @@
 package com.jtlapp.jvmvsjs.springjdbc.controllers;
 
 import com.google.gson.JsonObject;
-import com.jtlapp.jvmvsjs.jdbcquery.SharedQuery;
-import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryDB;
-import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryException;
-import com.jtlapp.jvmvsjs.jdbcquery.SharedQueryRepo;
+import com.jtlapp.jvmvsjs.jdbcquery.Database;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.sql.SQLException;
 
 @RestController
 @RequestMapping("/api")
@@ -18,9 +17,7 @@ public class ApiController {
     static final String appVersion = System.getenv("APP_VERSION");;
 
     @Autowired
-    private SharedQueryDB sharedQueryDB;
-    @Autowired
-    private SharedQueryRepo sharedQueryRepo;
+    private Database db;
 
     @GetMapping("/info")
     public ResponseEntity<String> info() {
@@ -31,25 +28,8 @@ public class ApiController {
         return ResponseEntity.ok(gson.toString());
     }
 
-    @PostMapping("/query/{queryName}")
-    public ResponseEntity<String> query(
-            @PathVariable(name = "queryName") String queryName,
-            @RequestBody String jsonBody
-    ) {
-        try {
-            SharedQuery query = sharedQueryRepo.get(sharedQueryDB, queryName);
-            String jsonResponse = query.executeUsingGson(sharedQueryDB, jsonBody);
-            return ResponseEntity.ok(jsonResponse);
-        }
-        catch (SharedQueryException e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(toErrorJson(queryName, e));
-        }
-    }
-
-    @GetMapping("/sleep/{millis}")
-    public ResponseEntity<Void> sleep(@PathVariable(name = "millis") int millis) {
+    @GetMapping("/app-sleep")
+    public ResponseEntity<Void> appSleep(@RequestParam int millis) {
         try {
             Thread.sleep(millis);
             return ResponseEntity.ok().build();
@@ -60,8 +40,22 @@ public class ApiController {
         }
     }
 
-    private String toErrorJson(String queryName, Throwable e) {
-        return String.format("{\"query\": \"%s\", \"error\": \"%s: %s\"}",
-                queryName, e.getClass().getSimpleName(), e.getMessage());
+    @GetMapping("/pg-sleep")
+    public ResponseEntity<String> pgSleep(@RequestParam int millis) {
+        try {
+            var conn = db.openConnection();
+            Database.issueSleepQuery(conn, millis);
+            return ResponseEntity.ok("{}");
+        }
+        catch (SQLException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(toErrorJson("pg-sleep", e));
+        }
+    }
+
+    private String toErrorJson(String endpoint, Throwable e) {
+        return String.format("{\"endpoint\": \"%s\", \"error\": \"%s: %s\"}",
+                endpoint, e.getClass().getSimpleName(), e.getMessage());
     }
 }

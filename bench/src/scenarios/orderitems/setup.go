@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 )
 
 const (
@@ -119,32 +118,4 @@ func (s *SetupImpl) PopulateTables() error {
 		}
 	}
 	return nil
-}
-
-func (s *SetupImpl) GetSharedQueries() []database.SharedQuery {
-	return []database.SharedQuery{
-		{
-			Name: "orderitems_getOrder",
-			Query: `
-				SELECT o.id AS order_id, o.order_date, o.status, u.username, u.email,
-						p.name, p.description, p.price, oi.quantity
-					FROM orders o
-					JOIN users u ON o.user_id = u.id
-					JOIN order_items oi ON oi.order_id = o.id
-					JOIN products p ON oi.product_id = p.id
-					WHERE o.id = ${orderID}
-			`,
-			Returns: "rows",
-		},
-		{
-			Name: "orderitems_boostOrderItems",
-			Query: `
-				UPDATE order_items oi
-					SET quantity = quantity + 1
-					FROM orders o
-					WHERE oi.order_id = o.id AND o.id = ${orderID}
-			`,
-			Returns: "count",
-		},
-	}
 }

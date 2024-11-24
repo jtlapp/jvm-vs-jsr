@@ -39,7 +39,7 @@
     </dependency>
     <dependency>
       <groupId>com.jtlapp.jvmvsjs</groupId>
-      <artifactId>r2dbc-query-lib</artifactId>
+      <artifactId>r2dbc-lib</artifactId>
     </dependency>
   </dependencies>
 

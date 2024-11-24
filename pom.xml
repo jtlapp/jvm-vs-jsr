@@ -31,9 +31,9 @@
 
     <modules>
         <module>bench</module>
-        <module>lib/jdbc-query-lib</module>
-        <module>lib/r2dbc-query-lib</module>
-        <module>lib/vertx-query-lib</module>
+        <module>lib/jdbc-lib</module>
+        <module>lib/r2dbc-lib</module>
+        <module>lib/vertx-lib</module>
         <module>app/spring-async-app</module>
         <module>app/spring-jdbc-app</module>
         <module>app/spring-webflux-app</module>
@@ -103,17 +103,17 @@
             </dependency>
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>
-                <artifactId>jdbc-query-lib</artifactId>
+                <artifactId>jdbc-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>
-                <artifactId>r2dbc-query-lib</artifactId>
+                <artifactId>r2dbc-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>
-                <artifactId>vertx-query-lib</artifactId>
+                <artifactId>vertx-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

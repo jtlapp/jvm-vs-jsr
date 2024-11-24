@@ -39,6 +39,17 @@ public class JoobyNoMVCApp extends Jooby {
             return CompletableFuture.completedFuture(gson.toString());
         });
 
+        get("/api/app-sleep", ctx -> {
+            int millis = ctx.query("millis").intValue(0);
+            var future = new CompletableFuture<String>();
+
+            scheduler.schedule(() -> {
+                future.complete("{}");
+            }, millis, TimeUnit.MILLISECONDS);
+
+            return future;
+        });
+
         post("/api/echoText", ctx -> {
             var body = ctx.body(String.class);
             return CompletableFuture.completedFuture(body);
@@ -54,17 +65,6 @@ public class JoobyNoMVCApp extends Jooby {
             var body = ctx.body(String.class);
             var jackson = objectMapper.readTree(body);
             return CompletableFuture.completedFuture(jackson.toString());
-        });
-
-        get("/api/sleep/{millis}", ctx -> {
-            int millis = ctx.path("millis").intValue();
-            var future = new CompletableFuture<String>();
-
-            scheduler.schedule(() -> {
-                future.complete("");
-            }, millis, TimeUnit.MILLISECONDS);
-
-            return future;
         });
 
         onStop(scheduler::shutdown);
