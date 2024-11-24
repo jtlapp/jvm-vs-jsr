@@ -13,8 +13,8 @@ type Command interface {
 	Name() string
 	ArgsUsage() string
 	Description() string
-	ParseArgs() (*usage.CommandConfig, error)
-	Execute(config.ClientConfig, usage.CommandConfig) error
+	ParseArgs() (*config.CommandConfig, error)
+	Execute(config.ClientConfig, config.CommandConfig) error
 	PrintUsage()
 	PrintUsageWithOptions()
 }
@@ -23,16 +23,16 @@ type baseCommand struct {
 	name        string
 	argsUsage   string
 	description string
-	addOptions  func(*usage.CommandConfig, *flag.FlagSet)
-	execute     func(config.ClientConfig, usage.CommandConfig) error
+	addOptions  func(*config.CommandConfig, *flag.FlagSet)
+	execute     func(config.ClientConfig, config.CommandConfig) error
 }
 
 func (c *baseCommand) Name() string        { return c.name }
 func (c *baseCommand) ArgsUsage() string   { return c.argsUsage }
 func (c *baseCommand) Description() string { return c.description }
 
-func (c *baseCommand) ParseArgs() (*usage.CommandConfig, error) {
-	commandConfig := usage.CommandConfig{}
+func (c *baseCommand) ParseArgs() (*config.CommandConfig, error) {
+	commandConfig := config.CommandConfig{}
 
 	if (*c).addOptions != nil {
 		flagSet := flag.NewFlagSet(c.name, flag.ExitOnError)
@@ -47,7 +47,7 @@ func (c *baseCommand) ParseArgs() (*usage.CommandConfig, error) {
 
 func (c *baseCommand) Execute(
 	clientConfig config.ClientConfig,
-	commandConfig usage.CommandConfig,
+	commandConfig config.CommandConfig,
 ) error {
 	return c.execute(clientConfig, commandConfig)
 }
@@ -65,7 +65,7 @@ func (c *baseCommand) PrintUsageWithOptions() {
 		fmt.Println("Options:")
 		flagSet := flag.NewFlagSet(c.Name(), flag.ExitOnError)
 		installCustomUsageOutput(flagSet)
-		commandConfig := usage.CommandConfig{}
+		commandConfig := config.CommandConfig{}
 		c.addOptions(&commandConfig, flagSet)
 		flagSet.Usage()
 	}
@@ -74,8 +74,8 @@ func (c *baseCommand) PrintUsageWithOptions() {
 
 func newCommand(
 	name, argsUsage, description string,
-	addOptions func(*usage.CommandConfig, *flag.FlagSet),
-	execute func(config.ClientConfig, usage.CommandConfig) error,
+	addOptions func(*config.CommandConfig, *flag.FlagSet),
+	execute func(config.ClientConfig, config.CommandConfig) error,
 ) Command {
 
 	return &baseCommand{

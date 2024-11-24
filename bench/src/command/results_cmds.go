@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/stats"
@@ -19,7 +18,7 @@ var SetupResultsDB = newCommand(
 	"",
 	"Creates the results database tables on the client pod.",
 	nil,
-	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
 
@@ -67,7 +66,7 @@ var ShowStatistics = newCommand(
 		"options. If -since is provided, prints statistics only for trials "+
 		"completed since the given time duration.",
 	addStatisticsOptions,
-	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
 
 		platformConfig, err := config.GetPlatformConfig(clientConfig)
 		if err != nil {
@@ -108,7 +107,7 @@ var ShowStatistics = newCommand(
 		return nil
 	})
 
-func addStatisticsOptions(commandConfig *usage.CommandConfig, flagSet *flag.FlagSet) {
+func addStatisticsOptions(commandConfig *config.CommandConfig, flagSet *flag.FlagSet) {
 	commandConfig.SincePeriod = flagSet.String("sincePeriod", "356d",
 		"How far back to look for trials. Suffix with 'd' for days, 'h' for hours, or 'm' for minutes.")
 	addTrialOptions(commandConfig, flagSet)

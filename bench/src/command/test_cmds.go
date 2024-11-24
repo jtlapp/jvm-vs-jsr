@@ -22,7 +22,7 @@ var LoopDeterminingRates = newCommand(
 		"The resulting rates are guaranteed to be error-free for the specified "+
 		"duration. Provide a rate guess to hasten convergence on the stable rate.",
 	addLoopOptions,
-	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
 
 		testConfig, err := getTestConfig(commandConfig)
 		if err != nil {
@@ -48,7 +48,7 @@ var DetermineRate = newCommand(
 		"to be error-free for the specified duration. Provide a rate guess to hasten "+
 		"convergence on the stable rate.",
 	addTrialOptions,
-	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
 
 		testConfig, err := getTestConfig(commandConfig)
 		if err != nil {
@@ -66,7 +66,7 @@ var TryRate = newCommand(
 	"-scenario=<scenario> [<trial-options>]",
 	"Tries issuing requests at the given rate for the specified duration.",
 	addTrialOptions,
-	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
 
 		testConfig, err := getTestConfig(commandConfig)
 		if err != nil {
@@ -97,7 +97,7 @@ var ShowStatus = newCommand(
 	"",
 	"Prints the active ports, waiting ports, and file descriptors in use.",
 	nil,
-	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
 		resources := util.NewResourceStatus()
 		establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
 			resources.GetPercentages()
@@ -116,7 +116,7 @@ var ShowStatus = newCommand(
 func performRuns(
 	clientConfig config.ClientConfig,
 	testConfig config.TestConfig,
-	commandConfig *usage.CommandConfig,
+	commandConfig *config.CommandConfig,
 	runCount int,
 	resetRandomSeed bool,
 ) (*stats.RunStats, error) {
@@ -133,7 +133,7 @@ func performRuns(
 	return benchmarkRunner.DetermineRate(runCount, resetRandomSeed)
 }
 
-func addLoopOptions(config *usage.CommandConfig, flagSet *flag.FlagSet) {
+func addLoopOptions(config *config.CommandConfig, flagSet *flag.FlagSet) {
 	config.LoopCount = flagSet.Int("runCount", 8,
 		"Number of times to run the rate determination benchmark")
 
@@ -143,7 +143,7 @@ func addLoopOptions(config *usage.CommandConfig, flagSet *flag.FlagSet) {
 	addTrialOptions(config, flagSet)
 }
 
-func addTrialOptions(config *usage.CommandConfig, flagSet *flag.FlagSet) {
+func addTrialOptions(config *config.CommandConfig, flagSet *flag.FlagSet) {
 	config.ScenarioName = flagSet.String("scenario", "",
 		"Name of scenario to test (REQUIRED)")
 
@@ -170,7 +170,7 @@ func addTrialOptions(config *usage.CommandConfig, flagSet *flag.FlagSet) {
 			"querying for statistics, set to 0 to query across all random seeds.")
 }
 
-func getTestConfig(commandConfig usage.CommandConfig) (*config.TestConfig, error) {
+func getTestConfig(commandConfig config.CommandConfig) (*config.TestConfig, error) {
 	scenarioName := *commandConfig.ScenarioName
 	if scenarioName == "" {
 		return nil, usage.NewUsageError("scenario name is required")
@@ -192,7 +192,7 @@ func getTestConfig(commandConfig usage.CommandConfig) (*config.TestConfig, error
 func createBenchmarkRunner(
 	clientConfig config.ClientConfig,
 	testConfig config.TestConfig,
-	commandConfig *usage.CommandConfig,
+	commandConfig *config.CommandConfig,
 	resultsDB *database.ResultsDB,
 ) (*runner.BenchmarkRunner, error) {
 

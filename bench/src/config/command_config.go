@@ -1,4 +1,4 @@
-package usage
+package config
 
 type CommandConfig struct {
 	ScenarioName             *string

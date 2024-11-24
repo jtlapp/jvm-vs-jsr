@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 
-	"jvm-vs-jsr.jtlapp.com/benchmark/command/usage"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
@@ -14,7 +13,7 @@ var SetupBackendDB = newCommand(
 	"-scenario=<scenario>",
 	"Creates database tables and queries required for the test scenario.",
 	nil,
-	func(clientConfig config.ClientConfig, commandConfig usage.CommandConfig) error {
+	func(clientConfig config.ClientConfig, commandConfig config.CommandConfig) error {
 		backendDB := database.NewBackendDatabase()
 		defer backendDB.Close()
 
