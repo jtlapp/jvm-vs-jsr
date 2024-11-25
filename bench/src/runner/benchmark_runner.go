@@ -131,6 +131,8 @@ func (br *BenchmarkRunner) performRateDetermination(iteration int, randomSeed in
 	var metrics *vegeta.Metrics
 	startTime := time.Now()
 
+	util.Logf("\n--- Rate determination run %d ---\n", iteration)
+
 	for currentRequestRate != 0 && nextRequestRate != currentRequestRate {
 		br.waitBetweenTests()
 
@@ -140,7 +142,7 @@ func (br *BenchmarkRunner) performRateDetermination(iteration int, randomSeed in
 		}
 
 		util.Log()
-		util.Logf("(%d) Testing %d requests/sec...", iteration, currentRequestRate)
+		util.Logf("Testing %d requests/sec...", currentRequestRate)
 		var trialID int
 		trialID, metrics, err = br.performRateTrial(
 			runID, currentRequestRate, randomSeed, *br.commandConfig.DurationSeconds)
