@@ -13,28 +13,28 @@ const (
 
 type PostParseHookType func(flagSet *flag.FlagSet, flagsUsed []string)
 
-type Runner struct {
+type Framework struct {
 	Commands      []Command
 	PostParseHook PostParseHookType
 	ShowUsage     func()
 	ErrorHook     func(error)
 }
 
-func (r *Runner) Run() {
-	if len(r.Commands) < 1 {
-		r.fail(NewUsageError("no command specified"))
+func (f *Framework) Run() {
+	if len(f.Commands) < 1 {
+		f.fail(NewUsageError("no command specified"))
 	}
 
 	// Extract the command or show help.
 
 	if len(os.Args) == 1 || os.Args[1] == helpOption {
-		r.ShowUsage()
+		f.ShowUsage()
 		os.Exit(0)
 	}
 	commandName := os.Args[1]
-	command, err := r.find(commandName)
+	command, err := f.find(commandName)
 	if err != nil {
-		r.fail(err)
+		f.fail(err)
 	}
 
 	// Show command-specific help if requested.
@@ -49,18 +49,18 @@ func (r *Runner) Run() {
 
 	// Execute the command.
 
-	commandConfig, err := command.ParseArgs(r.PostParseHook)
+	commandConfig, err := command.ParseArgs(f.PostParseHook)
 	if err != nil {
-		r.fail(err)
+		f.fail(err)
 	}
 	err = command.Execute(*commandConfig)
 	if err != nil {
-		r.fail(err)
+		f.fail(err)
 	}
 }
 
-func (r *Runner) find(name string) (Command, error) {
-	for _, c := range r.Commands {
+func (f *Framework) find(name string) (Command, error) {
+	for _, c := range f.Commands {
 		if c.Name() == name {
 			return c, nil
 		}
@@ -68,13 +68,13 @@ func (r *Runner) find(name string) (Command, error) {
 	return nil, NewUsageError("unknown command: %s", name)
 }
 
-func (c *Runner) fail(err error) {
+func (f *Framework) fail(err error) {
 	if err != nil {
-		if c.ErrorHook != nil {
-			c.ErrorHook(err)
+		if f.ErrorHook != nil {
+			f.ErrorHook(err)
 		}
 		if IsUsageError(err) {
-			c.ShowUsage()
+			f.ShowUsage()
 		}
 		os.Exit(1)
 	}

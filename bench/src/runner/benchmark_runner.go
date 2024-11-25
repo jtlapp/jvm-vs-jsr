@@ -73,6 +73,7 @@ func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating single-trial run: %v", err)
 	}
+	util.Log()
 
 	var trialID int
 	trialID, metrics, err = br.performRateTrial(

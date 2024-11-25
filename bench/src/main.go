@@ -25,13 +25,13 @@ var commands = []cli.Command{
 }
 
 func main() {
-	runner := cli.Runner{
+	framework := cli.Framework{
 		Commands:      commands,
 		PostParseHook: logBeforeRunning,
 		ShowUsage:     showUsage,
 		ErrorHook:     logError,
 	}
-	runner.Run()
+	framework.Run()
 }
 
 func logBeforeRunning(flagSet *flag.FlagSet, flagsUsed []string) {
@@ -48,7 +48,7 @@ func logBeforeRunning(flagSet *flag.FlagSet, flagsUsed []string) {
 			configLine += fmt.Sprintf("%s=%s", f.Name, f.Value.String())
 		}
 	})
-	util.Logf("\n[%s]\n", configLine)
+	util.Logf("\n  [%s]", configLine)
 }
 
 func logError(err error) {
