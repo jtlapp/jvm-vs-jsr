@@ -29,7 +29,7 @@ public class ApiController {
     }
 
     @GetMapping("/app-sleep")
-    public ResponseEntity<Void> appSleep(@RequestParam int millis) {
+    public ResponseEntity<Void> appSleep(@RequestParam("millis") int millis) {
         try {
             Thread.sleep(millis);
             return ResponseEntity.ok().build();
@@ -41,7 +41,7 @@ public class ApiController {
     }
 
     @GetMapping("/pg-sleep")
-    public ResponseEntity<String> pgSleep(@RequestParam int millis) {
+    public ResponseEntity<String> pgSleep(@RequestParam("millis") int millis) {
         try {
             var conn = db.openConnection();
             Database.issueSleepQuery(conn, millis);

@@ -133,6 +133,8 @@ func addTrialOptions(config *config.CommandConfig, flagSet *flag.FlagSet) {
 	config.CPUsToUse = flagSet.Int("cpusToUse", runtime.NumCPU(),
 		"Number of CPUs (and workers) to use")
 
+	config.WorkerCount = config.CPUsToUse
+
 	config.MaxConnections = flagSet.Int("maxConnections", 0,
 		"Maximum number of connections to use (default 0, meaning unlimited)")
 
