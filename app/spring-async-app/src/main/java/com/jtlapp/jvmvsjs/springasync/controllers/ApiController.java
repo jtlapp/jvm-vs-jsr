@@ -28,7 +28,7 @@ public class ApiController {
     }
 
     @GetMapping("/app-sleep")
-    public CompletableFuture<String> appSleep(@RequestParam int millis) {
+    public CompletableFuture<String> appSleep(@RequestParam("millis") int millis) {
         var future = new CompletableFuture<String>();
 
         scheduler.schedule(() -> {

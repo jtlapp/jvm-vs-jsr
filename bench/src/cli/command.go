@@ -58,7 +58,7 @@ func (c *baseCommand) ParseArgs(postParseHook PostParseHookType) (*config.Comman
 	}
 	flagSet := flag.NewFlagSet(c.name, flag.ExitOnError)
 	(*c).addOptions(&commandConfig, flagSet)
-	flagsUsed, err := parseFlagsWithFileDefaults(*commandConfig.ConfigFile, flagSet, os.Args[2:])
+	flagsUsed, err := parseFlagsWithFileDefaults(commandConfig.ConfigFile, flagSet, os.Args[2:])
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (c *baseCommand) PrintUsageWithOptions() {
 }
 
 func AllowConfigFile(flagSet *flag.FlagSet) *string {
-	return flagSet.String(fileFlag, noFile, "path to YAML config file providing default values")
+	return flagSet.String(fileFlag, noFile, "Path to YAML config file providing default values.")
 }
 
 func installCustomUsageOutput(flagSet *flag.FlagSet) {
@@ -110,14 +110,14 @@ func installCustomUsageOutput(flagSet *flag.FlagSet) {
 	}
 }
 
-func parseFlagsWithFileDefaults(configFile string, flagSet *flag.FlagSet, args []string) ([]string, error) {
+func parseFlagsWithFileDefaults(configFile *string, flagSet *flag.FlagSet, args []string) ([]string, error) {
 	flagsUsed := make([]string, 0)
 
 	if err := flagSet.Parse(args); err != nil {
 		return nil, fmt.Errorf("error parsing flags: %w", err)
 	}
 
-	if configFile == noFile {
+	if *configFile == noFile {
 		flagSet.VisitAll(func(f *flag.Flag) {
 			flagsUsed = append(flagsUsed, f.Name)
 		})
@@ -127,7 +127,7 @@ func parseFlagsWithFileDefaults(configFile string, flagSet *flag.FlagSet, args [
 			providedAsArg[f.Name] = true
 		})
 
-		configFileBytes, err := os.ReadFile(configFile)
+		configFileBytes, err := os.ReadFile(*configFile)
 		if err != nil {
 			return nil, fmt.Errorf("error reading config file: %w", err)
 		}

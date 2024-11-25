@@ -34,14 +34,14 @@ public class ApiController {
     }
 
     @GetMapping("/app-sleep")
-    public Mono<String> appSleep(@RequestParam int millis) {
+    public Mono<String> appSleep(@RequestParam("millis") int millis) {
         return Mono.create(sink ->
                 scheduler.schedule(() -> sink.success(""), millis, TimeUnit.MILLISECONDS)
         );
     }
 
     @GetMapping("/pg-sleep")
-    public Mono<ResponseEntity<String>> pgSleep(@RequestParam int millis) {
+    public Mono<ResponseEntity<String>> pgSleep(@RequestParam("millis") int millis) {
         return db.issueSleepQuery(millis)
                 .thenReturn(ResponseEntity.ok().body("{}"))
                 .onErrorResume(e -> Mono.just(ResponseEntity
