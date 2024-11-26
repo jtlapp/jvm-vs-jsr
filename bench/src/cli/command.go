@@ -62,6 +62,9 @@ func (c *baseCommand) ParseArgs(postParseHook PostParseHookType) (*config.Comman
 	if err != nil {
 		return nil, err
 	}
+	if flagSet.NArg() > 0 {
+		return nil, NewUsageError("unexpected arguments: %v", flagSet.Args())
+	}
 	if postParseHook != nil {
 		postParseHook(flagSet, flagsUsed)
 	}
@@ -142,7 +145,8 @@ func parseFlagsWithFileDefaults(configFile *string, flagSet *flag.FlagSet, args 
 			if f.Name != fileFlag && !providedAsArg[f.Name] {
 				if val, ok := configFileMap[f.Name]; ok {
 					if err = f.Value.Set(fmt.Sprint(val)); err != nil {
-						fileFlagErr = fmt.Errorf("error setting '%s' from file, using default instead", f.Name)
+						fileFlagErr = fmt.Errorf("error setting '%s' from file", f.Name)
+						return
 					}
 				}
 			}
