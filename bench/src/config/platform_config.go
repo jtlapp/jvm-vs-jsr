@@ -44,3 +44,15 @@ func GetPlatformConfig() (*PlatformConfig, error) {
 		MaxReservedPorts: maxReservedPorts,
 	}, nil
 }
+
+func (pc *PlatformConfig) Print() {
+	fmt.Printf("BaseAppUrl: %s\n", pc.BaseAppUrl)
+	fmt.Printf("AppName: %s\n", pc.AppName)
+	fmt.Printf("AppVersion: %s\n", pc.AppVersion)
+	fmt.Printf("CPUsPerNode: %d\n", pc.CPUsPerNode)
+	fmt.Printf("MaxReservedPorts: %d\n", pc.MaxReservedPorts)
+	fmt.Println("AppConfig:")
+	for key, value := range pc.AppConfig {
+		fmt.Printf("  %s: %v\n", key, value)
+	}
+}

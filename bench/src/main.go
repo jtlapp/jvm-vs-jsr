@@ -15,6 +15,7 @@ import (
 )
 
 var commands = []cli.Command{
+	cmd.ShowAppConfig,
 	cmd.SetupResultsDB,
 	cmd.SetupBackendDB,
 	cmd.LoopDeterminingRates,

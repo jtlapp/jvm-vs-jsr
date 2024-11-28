@@ -1,7 +1,9 @@
 package com.jtlapp.jvmvsjs.springjdbc.controllers;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtlapp.jvmvsjs.jdbcquery.Database;
+import com.jtlapp.jvmvsjs.springjdbc.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,19 +15,28 @@ import java.sql.SQLException;
 @RequestMapping("/api")
 public class ApiController {
 
-    static final String appName = System.getenv("APP_NAME");;
-    static final String appVersion = System.getenv("APP_VERSION");;
+    static final String appName = System.getenv("APP_NAME");
+    static final String appVersion = System.getenv("APP_VERSION");
+    @Autowired
+    public AppConfig appConfig;
+    static final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private Database db;
 
     @GetMapping("/info")
     public ResponseEntity<String> info() {
-        var gson = new JsonObject();
-        gson.addProperty("appName", appName);
-        gson.addProperty("appVersion", appVersion);
-        gson.add("appConfig", new JsonObject());
-        return ResponseEntity.ok(gson.toString());
+        try {
+            var jsonObj = mapper.createObjectNode()
+                    .put("appName", appName)
+                    .put("appVersion", appVersion)
+                    .set("appConfig", appConfig.toJsonNode(mapper));
+            return ResponseEntity.ok(mapper.writeValueAsString(jsonObj));
+        } catch (JsonProcessingException e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(toErrorJson("info", e));
+        }
     }
 
     @GetMapping("/app-sleep")

@@ -9,6 +9,21 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 )
 
+var ShowAppConfig = cli.NewCommand(
+	"app-config",
+	"",
+	"Prints the app's load-relevant configuration.",
+	nil,
+	func(commandConfig config.CommandConfig) error {
+
+		platformConfig, err := config.GetPlatformConfig()
+		if err != nil {
+			return err
+		}
+		platformConfig.Print()
+		return nil
+	})
+
 var SetupBackendDB = cli.NewCommand(
 	"setup-backend",
 	"-scenario=<scenario>",

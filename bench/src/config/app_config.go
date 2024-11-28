@@ -37,24 +37,4 @@ func GetAppInfo(baseAppUrl string) (*AppInfo, error) {
 	}
 
 	return &appInfo, nil
-
-	// TODO: Delete this?
-	// for key, value := range appInfo.AppConfig {
-	// 	switch v := value.(type) {
-	// 	case string:
-	// 		fmt.Printf("%s: (string) %s\n", key, v)
-	// 	case float64:
-	// 		fmt.Printf("%s: (number) %f\n", key, v)
-	// 	case bool:
-	// 		fmt.Printf("%s: (bool) %t\n", key, v)
-	// 	case map[string]interface{}:
-	// 		fmt.Printf("%s: (object) %v\n", key, v)
-	// 	case []interface{}:
-	// 		fmt.Printf("%s: (array) %v\n", key, v)
-	// 	case nil:
-	// 		fmt.Printf("%s: null\n", key)
-	// 	default:
-	// 		fmt.Printf("%s: (unknown type) %v\n", key, v)
-	// 	}
-	// }
 }
