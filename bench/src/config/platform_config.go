@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sort"
 )
 
 const (
@@ -15,7 +16,7 @@ type PlatformConfig struct {
 	BaseAppUrl       string
 	AppName          string
 	AppVersion       string
-	AppConfig        map[string]interface{}
+	AppConfig        AppConfig
 	CPUsPerNode      uint
 	MaxReservedPorts uint
 }
@@ -52,7 +53,17 @@ func (pc *PlatformConfig) Print() {
 	fmt.Printf("CPUsPerNode: %d\n", pc.CPUsPerNode)
 	fmt.Printf("MaxReservedPorts: %d\n", pc.MaxReservedPorts)
 	fmt.Println("AppConfig:")
-	for key, value := range pc.AppConfig {
-		fmt.Printf("  %s: %v\n", key, value)
+	fmt.Println("  server:")
+	printSortedStringMap(pc.AppConfig.Server)
+}
+
+func printSortedStringMap(stringMap map[string]interface{}) {
+	keys := make([]string, 0, len(stringMap))
+	for k := range stringMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Printf("    %s: %v\n", k, stringMap[k])
 	}
 }

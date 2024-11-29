@@ -2,14 +2,28 @@ package com.jtlapp.jvmvsjs.springjdbc.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Configuration that may affect load performance.
+ * Configurations that may affect load performance.
  */
 @Component
 public class AppConfig {
+    @Autowired
+    public ServerConfig server;
+
+    public JsonNode toJsonNode(ObjectMapper mapper) {
+        return mapper.valueToTree(this);
+    }
+}
+
+/**
+ * Configuration relevant to all requests made to the app.
+ */
+@Component
+class ServerConfig {
     public final String jvmVendor = System.getProperty("java.vm.vendor");
     public final String jvmName = System.getProperty("java.vm.name");
     public final String jvmVersion = System.getProperty("java.vm.version");
@@ -25,12 +39,8 @@ public class AppConfig {
     private static final long initialMemoryBytes = Runtime.getRuntime().totalMemory();
     private static final long maxMemoryBytes = Runtime.getRuntime().maxMemory();
 
-    public AppConfig() {
+    public ServerConfig() {
         initialMemoryMB = (int) (initialMemoryBytes / 1024 / 1024);
         maxMemoryMB = (int) (maxMemoryBytes / 1024 / 1024);
-    }
-
-    public JsonNode toJsonNode(ObjectMapper mapper) {
-        return mapper.valueToTree(this);
     }
 }

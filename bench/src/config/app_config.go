@@ -8,9 +8,14 @@ import (
 )
 
 type AppInfo struct {
-	AppName    string                 `json:"appName"`
-	AppVersion string                 `json:"appVersion"`
-	AppConfig  map[string]interface{} `json:"appConfig"`
+	AppName    string    `json:"appName"`
+	AppVersion string    `json:"appVersion"`
+	AppConfig  AppConfig `json:"appConfig"`
+}
+
+type AppConfig struct {
+	Server   map[string]interface{} `json:"server"`
+	DbClient map[string]interface{} `json:"dbclient"`
 }
 
 func GetAppInfo(baseAppUrl string) (*AppInfo, error) {
