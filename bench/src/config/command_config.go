@@ -16,5 +16,5 @@ type CommandConfig struct {
 	MinSecondsBetweenTests   *int
 	LoopCount                *int
 	ResetRandomSeed          *bool
-	SincePeriod              *string
+	TrialCount               *int
 }

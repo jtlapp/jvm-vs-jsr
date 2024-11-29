@@ -2,7 +2,6 @@ package stats
 
 import (
 	"fmt"
-	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/database"
@@ -10,6 +9,8 @@ import (
 )
 
 type RunStats struct {
+	ScenarioName                 string
+	AppKey                       database.AppKey
 	TrialCount                   int
 	RequestsPerSecond            ValueStats
 	SuccessfulCompletesPerSecond ValueStats
@@ -19,29 +20,37 @@ type RunStats struct {
 
 func NewRunStats(
 	resultsDB *database.ResultsDB,
-	startTime time.Time,
-	platformConfig *config.PlatformConfig,
+	appKey *database.AppKey,
 	commandConfig *config.CommandConfig,
+	maxTrials int,
 ) (*RunStats, error) {
 
-	trials, err := resultsDB.GetTrials(startTime, platformConfig, commandConfig)
+	trials, err := resultsDB.GetRecentTrials(appKey, commandConfig, maxTrials)
 	if err != nil {
 		return nil, fmt.Errorf("error getting trials: %v", err)
 	}
 
 	if len(trials) == 0 {
-		return nil, fmt.Errorf("no runs found meeting these criteria")
+		return nil, nil
 	}
 
-	runStats, err := CalculateRunStats(trials)
+	runStats, err := CalculateRunStats(*commandConfig.ScenarioName, appKey, trials)
 	if err != nil {
 		return nil, fmt.Errorf("error calculating run stats: %v", err)
 	}
 	return &runStats, nil
 }
 
-func CalculateRunStats(trials []database.TrialInfo) (RunStats, error) {
-	stats := RunStats{TrialCount: len(trials)}
+func CalculateRunStats(
+	scenarioName string,
+	appKey *database.AppKey,
+	trials []database.TrialInfo,
+) (RunStats, error) {
+	stats := RunStats{
+		ScenarioName: scenarioName,
+		AppKey:       *appKey,
+		TrialCount:   len(trials),
+	}
 
 	// Extract slices for value-based statistics
 	rps := make([]float64, len(trials))
@@ -70,7 +79,9 @@ func CalculateRunStats(trials []database.TrialInfo) (RunStats, error) {
 }
 
 func (rs RunStats) Print() {
-	util.Logf(`Statistics over %d runs:
+	appConfigString, _ := rs.AppKey.AppConfig.ToJsonString()
+
+	util.Logf(`Statistics for %d run(s) of '%s' on %s %s %s:
 
 	Requests Per Second:
 		Avg: %.1f, Median: %.1f, Range: %.1f (%.1f to %.1f), SD: %.1f, CV: %.2f
@@ -86,6 +97,10 @@ func (rs RunStats) Print() {
 		Tail Ratios:
 			Average: %.2fx, Max: %.2fx`,
 		rs.TrialCount,
+		rs.ScenarioName,
+		rs.AppKey.AppName,
+		rs.AppKey.AppVersion,
+		appConfigString,
 		rs.RequestsPerSecond.Average,
 		rs.RequestsPerSecond.Median,
 		rs.RequestsPerSecond.Range,
@@ -110,5 +125,5 @@ func (rs RunStats) Print() {
 		rs.Latency.WorstMean,
 		rs.Latency.AverageTailRatio,
 		rs.Latency.MaxTailRatio)
-	util.Log()
+	util.Log("\n")
 }

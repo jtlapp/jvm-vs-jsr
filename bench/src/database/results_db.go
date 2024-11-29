@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 	"jvm-vs-jsr.jtlapp.com/benchmark/util"
@@ -147,7 +146,7 @@ func (rdb *ResultsDB) CreateRun(
 		*commandConfig.InitialRequestsPerSecond, // $6  - initialRequestsPerSecond
 		*commandConfig.InitialRandomSeed,        // $7  - initialRandomSeed
 		*commandConfig.MaxConnections,           // $8  - maxConnections
-		*commandConfig.WorkerCount,              // $9 - workerCount
+		*commandConfig.WorkerCount,              // $9  - workerCount
 		*commandConfig.CPUsToUse,                // $10 - cpusUsed
 		*commandConfig.DurationSeconds,          // $11 - trialDurationSeconds
 		*commandConfig.RequestTimeoutSeconds,    // $12 - timeoutSeconds
@@ -254,10 +253,46 @@ func (rdb *ResultsDB) SaveTrial(
 	return trialID, nil
 }
 
-func (rdb *ResultsDB) GetTrials(
-	sinceTime time.Time,
-	platformConfig *config.PlatformConfig,
+func (rdb *ResultsDB) GetAppKeys() ([]AppKey, error) {
+	pool, err := rdb.GetPool()
+	if err != nil {
+		return nil, err
+	}
+
+	const query = `
+		SELECT DISTINCT "appName", "appVersion", "appConfig"
+			FROM runs`
+
+	rows, err := pool.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+
+	var appKeys []AppKey
+	for rows.Next() {
+		var appKey AppKey
+		var appConfigBytes []byte
+		err := rows.Scan(
+			&appKey.AppName,
+			&appKey.AppVersion,
+			&appConfigBytes,
+		)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(appConfigBytes, &appKey.AppConfig)
+		if err != nil {
+			return nil, fmt.Errorf("error unmarshaling appConfig: %v", err)
+		}
+		appKeys = append(appKeys, appKey)
+	}
+	return appKeys, nil
+}
+
+func (rdb *ResultsDB) GetRecentTrials(
+	appKey *AppKey,
 	commandConfig *config.CommandConfig,
+	maxTrials int,
 ) ([]TrialInfo, error) {
 	pool, err := rdb.GetPool()
 	if err != nil {
@@ -281,8 +316,7 @@ func (rdb *ResultsDB) GetTrials(
 			t."errorMessages"
 		FROM trials t
 		JOIN runs r ON t.id = r."bestTrialID"
-		WHERE r."createdAt" >= $1
-		  AND r."appName" = $2
+		WHERE r."appName" = $2
 		  AND r."appVersion" = $3
 		  AND r."appConfig" = $4
 		  AND r."scenarioName" = $5
@@ -303,11 +337,13 @@ func (rdb *ResultsDB) GetTrials(
 		query += ` AND r."initialRandomSeed" >= (-1 * $15)`
 	}
 
+	query += ` ORDER BY r."createdAt" DESC LIMIT $1`
+
 	rows, err := pool.Query(context.Background(), query,
-		sinceTime,                             // $1  - createdAt
-		platformConfig.AppName,                // $2  - appName
-		platformConfig.AppVersion,             // $3  - appVersion
-		platformConfig.AppConfig,              // $4  - appConfig
+		maxTrials,                             // $1
+		appKey.AppName,                        // $2  - appName
+		appKey.AppVersion,                     // $3  - appVersion
+		appKey.AppConfig,                      // $4  - appConfig
 		*commandConfig.ScenarioName,           // $5  - scenarioName
 		*commandConfig.MaxConnections,         // $6  - maxConnections
 		*commandConfig.WorkerCount,            // $7  - workerCount

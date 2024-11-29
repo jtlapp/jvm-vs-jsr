@@ -43,3 +43,11 @@ func GetAppInfo(baseAppUrl string) (*AppInfo, error) {
 
 	return &appInfo, nil
 }
+
+func (ac *AppConfig) ToJsonString() (string, error) {
+	bytes, err := json.Marshal(ac)
+	if err != nil {
+		return "", fmt.Errorf("error marshalling app config: %v", err)
+	}
+	return string(bytes), nil
+}

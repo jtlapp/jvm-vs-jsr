@@ -3,9 +3,6 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"strconv"
-	"strings"
-	"time"
 
 	"jvm-vs-jsr.jtlapp.com/benchmark/cli"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
@@ -62,51 +59,45 @@ var SetupResultsDB = cli.NewCommand(
 
 var ShowStatistics = cli.NewCommand(
 	"stats",
-	"-scenario=<scenario> [-since=period[d|h|m]] [<trial-options>]",
+	"-scenario=<scenario> [-count=<num-trials>] [<trial-options>]",
 	"Prints statistics for runs of the given scenario using the given trial "+
-		"options. If -since is provided, prints statistics only for trials "+
-		"completed since the given time duration.",
+		"options. If -count is provided, prints statistics only for the "+
+		"most recent <num-trials> trials.",
 	addStatisticsOptions,
 	func(commandConfig config.CommandConfig) error {
-
-		platformConfig, err := config.GetPlatformConfig()
-		if err != nil {
-			return err
-		}
-
-		var sinceArg = *commandConfig.SincePeriod
-		var sinceDuration time.Duration
-		if strings.HasSuffix(sinceArg, "d") {
-			days, err := strconv.Atoi(strings.TrimSuffix(sinceArg, "d"))
-			if err != nil {
-				return fmt.Errorf("failed to parse 'since' period: %v", err)
-			}
-			sinceDuration = time.Duration(days) * 24 * time.Hour
-		} else {
-			var err error
-			sinceDuration, err = time.ParseDuration(sinceArg)
-			if err != nil {
-				return fmt.Errorf("failed to parse 'since' period: %v", err)
-			}
-		}
-
-		startTime := time.Now().Add(-sinceDuration)
 
 		resultsDB := database.NewResultsDatabase()
 		defer resultsDB.Close()
 
-		runStats, err := stats.NewRunStats(resultsDB, startTime, platformConfig, &commandConfig)
+		appKeys, err := resultsDB.GetAppKeys()
 		if err != nil {
 			return err
 		}
-		util.Log()
-		runStats.Print()
+
+		if len(appKeys) == 0 {
+			fmt.Println("No results found.")
+			return nil
+		}
+
+		resultSetCount := 0
+		for _, appKey := range appKeys {
+			runStats, err := stats.NewRunStats(resultsDB, &appKey, &commandConfig,
+				*commandConfig.TrialCount)
+			if err != nil {
+				return err
+			}
+			if runStats != nil {
+				util.Log()
+				runStats.Print()
+				resultSetCount++
+			}
+		}
 		return nil
 	})
 
 func addStatisticsOptions(commandConfig *config.CommandConfig, flagSet *flag.FlagSet) {
-	commandConfig.SincePeriod = flagSet.String("sincePeriod", "356d",
-		"How far back to look for trials. Suffix with 'd' for days, 'h' for hours, or 'm' for minutes.")
+	commandConfig.TrialCount = flagSet.Int("count", int((^uint(0))>>1),
+		"The number of most recent trials to include in the statistics.")
 	addTrialOptions(commandConfig, flagSet)
 }
 

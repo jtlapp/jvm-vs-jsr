@@ -48,7 +48,6 @@ func (br *BenchmarkRunner) DetermineRate(runCount int, resetRandomSeed bool) (*s
 	}
 
 	randomSeed := int64(*br.commandConfig.InitialRandomSeed)
-	startTime := time.Now()
 
 	for i := 0; i < runCount; i++ {
 		err := br.performRateDetermination(i+1, randomSeed)
@@ -60,7 +59,13 @@ func (br *BenchmarkRunner) DetermineRate(runCount int, resetRandomSeed bool) (*s
 		}
 	}
 
-	return stats.NewRunStats(br.resultsDB, startTime, &br.platformConfig, &br.commandConfig)
+	appKey := database.AppKey{
+		AppName:    br.platformConfig.AppName,
+		AppVersion: br.platformConfig.AppVersion,
+		AppConfig:  br.platformConfig.AppConfig,
+	}
+
+	return stats.NewRunStats(br.resultsDB, &appKey, &br.commandConfig, runCount)
 }
 
 func (br *BenchmarkRunner) TryRate() (metrics *vegeta.Metrics, err error) {
