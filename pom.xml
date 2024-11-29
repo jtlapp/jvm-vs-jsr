@@ -31,6 +31,7 @@
 
     <modules>
         <module>bench</module>
+        <module>lib/java-lib</module>
         <module>lib/jdbc-lib</module>
         <module>lib/r2dbc-lib</module>
         <module>lib/vertx-lib</module>
@@ -100,6 +101,11 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jtlapp.jvmvsjs</groupId>
+                <artifactId>java-lib</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>

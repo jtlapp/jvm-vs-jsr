@@ -32,6 +32,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.jtlapp.jvmvsjs</groupId>
+			<artifactId>java-lib</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.jtlapp.jvmvsjs</groupId>
 			<artifactId>jdbc-lib</artifactId>
 		</dependency>
 	</dependencies>
