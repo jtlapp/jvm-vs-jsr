@@ -1,8 +1,8 @@
 package com.jtlapp.jvmvsjs.joobyvertx.controllers;
 
 import com.google.gson.JsonObject;
-import com.jtlapp.jvmvsjs.vertxquery.Database;
-import com.jtlapp.jvmvsjs.vertxquery.VertxUtil;
+import com.jtlapp.jvmvsjs.vertxlib.Database;
+import com.jtlapp.jvmvsjs.vertxlib.VertxUtil;
 import io.jooby.Context;
 import io.jooby.StatusCode;
 import io.jooby.annotation.*;

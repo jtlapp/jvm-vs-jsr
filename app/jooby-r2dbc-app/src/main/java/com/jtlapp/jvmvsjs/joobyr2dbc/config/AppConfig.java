@@ -1,6 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyr2dbc.config;
 
-import com.jtlapp.jvmvsjs.r2dbcquery.Database;
+import com.jtlapp.jvmvsjs.r2dbclib.Database;
 import io.avaje.inject.Bean;
 import io.avaje.inject.External;
 import io.avaje.inject.Factory;

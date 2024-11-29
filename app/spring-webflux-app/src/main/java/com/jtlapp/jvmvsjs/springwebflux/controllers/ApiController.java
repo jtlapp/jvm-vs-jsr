@@ -1,7 +1,7 @@
 package com.jtlapp.jvmvsjs.springwebflux.controllers;
 
 import com.google.gson.JsonObject;
-import com.jtlapp.jvmvsjs.r2dbcquery.Database;
+import com.jtlapp.jvmvsjs.r2dbclib.Database;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

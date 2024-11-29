@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.vertxquery;
+package com.jtlapp.jvmvsjs.vertxlib;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;

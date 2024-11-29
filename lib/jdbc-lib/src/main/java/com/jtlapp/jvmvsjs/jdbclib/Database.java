@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.jdbcquery;
+package com.jtlapp.jvmvsjs.jdbclib;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

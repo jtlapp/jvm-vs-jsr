@@ -3,7 +3,7 @@ package com.jtlapp.jvmvsjs.springjdbc.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.jtlapp.jvmvsjs.jdbcquery.Database;
+import com.jtlapp.jvmvsjs.jdbclib.Database;
 
 /**
  * Configuration for and provider of the app's dependencies.

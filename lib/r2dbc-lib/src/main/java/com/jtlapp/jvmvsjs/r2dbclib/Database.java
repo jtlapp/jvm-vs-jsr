@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.r2dbcquery;
+package com.jtlapp.jvmvsjs.r2dbclib;
 
 import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;

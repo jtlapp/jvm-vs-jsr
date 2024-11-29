@@ -1,6 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyvertx.config;
 
-import com.jtlapp.jvmvsjs.vertxquery.Database;
+import com.jtlapp.jvmvsjs.vertxlib.Database;
 import io.avaje.inject.Bean;
 import io.avaje.inject.External;
 import io.avaje.inject.Factory;

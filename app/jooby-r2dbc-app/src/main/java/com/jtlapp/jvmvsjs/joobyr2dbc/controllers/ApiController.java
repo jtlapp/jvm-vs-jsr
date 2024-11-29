@@ -1,7 +1,7 @@
 package com.jtlapp.jvmvsjs.joobyr2dbc.controllers;
 
 import com.google.gson.JsonObject;
-import com.jtlapp.jvmvsjs.r2dbcquery.Database;
+import com.jtlapp.jvmvsjs.r2dbclib.Database;
 import io.jooby.Context;
 import io.jooby.annotation.*;
 import jakarta.inject.Inject;
