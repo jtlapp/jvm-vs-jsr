@@ -14,8 +14,10 @@ import (
 )
 
 const (
-	warmupRequestsPerSecond = 100
-	warmupSeconds           = 5
+	warmupRequestsPerSecond  = 100
+	warmupSeconds            = 5
+	firstErrorResponseCode   = 400
+	timeoutErrorResponseCode = 0
 )
 
 type BenchmarkRunner struct {
@@ -206,6 +208,9 @@ func (br *BenchmarkRunner) performRateTrial(
 	for res := range attacker.Attack(targetProvider, rateLimiter, duration, "") {
 		br.logger.Log(res.Code, string(res.Body))
 		metrics.Add(res)
+		if (res.Code == timeoutErrorResponseCode || res.Code >= firstErrorResponseCode) {
+			attacker.Stop()
+		}
 	}
 	attacker.Stop()
 	metrics.Close()
