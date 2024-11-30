@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.springjdbc.config;
+package com.jtlapp.jvmvsjs.springasync.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

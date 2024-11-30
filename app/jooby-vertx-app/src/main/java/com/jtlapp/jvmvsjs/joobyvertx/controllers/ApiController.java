@@ -21,8 +21,7 @@ public class ApiController {
 
     static final String appName = System.getenv("APP_NAME");;
     static final String appVersion = System.getenv("APP_VERSION");;
-
-    ObjectMapper objectMapper = new ObjectMapper();
+    static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Inject
     ScheduledExecutorService scheduler;

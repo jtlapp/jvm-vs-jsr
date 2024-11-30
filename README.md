@@ -47,9 +47,6 @@ or recommendations. I'll benchmark each of the following scenarios:
     - non-blocking API
     - JDBC
   - Reactive IO (Netty)
-    - R2DBC only (to establish need for WebFlux) [APP]
-      - non-blocking API
-      - postgres
     - WebFlux/R2DBC [APP]
       - non-blocking API
       - postgres

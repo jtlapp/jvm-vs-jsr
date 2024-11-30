@@ -27,8 +27,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
+            <groupId>com.jtlapp.jvmvsjs</groupId>
+            <artifactId>java-lib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jtlapp.jvmvsjs</groupId>
+            <artifactId>tomcat-lib</artifactId>
         </dependency>
     </dependencies>
 

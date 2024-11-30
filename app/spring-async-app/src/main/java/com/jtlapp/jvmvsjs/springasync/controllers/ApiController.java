@@ -1,6 +1,7 @@
 package com.jtlapp.jvmvsjs.springasync.controllers;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jtlapp.jvmvsjs.springasync.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,17 +15,21 @@ public class ApiController {
 
     static final String appName = System.getenv("APP_NAME");
     static final String appVersion = System.getenv("APP_VERSION");
+    static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private ScheduledExecutorService scheduler;
 
+    @Autowired
+    private AppConfig appConfig;
+
     @GetMapping("/info")
     public CompletableFuture<String> info() {
-        var gson = new JsonObject();
-        gson.addProperty("appName", appName);
-        gson.addProperty("appVersion", appVersion);
-        gson.add("appConfig", new JsonObject());
-        return CompletableFuture.completedFuture(gson.toString());
+        var jsonObj = objectMapper.createObjectNode()
+                .put("appName", appName)
+                .put("appVersion", appVersion)
+                .set("appConfig", appConfig.toJsonNode(objectMapper));
+        return CompletableFuture.completedFuture(jsonObj.toString());
     }
 
     @GetMapping("/app-sleep")

@@ -17,9 +17,10 @@ public class ApiController {
 
     static final String appName = System.getenv("APP_NAME");
     static final String appVersion = System.getenv("APP_VERSION");
+    static final ObjectMapper objectMapper = new ObjectMapper();
+
     @Autowired
     public AppConfig appConfig;
-    static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private Database db;
