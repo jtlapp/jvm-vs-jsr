@@ -3,10 +3,12 @@ package com.jtlapp.jvmvsjs.joobyr2dbc.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtlapp.jvmvsjs.joobylib.JoobyServerConfig;
+import io.avaje.inject.Component;
 
 /**
  * Configurations that may affect load performance.
  */
+@Component
 public class AppConfig {
     public JoobyServerConfig server = new JoobyServerConfig();
 

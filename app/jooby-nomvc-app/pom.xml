@@ -15,7 +15,7 @@
     <artifactId>jooby-nomvc-app</artifactId>
 
     <properties>
-        <application.class>com.jtlapp.jvmvsjs.joobynomvc.JoobyNoMVCApp</application.class>
+        <application.class>com.jtlapp.jvmvsjs.jooby.JoobyApp</application.class>
     </properties>
 
     <dependencies>

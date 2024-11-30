@@ -1,5 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyvertx;
 
+import com.jtlapp.jvmvsjs.joobyvertx.config.AppConfig;
 import com.jtlapp.jvmvsjs.joobyvertx.controllers.ApiController;
 import com.jtlapp.jvmvsjs.joobyvertx.controllers.HomeController;
 import io.avaje.inject.Factory;
@@ -22,13 +23,14 @@ public class JoobyVertxApp extends Jooby {
     @Inject
     ScheduledExecutorService scheduler;
 
+    @Inject
+    AppConfig appConfig;
+
     {
         install(AvajeInjectModule.of());
-        install(new NettyServer().setOptions(
-                new ServerOptions()
-                        .setIoThreads(Runtime.getRuntime().availableProcessors() + 1)
-                        .setWorkerThreads(Runtime.getRuntime().availableProcessors() + 1)
-        ));
+        var server = new NettyServer();
+        appConfig.server.setOptions(server);
+        install(server);
 
         use(ReactiveSupport.concurrent());
 

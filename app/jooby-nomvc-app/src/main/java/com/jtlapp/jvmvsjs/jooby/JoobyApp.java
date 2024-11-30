@@ -1,7 +1,7 @@
-package com.jtlapp.jvmvsjs.joobynomvc;
+package com.jtlapp.jvmvsjs.jooby;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jtlapp.jvmvsjs.joobynomvc.config.AppConfig;
+import com.jtlapp.jvmvsjs.jooby.config.AppConfig;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
 import io.jooby.ReactiveSupport;
@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class JoobyNoMVCApp extends Jooby {
+public class JoobyApp extends Jooby {
     public final String appName = System.getenv("APP_NAME");
     public final String appVersion = System.getenv("APP_VERSION");
     public final AppConfig appConfig = new AppConfig();
@@ -47,21 +47,10 @@ public class JoobyNoMVCApp extends Jooby {
             return future;
         });
 
-        post("/api/echoText", ctx -> {
-            var body = ctx.body(String.class);
-            return CompletableFuture.completedFuture(body);
-        });
-
-        post("/api/echoJackson", ctx -> {
-            var body = ctx.body(String.class);
-            var jackson = objectMapper.readTree(body);
-            return CompletableFuture.completedFuture(jackson.toString());
-        });
-
         onStop(scheduler::shutdown);
     }
 
     public static void main(final String[] args) {
-        runApp(args, ExecutionMode.EVENT_LOOP, JoobyNoMVCApp::new);
+        runApp(args, ExecutionMode.EVENT_LOOP, JoobyApp::new);
     }
 }

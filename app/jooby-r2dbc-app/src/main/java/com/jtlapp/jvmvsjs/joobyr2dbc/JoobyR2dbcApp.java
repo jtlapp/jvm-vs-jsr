@@ -1,5 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyr2dbc;
 
+import com.jtlapp.jvmvsjs.joobyr2dbc.config.AppConfig;
 import com.jtlapp.jvmvsjs.joobyr2dbc.controllers.ApiController;
 import com.jtlapp.jvmvsjs.joobyr2dbc.controllers.HomeController;
 import io.avaje.inject.Factory;
@@ -26,13 +27,14 @@ public class JoobyR2dbcApp extends Jooby {
     @Inject
     ScheduledExecutorService scheduler;
 
+    @Inject
+    AppConfig appConfig;
+
     {
         install(AvajeInjectModule.of());
-        install(new NettyServer().setOptions(
-                new ServerOptions()
-                        .setIoThreads(Runtime.getRuntime().availableProcessors() + 1)
-                        .setWorkerThreads(Runtime.getRuntime().availableProcessors() + 1)
-        ));
+        var server = new NettyServer();
+        appConfig.server.setOptions(server);
+        install(server);
 
         use(ReactiveSupport.concurrent());
         use(Reactor.reactor());
