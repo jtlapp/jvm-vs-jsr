@@ -14,16 +14,10 @@ public class AppConfig {
     @Autowired
     public ServerConfig server;
 
+    @Autowired
+    public R2dbcConfig dbclient;
+
     public JsonNode toJsonNode(ObjectMapper mapper) {
         return mapper.valueToTree(this);
-    }
-}
-
-// Netty doesn't appear to be much configurable within Spring Boot.
-
-@Component
-class ServerConfig extends CommonServerConfig {
-    ServerConfig() {
-        super("Netty");
     }
 }
