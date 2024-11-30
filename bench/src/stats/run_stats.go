@@ -14,7 +14,6 @@ type RunStats struct {
 	TrialCount                   int
 	RequestsPerSecond            ValueStats
 	SuccessfulCompletesPerSecond ValueStats
-	SuccessRate                  ValueStats
 	Latency                      LatencyStats
 }
 
@@ -55,18 +54,15 @@ func CalculateRunStats(
 	// Extract slices for value-based statistics
 	rps := make([]float64, len(trials))
 	successfulRPS := make([]float64, len(trials))
-	successRate := make([]float64, len(trials))
 
 	for i, trial := range trials {
 		rps[i] = trial.RequestsPerSecond
 		successfulRPS[i] = trial.SuccessfulCompletesPerSecond
-		successRate[i] = trial.PercentSuccesfullyCompleting
 	}
 
 	// Calculate value-based statistics
 	stats.RequestsPerSecond = CalculateValueStats(rps)
 	stats.SuccessfulCompletesPerSecond = CalculateValueStats(successfulRPS)
-	stats.SuccessRate = CalculateValueStats(successRate)
 
 	// Calculate latency statistics
 	latencyStats, err := CalculateLatencyStats(trials)

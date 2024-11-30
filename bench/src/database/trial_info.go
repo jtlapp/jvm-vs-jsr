@@ -11,7 +11,6 @@ import (
 type TrialInfo struct {
 	RandomSeed                   int64
 	RequestsPerSecond            float64
-	PercentSuccesfullyCompleting float64
 	SuccessfulCompletesPerSecond float64
 	TotalRequests                uint64
 	MeanLatency                  string
@@ -35,10 +34,12 @@ func NewTrialInfo(metrics *vegeta.Metrics, randomSeed int64) (*TrialInfo, error)
 		return nil, fmt.Errorf("failed to marshal status codes: %w", err)
 	}
 
+	// Don't store `metrics.Success` (percent successfully completed requests) because
+	// trials terminate on the first error, making this value always very close to 1.
+
 	return &TrialInfo{
 		RandomSeed:                   randomSeed,
 		RequestsPerSecond:            metrics.Rate,
-		PercentSuccesfullyCompleting: metrics.Success,
 		SuccessfulCompletesPerSecond: metrics.Throughput,
 		TotalRequests:                metrics.Requests,
 		MeanLatency:                  metrics.Latencies.Mean.String(),

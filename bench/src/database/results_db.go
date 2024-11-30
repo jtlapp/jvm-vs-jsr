@@ -44,7 +44,6 @@ const schemaSQL = `
 		"runID" INTEGER NOT NULL,
 		"randomSeed" INTEGER NOT NULL,
 		"requestsPerSecond" DOUBLE PRECISION NOT NULL,
-		"percentSuccesfullyCompleting" DOUBLE PRECISION NOT NULL,
 		"successfulCompletesPerSecond" DOUBLE PRECISION NOT NULL,
 		"totalRequests" INTEGER NOT NULL,
 		"meanLatency" VARCHAR NOT NULL,
@@ -202,7 +201,6 @@ func (rdb *ResultsDB) SaveTrial(
 			"runID",
 			"randomSeed",
 			"requestsPerSecond",
-			"percentSuccesfullyCompleting",
 			"successfulCompletesPerSecond",
 			"totalRequests",
 			"meanLatency",
@@ -220,7 +218,7 @@ func (rdb *ResultsDB) SaveTrial(
 			"remainingFDsInUse"
 		) VALUES (
 			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-			$11, $12, $13, $14, $15, $16, $17, $18, $19
+			$11, $12, $13, $14, $15, $16, $17, $18
 		)
 		RETURNING id`
 
@@ -229,22 +227,21 @@ func (rdb *ResultsDB) SaveTrial(
 		runID,                                  // $1
 		trialInfo.RandomSeed,                   // $2
 		trialInfo.RequestsPerSecond,            // $3
-		trialInfo.PercentSuccesfullyCompleting, // $4
-		trialInfo.SuccessfulCompletesPerSecond, // $5
-		trialInfo.TotalRequests,                // $6
-		trialInfo.MeanLatency,                  // $7
-		trialInfo.MaxLatency,                   // $8
-		trialInfo.Latency50thPercentile,        // $9
-		trialInfo.Latency95thPercentile,        // $10
-		trialInfo.Latency99thPercentile,        // $11
-		trialInfo.Histogram,                    // $12
-		trialInfo.StatusCodes,                  // $13
-		trialInfo.ErrorMessages,                // $14
-		resources.TotalAvailablePorts,          // $15
-		resources.TotalFileDescriptors,         // $16
-		resources.EstablishedPortsCount,        // $17
-		resources.TimeWaitPortsCount,           // $18
-		resources.FDsInUseCount,                // $19
+		trialInfo.SuccessfulCompletesPerSecond, // $4
+		trialInfo.TotalRequests,                // $5
+		trialInfo.MeanLatency,                  // $6
+		trialInfo.MaxLatency,                   // $7
+		trialInfo.Latency50thPercentile,        // $8
+		trialInfo.Latency95thPercentile,        // $9
+		trialInfo.Latency99thPercentile,        // $10
+		trialInfo.Histogram,                    // $11
+		trialInfo.StatusCodes,                  // $12
+		trialInfo.ErrorMessages,                // $13
+		resources.TotalAvailablePorts,          // $14
+		resources.TotalFileDescriptors,         // $15
+		resources.EstablishedPortsCount,        // $16
+		resources.TimeWaitPortsCount,           // $17
+		resources.FDsInUseCount,                // $18
 	).Scan(&trialID)
 
 	if err != nil {
@@ -303,7 +300,6 @@ func (rdb *ResultsDB) GetRecentTrials(
 		SELECT
 			t."randomSeed",
 			t."requestsPerSecond",
-			t."percentSuccesfullyCompleting",
 			t."successfulCompletesPerSecond",
 			t."totalRequests",
 			t."meanLatency",
@@ -348,7 +344,7 @@ func (rdb *ResultsDB) GetRecentTrials(
 		*commandConfig.MaxConnections,         // $6  - maxConnections
 		*commandConfig.WorkerCount,            // $7  - workerCount
 		*commandConfig.CPUsToUse,              // $8  - cpusUsed
-		*commandConfig.DurationSeconds,        // $9 - trialDurationSeconds
+		*commandConfig.DurationSeconds,        // $9  - trialDurationSeconds
 		*commandConfig.RequestTimeoutSeconds,  // $10 - timeoutSeconds
 		*commandConfig.MinSecondsBetweenTests, // $11 - minWaitSeconds
 		*commandConfig.LongSleepMillis,        // $12 - longSleepMillis
@@ -366,7 +362,6 @@ func (rdb *ResultsDB) GetRecentTrials(
 		err := rows.Scan(
 			&trial.RandomSeed,
 			&trial.RequestsPerSecond,
-			&trial.PercentSuccesfullyCompleting,
 			&trial.SuccessfulCompletesPerSecond,
 			&trial.TotalRequests,
 			&trial.MeanLatency,

@@ -158,7 +158,7 @@ func (br *BenchmarkRunner) performRateDetermination(iteration int, randomSeed in
 		}
 		printTestStatus(metrics)
 
-		if metrics.Success < 1 || metrics.Throughput < lowerBoundMetrics.Throughput {
+		if len(metrics.Errors) > 0 || metrics.Throughput < lowerBoundMetrics.Throughput {
 			requestRateUpperBound = currentRequestRate
 			nextRequestRate = (requestRateLowerBound + requestRateUpperBound) / 2
 		} else {
@@ -268,14 +268,16 @@ func printTestStatus(metrics *vegeta.Metrics) {
 	establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
 		resourceStatus.GetPercentages()
 
-	errorMessages := strings.Join(metrics.Errors, ", ")
-	if errorMessages == "" {
-		errorMessages = "(none)"
+	statusMessage := "100% successful"
+	errorMessages := "(none)"
+	if len(metrics.Errors) > 0 {
+		statusMessage = "Errored"
+		errorMessages = strings.Join(metrics.Errors, ", ")
 	}
 
 	util.Logf(
-		"  %.1f%% successful (%.1f req/s): issued %.1f req/s, %d%% ports active, %d%% ports waiting, %d%% FDs, errors: %s",
-		metrics.Success*100,
+		"  %s (%.1f req/s): issued %.1f req/s, %d%% ports active, %d%% ports waiting, %d%% FDs, errors: %s",
+		statusMessage,
 		metrics.Throughput,
 		metrics.Rate,
 		uint(establishedPortsPercent+.5),
