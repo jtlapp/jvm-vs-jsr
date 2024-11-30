@@ -1,7 +1,8 @@
 package com.jtlapp.jvmvsjs.springwebflux.controllers;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtlapp.jvmvsjs.r2dbclib.Database;
+import com.jtlapp.jvmvsjs.springwebflux.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,20 +18,24 @@ public class ApiController {
 
     static final String appName = System.getenv("APP_NAME");;
     static final String appVersion = System.getenv("APP_VERSION");;
+    static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private ScheduledExecutorService scheduler;
+
+    @Autowired
+    private AppConfig appConfig;
 
     @Autowired
     private Database db;
 
     @GetMapping("/info")
     public Mono<String> info() {
-        var gson = new JsonObject();
-        gson.addProperty("appName", appName);
-        gson.addProperty("appVersion", appVersion);
-        gson.add("appConfig", new JsonObject());
-        return Mono.just(gson.toString());
+        var jsonObj = objectMapper.createObjectNode()
+                .put("appName", appName)
+                .put("appVersion", appVersion)
+                .set("appConfig", appConfig.toJsonNode(objectMapper));
+        return Mono.just(jsonObj.toString());
     }
 
     @GetMapping("/app-sleep")
