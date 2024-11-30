@@ -28,7 +28,7 @@ const schemaSQL = `
 		"minWaitSeconds" INTEGER NOT NULL,
 		"longSleepMillis" INTEGER,
 		"shortSleepMillis" INTEGER,
-		"percentLongRequests" INTEGER,
+		"percentLongRequests" DOUBLE PRECISION,
 		"totalRunDurationSeconds" INTEGER NOT NULL,
 		"bestTrialID" INTEGER
     );

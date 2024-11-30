@@ -208,7 +208,7 @@ func (br *BenchmarkRunner) performRateTrial(
 	for res := range attacker.Attack(targetProvider, rateLimiter, duration, "") {
 		br.logger.Log(res.Code, string(res.Body))
 		metrics.Add(res)
-		if (res.Code == timeoutErrorResponseCode || res.Code >= firstErrorResponseCode) {
+		if res.Code == timeoutErrorResponseCode || res.Code >= firstErrorResponseCode {
 			attacker.Stop()
 		}
 	}

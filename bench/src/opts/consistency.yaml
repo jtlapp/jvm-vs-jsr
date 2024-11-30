@@ -7,5 +7,5 @@ seed: 123456
 runCount: 10
 resetSeedBetweenTests: true
 longSleepMillis: 400
-shortSleepMillis: 100
-percentLongRequests: 20
+shortSleepMillis: 50
+percentLongRequests: 12.5

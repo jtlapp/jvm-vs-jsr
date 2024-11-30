@@ -5,7 +5,7 @@ type CommandConfig struct {
 	ScenarioName             *string
 	LongSleepMillis          *int
 	ShortSleepMillis         *int
-	PercentLongRequests      *int
+	PercentLongRequests      *float64
 	CPUsToUse                *int
 	WorkerCount              *int
 	MaxConnections           *int

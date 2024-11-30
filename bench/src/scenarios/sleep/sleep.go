@@ -42,7 +42,7 @@ func (s *SleepScenario) GetTargetProvider(
 
 	return func(target *vegeta.Target) error {
 		var sleepDuration int
-		if randGen.Intn(100) < *config.PercentLongRequests {
+		if randGen.Float64()*100 < *config.PercentLongRequests {
 			sleepDuration = *config.LongSleepMillis
 		} else {
 			sleepDuration = *config.ShortSleepMillis
