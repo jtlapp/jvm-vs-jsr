@@ -117,7 +117,7 @@ func performRuns(
 }
 
 func addLoopOptions(config *config.CommandConfig, flagSet *flag.FlagSet) {
-	config.LoopCount = flagSet.Int("runCount", 8,
+	config.LoopCount = flagSet.Int("runCount", 10,
 		"Number of times to run the rate determination benchmark")
 
 	config.ResetRandomSeed = flagSet.Bool("resetSeedBetweenTests", false,

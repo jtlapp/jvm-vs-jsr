@@ -4,7 +4,7 @@ initialRequestsPerSecond: 500
 testDurationSeconds: 180
 requestTimeoutSeconds: 5
 seed: 123456
-runCount: 8
+runCount: 10
 resetSeedBetweenTests: true
 longSleepMillis: 400
 shortSleepMillis: 100
