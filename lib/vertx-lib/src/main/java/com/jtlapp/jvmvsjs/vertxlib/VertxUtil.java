@@ -1,7 +1,7 @@
 package com.jtlapp.jvmvsjs.vertxlib;
 
 import io.vertx.core.Future;
-        import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 
 public class VertxUtil {
 

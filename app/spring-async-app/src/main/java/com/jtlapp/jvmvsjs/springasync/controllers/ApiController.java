@@ -1,6 +1,5 @@
 package com.jtlapp.jvmvsjs.springasync.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

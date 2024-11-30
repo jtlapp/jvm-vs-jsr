@@ -1,7 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyvertx.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonObject;
 import com.jtlapp.jvmvsjs.joobyvertx.config.AppConfig;
 import com.jtlapp.jvmvsjs.vertxlib.Database;
 import com.jtlapp.jvmvsjs.vertxlib.VertxUtil;

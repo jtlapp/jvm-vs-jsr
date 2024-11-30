@@ -1,7 +1,6 @@
 package com.jtlapp.jvmvsjs.joobyr2dbc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonObject;
 import com.jtlapp.jvmvsjs.joobyr2dbc.config.AppConfig;
 import com.jtlapp.jvmvsjs.r2dbclib.Database;
 import io.jooby.Context;
