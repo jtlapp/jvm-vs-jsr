@@ -14,6 +14,9 @@ public class AppConfig {
     @Autowired
     public TomcatServerConfig server;
 
+    @Autowired
+    public JdbcConfig dbclient;
+
     public JsonNode toJsonNode(ObjectMapper mapper) {
         return mapper.valueToTree(this);
     }

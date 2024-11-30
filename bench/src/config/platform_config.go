@@ -47,14 +47,21 @@ func GetPlatformConfig() (*PlatformConfig, error) {
 }
 
 func (pc *PlatformConfig) Print() {
+	fmt.Println()
+
 	fmt.Printf("BaseAppUrl: %s\n", pc.BaseAppUrl)
 	fmt.Printf("AppName: %s\n", pc.AppName)
 	fmt.Printf("AppVersion: %s\n", pc.AppVersion)
 	fmt.Printf("CPUsPerNode: %d\n", pc.CPUsPerNode)
 	fmt.Printf("MaxReservedPorts: %d\n", pc.MaxReservedPorts)
+	fmt.Println()
+
 	fmt.Println("AppConfig:")
 	fmt.Println("  server:")
 	printSortedStringMap(pc.AppConfig.Server)
+	fmt.Println("  dbclient:")
+	printSortedStringMap(pc.AppConfig.DbClient)
+	fmt.Println()
 }
 
 func printSortedStringMap(stringMap map[string]interface{}) {
