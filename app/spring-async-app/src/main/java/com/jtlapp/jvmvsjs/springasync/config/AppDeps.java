@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration
-public class AppConfig {
+public class AppDeps {
 
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {
