@@ -14,6 +14,7 @@
         <spring.boot.version>3.3.4</spring.boot.version>
         <jooby.version>3.4.1</jooby.version>
         <jooby.avaje.inject.version>3.3.1</jooby.avaje.inject.version>
+        <jooby.netty.version>3.5.4</jooby.netty.version>
 
         <postgresql.version>42.7.4</postgresql.version>
         <r2dbc.postgresql.version>1.0.5.RELEASE</r2dbc.postgresql.version>
@@ -33,6 +34,7 @@
         <module>bench</module>
         <module>lib/java-lib</module>
         <module>lib/jdbc-lib</module>
+        <module>lib/jooby-lib</module>
         <module>lib/r2dbc-lib</module>
         <module>lib/vertx-lib</module>
         <module>app/spring-async-app</module>
@@ -78,6 +80,11 @@
                 <version>${jooby.avaje.inject.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.jooby</groupId>
+                <artifactId>jooby-netty</artifactId>
+                <version>${jooby.netty.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>r2dbc-postgresql</artifactId>
                 <version>${r2dbc.postgresql.version}</version>
@@ -110,6 +117,11 @@
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>
                 <artifactId>jdbc-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jtlapp.jvmvsjs</groupId>
+                <artifactId>jooby-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

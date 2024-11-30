@@ -1,12 +1,10 @@
 package com.jtlapp.jvmvsjs.joobynomvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.jtlapp.jvmvsjs.joobynomvc.config.AppConfig;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
 import io.jooby.ReactiveSupport;
-import io.jooby.ServerOptions;
 import io.jooby.netty.NettyServer;
 
 import java.util.concurrent.CompletableFuture;
@@ -16,27 +14,26 @@ import java.util.concurrent.TimeUnit;
 public class JoobyNoMVCApp extends Jooby {
     public final String appName = System.getenv("APP_NAME");
     public final String appVersion = System.getenv("APP_VERSION");
+    public final AppConfig appConfig = new AppConfig();
 
     {
         var scheduler = Executors.newScheduledThreadPool(1);
         var objectMapper = new ObjectMapper();
 
-        install(new NettyServer().setOptions(
-                new ServerOptions()
-                        .setIoThreads(Runtime.getRuntime().availableProcessors() + 1)
-                        .setWorkerThreads(Runtime.getRuntime().availableProcessors() + 1)
-        ));
+        var server = new NettyServer();
+        appConfig.server.setOptions(server);
+        install(server);
 
         use(ReactiveSupport.concurrent());
 
         get("/", ctx -> "Running Jooby without MVC\n");
 
         get("/api/info", ctx -> {
-            var gson = new JsonObject();
-            gson.addProperty("appName", appName);
-            gson.addProperty("appVersion", appVersion);
-            gson.add("appConfig", new JsonObject());
-            return CompletableFuture.completedFuture(gson.toString());
+            var jsonObj = objectMapper.createObjectNode()
+                    .put("appName", appName)
+                    .put("appVersion", appVersion)
+                    .set("appConfig", appConfig.toJsonNode(objectMapper));
+            return CompletableFuture.completedFuture(jsonObj.toString());
         });
 
         get("/api/app-sleep", ctx -> {
@@ -53,12 +50,6 @@ public class JoobyNoMVCApp extends Jooby {
         post("/api/echoText", ctx -> {
             var body = ctx.body(String.class);
             return CompletableFuture.completedFuture(body);
-        });
-
-        post("/api/echoGson", ctx -> {
-            var body = ctx.body(String.class);
-            var gson = JsonParser.parseString(body).getAsJsonObject();
-            return CompletableFuture.completedFuture(gson.toString());
         });
 
         post("/api/echoJackson", ctx -> {

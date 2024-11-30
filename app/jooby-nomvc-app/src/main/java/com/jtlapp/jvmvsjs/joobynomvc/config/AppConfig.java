@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.joobyvertx.config;
+package com.jtlapp.jvmvsjs.joobynomvc.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

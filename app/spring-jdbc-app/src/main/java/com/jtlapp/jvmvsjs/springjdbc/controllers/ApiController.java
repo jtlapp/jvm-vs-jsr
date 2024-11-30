@@ -19,7 +19,7 @@ public class ApiController {
     static final String appVersion = System.getenv("APP_VERSION");
     @Autowired
     public AppConfig appConfig;
-    static final ObjectMapper mapper = new ObjectMapper();
+    static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private Database db;
@@ -27,11 +27,11 @@ public class ApiController {
     @GetMapping("/info")
     public ResponseEntity<String> info() {
         try {
-            var jsonObj = mapper.createObjectNode()
+            var jsonObj = objectMapper.createObjectNode()
                     .put("appName", appName)
                     .put("appVersion", appVersion)
-                    .set("appConfig", appConfig.toJsonNode(mapper));
-            return ResponseEntity.ok(mapper.writeValueAsString(jsonObj));
+                    .set("appConfig", appConfig.toJsonNode(objectMapper));
+            return ResponseEntity.ok(objectMapper.writeValueAsString(jsonObj));
         } catch (JsonProcessingException e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)

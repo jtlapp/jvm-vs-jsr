@@ -31,4 +31,10 @@ class ServerConfig extends CommonServerConfig {
     public int maxWebServerThreads; // Tomcat defaults to 200
     @Value("${server.tomcat.max-connections}")
     public int maxWebServerConns; // Tomcat defaults to 10000
+    @Value("${server.compression.enabled}")
+    public boolean responseCompression; // defaults to false
+
+    ServerConfig() {
+        super("Tomcat");
+    }
 }

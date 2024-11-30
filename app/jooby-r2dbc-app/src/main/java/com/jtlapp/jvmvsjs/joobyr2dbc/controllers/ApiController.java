@@ -1,6 +1,8 @@
 package com.jtlapp.jvmvsjs.joobyr2dbc.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
+import com.jtlapp.jvmvsjs.joobyr2dbc.config.AppConfig;
 import com.jtlapp.jvmvsjs.r2dbclib.Database;
 import io.jooby.Context;
 import io.jooby.annotation.*;
@@ -16,22 +18,25 @@ import java.util.concurrent.TimeUnit;
 @Path("/api")
 public class ApiController {
 
-    static final String appName = System.getenv("APP_NAME");;
-    static final String appVersion = System.getenv("APP_VERSION");;
+    static final String appName = System.getenv("APP_NAME");
+    static final String appVersion = System.getenv("APP_VERSION");
+
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Inject
     ScheduledExecutorService scheduler;
-
+    @Inject
+    AppConfig appConfig;
     @Inject
     Database db;
 
     @GET("/info")
     public CompletableFuture<String> info() {
-        var gson = new JsonObject();
-        gson.addProperty("appName", appName);
-        gson.addProperty("appVersion", appVersion);
-        gson.add("appConfig", new JsonObject());
-        return CompletableFuture.completedFuture(gson.toString());
+        var jsonObj = objectMapper.createObjectNode()
+                .put("appName", appName)
+                .put("appVersion", appVersion)
+                .set("appConfig", appConfig.toJsonNode(objectMapper));
+        return CompletableFuture.completedFuture(jsonObj.toString());
     }
 
     @GET("/app-sleep")

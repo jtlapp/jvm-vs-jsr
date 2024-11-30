@@ -21,8 +21,16 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.jtlapp.jvmvsjs</groupId>
+      <artifactId>java-lib</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.jooby</groupId>
       <artifactId>jooby-netty</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.jtlapp.jvmvsjs</groupId>
+      <artifactId>jooby-lib</artifactId>
     </dependency>
     <dependency>
       <groupId>io.jooby</groupId>

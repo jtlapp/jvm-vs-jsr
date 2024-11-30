@@ -1,6 +1,8 @@
 package com.jtlapp.jvmvsjs.joobyvertx.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
+import com.jtlapp.jvmvsjs.joobyvertx.config.AppConfig;
 import com.jtlapp.jvmvsjs.vertxlib.Database;
 import com.jtlapp.jvmvsjs.vertxlib.VertxUtil;
 import io.jooby.Context;
@@ -21,19 +23,22 @@ public class ApiController {
     static final String appName = System.getenv("APP_NAME");;
     static final String appVersion = System.getenv("APP_VERSION");;
 
+    ObjectMapper objectMapper = new ObjectMapper();
+
     @Inject
     ScheduledExecutorService scheduler;
-
+    @Inject
+    AppConfig appConfig;
     @Inject
     Database db;
 
     @GET("/info")
     public CompletableFuture<String> info() {
-        var gson = new JsonObject();
-        gson.addProperty("appName", appName);
-        gson.addProperty("appVersion", appVersion);
-        gson.add("appConfig", new JsonObject());
-        return CompletableFuture.completedFuture(gson.toString());
+        var jsonObj = objectMapper.createObjectNode()
+                .put("appName", appName)
+                .put("appVersion", appVersion)
+                .set("appConfig", appConfig.toJsonNode(objectMapper));
+        return CompletableFuture.completedFuture(jsonObj.toString());
     }
 
     @GET("/app-sleep")
