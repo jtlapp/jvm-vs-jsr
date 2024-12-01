@@ -12,7 +12,6 @@ import io.jooby.jetty.JettyServer;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.concurrent.Executors;
 
 public class JoobyJdbcApp extends Jooby {
     public final String appName = System.getenv("APP_NAME");
@@ -22,7 +21,6 @@ public class JoobyJdbcApp extends Jooby {
     private final Database db = createDatabase();
 
     {
-        var scheduler = Executors.newScheduledThreadPool(1);
         var objectMapper = new ObjectMapper();
         var server = new JettyServer();
 
@@ -61,8 +59,6 @@ public class JoobyJdbcApp extends Jooby {
                         toErrorJson("pg-sleep", e));
             }
         });
-
-        onStop(scheduler::shutdown);
     }
 
     private Database createDatabase() {
