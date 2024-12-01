@@ -57,9 +57,9 @@ releases:
 
   # application group
 
-  - name: jooby-nomvc-app
+  - name: jooby-jdbc-app
     chart: charts/generic-app
-    installed: {{ .Values | getOrNil "jooby-nomvc-app_installed" | default false }}
+    installed: {{ .Values | getOrNil "jooby-jdbc-app_installed" | default false }}
     labels:
       appGroup: "true"
     values:

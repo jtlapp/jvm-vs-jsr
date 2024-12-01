@@ -12,7 +12,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>jooby-nomvc-app</artifactId>
+    <artifactId>jooby-jdbc-app</artifactId>
 
     <properties>
         <application.class>com.jtlapp.jvmvsjs.joobyjdbc.JoobyJdbcApp</application.class>
