@@ -14,11 +14,7 @@ public class Database {
 
         jdbcProperties.setProperty("user", username);
         jdbcProperties.setProperty("password", password);
-
-        // TODO: what caching should I do with pgbouncer?
         jdbcProperties.setProperty("prepareThreshold", "1");
-        jdbcProperties.setProperty("preparedStatementCacheQueries", "25");
-        jdbcProperties.setProperty("preparedStatementCacheSizeMiB", "1");
     }
 
     public Connection openConnection() throws SQLException {

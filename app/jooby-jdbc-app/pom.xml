@@ -15,7 +15,7 @@
     <artifactId>jooby-nomvc-app</artifactId>
 
     <properties>
-        <application.class>com.jtlapp.jvmvsjs.jooby.JoobyApp</application.class>
+        <application.class>com.jtlapp.jvmvsjs.joobyjdbc.JoobyJdbcApp</application.class>
     </properties>
 
     <dependencies>
@@ -28,12 +28,20 @@
             <artifactId>java-lib</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.jtlapp.jvmvsjs</groupId>
+            <artifactId>jdbc-lib</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.jooby</groupId>
-            <artifactId>jooby-netty</artifactId>
+            <artifactId>jooby-jetty</artifactId>
         </dependency>
         <dependency>
             <groupId>com.jtlapp.jvmvsjs</groupId>
             <artifactId>jooby-lib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jooby</groupId>
+            <artifactId>jooby-hikari</artifactId>
         </dependency>
     </dependencies>
 

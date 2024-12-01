@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * Configuration relevant to all Spring Tomcat apps.
  */
 @Component
-public class TomcatServerConfig extends CommonServerConfig {
+public class ServerConfig extends CommonServerConfig {
     @Value("${server.tomcat.threads.min-spare}")
     public int minWebServerThreads; // Tomcat defaults to 10
     @Value("${server.tomcat.threads.max}")
@@ -18,7 +18,7 @@ public class TomcatServerConfig extends CommonServerConfig {
     @Value("${server.compression.enabled}")
     public boolean responseCompression; // defaults to false
 
-    public TomcatServerConfig() {
+    public ServerConfig() {
         super("Tomcat");
     }
 }

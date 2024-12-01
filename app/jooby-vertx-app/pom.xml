@@ -33,11 +33,6 @@
             <artifactId>jooby-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.jooby</groupId>
-            <artifactId>jooby-avaje-inject</artifactId>
-            <version>${jooby.avaje.inject.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.jtlapp.jvmvsjs</groupId>
             <artifactId>vertx-lib</artifactId>
         </dependency>
@@ -61,18 +56,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>io.jooby</groupId>
-                            <artifactId>jooby-apt</artifactId>
-                            <version>${jooby.version}</version>
-                        </path>
-                        <path>
-                            <groupId>io.avaje</groupId>
-                            <artifactId>avaje-inject-generator</artifactId>
-                            <version>${ajave.inject.generator.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
                     <compilerArgs>
                         <compilerArg>
                             -Ajooby.debug=false
