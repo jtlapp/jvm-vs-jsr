@@ -61,8 +61,11 @@ public class JoobyR2dbcApp extends Jooby {
             int millis = ctx.query("millis").intValue(0);
             return db.issueSleepQuery(millis)
                     .map(result -> "{}")
-                    .onErrorResume(e -> Mono.just(toErrorJson("pg-sleep", e)));
-//                    .toFuture();
+                    .onErrorResume(e -> {
+                        System.out.println(e);
+                        return Mono.just(toErrorJson("pg-sleep", e));
+                    })
+                    .toFuture();
         });
 
         onStop(scheduler::shutdown);

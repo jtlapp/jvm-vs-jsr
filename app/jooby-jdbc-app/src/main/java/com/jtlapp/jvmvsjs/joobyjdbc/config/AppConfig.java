@@ -17,10 +17,10 @@ public class AppConfig {
 
     public final ServerConfig server =
             new ServerConfig("Jetty", ioThreadCount, workerThreadCount);
-    public final JdbcConfig dbclient;
+    public final HikariConfig dbclient;
 
     public AppConfig(DataSource dataSource) {
-        dbclient = new JdbcConfig(dataSource);
+        dbclient = new HikariConfig(dataSource);
     }
 
     public JsonNode toJsonNode(ObjectMapper mapper) {

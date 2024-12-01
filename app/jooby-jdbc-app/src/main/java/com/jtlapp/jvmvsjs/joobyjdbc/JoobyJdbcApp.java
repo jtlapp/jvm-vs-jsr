@@ -24,9 +24,9 @@ public class JoobyJdbcApp extends Jooby {
         var objectMapper = new ObjectMapper();
         var server = new JettyServer();
 
-        install(new HikariModule());
         var dataSource = require(DataSource.class);
         appConfig = new AppConfig(dataSource);
+        install(new HikariModule());
 
         appConfig.server.setOptions(server);
         install(server);
