@@ -27,7 +27,6 @@ public class JoobyR2dbcApp extends Jooby {
     private final Database db = createDatabase();
 
     {
-        var scheduler = Executors.newScheduledThreadPool(1);
         var objectMapper = new ObjectMapper();
         var server = new NettyServer();
 
@@ -66,8 +65,6 @@ public class JoobyR2dbcApp extends Jooby {
                                     toErrorJson("pg-sleep", e))
                     );
         });
-
-        onStop(scheduler::shutdown);
     }
 
     private Database createDatabase() {

@@ -3,13 +3,11 @@ package com.jtlapp.jvmvsjs.joobyvertx;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtlapp.jvmvsjs.joobyvertx.config.AppConfig;
 import com.jtlapp.jvmvsjs.vertxlib.Database;
-import com.jtlapp.jvmvsjs.vertxlib.VertxUtil;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
 import io.jooby.ReactiveSupport;
 import io.jooby.StatusCode;
 import io.jooby.netty.NettyServer;
-import io.vertx.core.Future;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
@@ -47,25 +45,24 @@ public class JoobyVertxApp extends Jooby {
 
         get("/api/app-sleep", ctx -> {
             int millis = ctx.query("millis").intValue(0);
-            var future = new CompletableFuture<String>();
 
             scheduler.schedule(() -> {
-                future.complete("{}");
+                ctx.send("{}");
             }, millis, TimeUnit.MILLISECONDS);
 
-            return future;
-        });
+            return ctx;
+        }).setNonBlocking(true);
 
         get("/api/pg-sleep", ctx -> {
             int millis = ctx.query("millis").intValue(0);
-            var vertxFuture = db.issueSleepQuery(millis)
-                    .map(result -> "{}")
-                    .recover(e -> {
+            db.issueSleepQuery(millis)
+                    .andThen(result -> ctx.send("{}"))
+                    .onFailure(e -> {
                         ctx.setResponseCode(StatusCode.SERVER_ERROR);
-                        return Future.succeededFuture(toErrorJson("pg-sleep", e));
+                        ctx.send(toErrorJson("pg-sleep", e));
                     });
-            return VertxUtil.toCompletableFuture(vertxFuture);
-        });
+            return ctx;
+        }).setNonBlocking(true);
 
         onStop(scheduler::shutdown);
     }
