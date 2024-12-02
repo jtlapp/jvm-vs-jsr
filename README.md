@@ -4,6 +4,12 @@ Benchmarks comparing JVM and JS Runtime concurrency frameworks.
 
 **CURRENTLY UNDER DEVELOPMENT**
 
+## Purpose
+
+To acquire a definitive understanding of how the throughput of I/O-bound work on Java virtual 
+threads compares with Java kernel threads, Java reactive frameworks, and JavaScript runtime 
+platforms (e.g. Node.js).
+
 ## Introduction
 
 When Node.js first came out, people were astonished that it could provide better throughput than 
@@ -12,32 +18,43 @@ issue in Java, but I had trouble finding apples-to-apples comparisons of how wel
 perform relative to Node.js. TechEmpower [provides benchmarks](https://www.techempower.
 com/benchmarks),
 but I found it difficult to understand the commonalities and differences between any two
-implementations. The present repo is my effort to determine which of the two platforms 
-are better for I/O-bound work.
+implementations. The present repo is an effort to get a definitive sense of how throughput compares 
+on these platforms for I/O-bound work.
 
-My objective is to select a high performance platform for REST API microservices. Go would be an 
+I'll be collecting throughput metrics for non-blocking APIs and for APIs that hit a backend
+Postgres database. I'll be considering the
+database clients JDBC (including HikariCP), R2DBC, and the Vert.x PG client.
+
+I ended up writing an unexpected amount of Go client code for this project, but there are no
+unit tests because I don't plan to maintain the repo after making my decision.
+
+## Motivation
+
+I plan to select a high performance platform for REST API microservices. Go would be an 
 obvious choice for the programming language, but I have not been happy with Go. I've narrowed the
 language down to one of TypeScript, Java, and Kotlin.
 
-I want to use a well-supported batteries-included web server framework. For Java and Kotlin, I 
-plan to evaluate Spring Boot, Quarkus, and Micronaut. I'll be evaluating them with kernel 
-threads, with virtual threads, and with reactive I/O. I also plan to evaluate the virtual-thread-only framework Helidon. I'll also be investigating GraalVM.
-
-For TypeScript, I plan to evaluate Nest.js and probably also tsoa, running them on Node.js, Deno,
-and Bun. I'll also be looking at improving throughput with worker threads.
-
-I'll be collecting throughput metrics for non-blocking APIs and for APIs that hit a backend 
-Postgres database. I'll be considering the 
-database clients JDBC, R2DBC, and the Vert.x PG client.
-
-I ended up writing an unexpected amount of Go client code for this project, but there are no 
-unit tests because I don't plan to maintain the repo after making my decision.
+Because Java does not support async/await or coroutines, Most of Java's reactive solutions require 
+future chaining, which complicates both programming and debugging. This suggests to me that, 
+regardless of throughput performance, in the end I'll be selecting Java virtual threads, 
+Kotlin coroutines, or a JavaScript runtime. I want to know which of these performs best.
 
 ## The Plan
 
-There are too many combinations of the above configurations to test all of them, so I need to be 
-strategic about proceeding. We can limit the use of Tomcat and Netty according to requirements
-or recommendations. I'll benchmark each of the following scenarios:
+The first goal is to compare bare-metal Java solutions to bare-metal JavaScript runtime 
+solutions to learn the best possible throughput available. Fastify seems like a 
+reasonable bare-bones approach to testing on a JavaScript runtime, while Jooby seems like a 
+reasonable bare-bones approach for the JVM, given that Jooby code can be written in an
+Express.js-like fashion. I also want to compare these results to Spring Boot, which seems like a 
+necessary baseline for comparing the performance of Java frameworks.
+
+After that I'll start exploring other frameworks. I'm only interested in well-supported 
+batteries-included frameworks, which seem to be Spring Boot, Quarkus, and Micronaut. (I'm only 
+using Jooby for bare-bones testing.) There are too many combinations of possible configurations 
+to test all of them, so I need to be strategic We can limit the use of Tomcat and Netty 
+according to requirements or recommendations.
+
+Here are the combinations I'm considering for the second step:
 
 - Spring Boot
   - Kernel threads (Tomcat) [APP]
@@ -94,7 +111,8 @@ or recommendations. I'll benchmark each of the following scenarios:
 
 The "[APP]" notation indicates that the combination represents a distinct application.
 
-After establishing the most performant JVM and JS runtime scenarios, I'll explore improving them with GraalVM and worker threads, and I'll look at simplifying reactive code with Kotlin.
+After establishing the most performant JVM and JS runtime scenarios, I'll explore improving them
+with GraalVM and worker threads, and I'll look at simplifying reactive code with Kotlin.
 
 ## Installation and Setup
 
@@ -144,13 +162,15 @@ Create your cluster and configure `kubectl` to use it. Then:
 mvn clean install
 ./bin/deploy database
 ./bin/deploy client
-./bin/deploy spring-jdbc-kernel # or another app
+./bin/deploy spring-jdbc-kernel-app # or another app
 ```
 
 The `deploy` command deploys or redeploys. In the case of apps, it replaces the currently 
 deployed app (if any) with the named app.
 
 ## Running Benchmarks
+
+**TODO: Obsolete/rewrite**
 
 1. Exec into the client pod using bash: `kubectl exec -it <client-pod> -- bash`.
 2. Run `./benchmark setup <scenario>` to set up the scenario of the given name.
@@ -168,5 +188,5 @@ output assists with debugging newly added applications.
 ```bash
 ./bin/undeploy database
 ./bin/undeploy client
-./bin/undeploy spring-jdbc-kernel # or another app
+./bin/undeploy spring-jdbc-kernel-app # or another app
 ```
