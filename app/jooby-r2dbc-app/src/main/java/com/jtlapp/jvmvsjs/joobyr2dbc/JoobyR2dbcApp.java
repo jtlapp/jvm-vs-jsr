@@ -10,11 +10,11 @@ import io.jooby.reactor.Reactor;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import org.springframework.r2dbc.core.DatabaseClient;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 
@@ -49,13 +49,12 @@ public class JoobyR2dbcApp extends Jooby {
 
         get("/api/app-sleep", ctx -> {
             int millis = ctx.query("millis").intValue(0);
-            var future = new CompletableFuture<String>();
-
-            scheduler.schedule(() -> {
-                future.complete("{}");
-            }, millis, TimeUnit.MILLISECONDS);
-
-            return future;
+            return Mono.delay(Duration.ofMillis(millis))
+                    .thenReturn("{}")
+                    .onErrorMap(e ->
+                            new StatusCodeException(StatusCode.SERVER_ERROR,
+                                    toErrorJson("app-sleep", e))
+                    );
         });
 
         get("/api/pg-sleep", ctx -> {
