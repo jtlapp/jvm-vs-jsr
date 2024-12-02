@@ -12,10 +12,7 @@
         <maven.compiler.target>21</maven.compiler.target>
 
         <spring.boot.version>3.3.4</spring.boot.version>
-        <jooby.version>3.4.1</jooby.version>
-        <jooby.hikari.version>3.5.4</jooby.hikari.version>
-        <jooby.jetty.version>3.5.4</jooby.jetty.version>
-        <jooby.netty.version>3.5.4</jooby.netty.version>
+        <jooby.version>3.5.4</jooby.version>
 
         <postgresql.version>42.7.4</postgresql.version>
         <r2dbc.postgresql.version>1.0.5.RELEASE</r2dbc.postgresql.version>
@@ -79,17 +76,17 @@
             <dependency>
                 <groupId>io.jooby</groupId>
                 <artifactId>jooby-jetty</artifactId>
-                <version>${jooby.jetty.version}</version>
+                <version>${jooby.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.jooby</groupId>
                 <artifactId>jooby-netty</artifactId>
-                <version>${jooby.netty.version}</version>
+                <version>${jooby.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.jooby</groupId>
                 <artifactId>jooby-hikari</artifactId>
-                <version>${jooby.hikari.version}</version>
+                <version>${jooby.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>

@@ -9,10 +9,10 @@ import (
 	"jvm-vs-jsr.jtlapp.com/benchmark/scenarios"
 )
 
-var ShowAppConfig = cli.NewCommand(
-	"app-config",
+var ShowAppInfo = cli.NewCommand(
+	"app-info",
 	"",
-	"Prints the app's load-relevant configuration.",
+	"Prints information about the app, including its load-related configuration.",
 	nil,
 	func(commandConfig config.CommandConfig) error {
 

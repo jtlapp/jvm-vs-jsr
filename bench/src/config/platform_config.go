@@ -49,17 +49,17 @@ func GetPlatformConfig() (*PlatformConfig, error) {
 func (pc *PlatformConfig) Print() {
 	fmt.Println()
 
-	fmt.Printf("BaseAppUrl: %s\n", pc.BaseAppUrl)
-	fmt.Printf("AppName: %s\n", pc.AppName)
-	fmt.Printf("AppVersion: %s\n", pc.AppVersion)
-	fmt.Printf("CPUsPerNode: %d\n", pc.CPUsPerNode)
-	fmt.Printf("MaxReservedPorts: %d\n", pc.MaxReservedPorts)
+	fmt.Printf("  BaseAppUrl: %s\n", pc.BaseAppUrl)
+	fmt.Printf("  AppName: %s\n", pc.AppName)
+	fmt.Printf("  AppVersion: %s\n", pc.AppVersion)
+	fmt.Printf("  CPUsPerNode: %d\n", pc.CPUsPerNode)
+	fmt.Printf("  MaxReservedPorts: %d\n", pc.MaxReservedPorts)
 	fmt.Println()
 
-	fmt.Println("AppConfig:")
-	fmt.Println("  server:")
+	fmt.Println("  AppConfig:")
+	fmt.Println("    server:")
 	printSortedStringMap(pc.AppConfig.Server)
-	fmt.Println("  dbclient:")
+	fmt.Println("    dbclient:")
 	printSortedStringMap(pc.AppConfig.DbClient)
 	fmt.Println()
 }
@@ -71,6 +71,6 @@ func printSortedStringMap(stringMap map[string]interface{}) {
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		fmt.Printf("    %s: %v\n", k, stringMap[k])
+		fmt.Printf("      %s: %v\n", k, stringMap[k])
 	}
 }

@@ -3,14 +3,13 @@ package com.jtlapp.jvmvsjs.joobyr2dbc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtlapp.jvmvsjs.joobyr2dbc.config.AppConfig;
 import com.jtlapp.jvmvsjs.r2dbclib.Database;
-import io.jooby.ExecutionMode;
-import io.jooby.Jooby;
-import io.jooby.ReactiveSupport;
+import io.jooby.*;
+import io.jooby.exception.StatusCodeException;
 import io.jooby.netty.NettyServer;
+import io.jooby.reactor.Reactor;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import org.springframework.r2dbc.core.DatabaseClient;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -20,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 
 public class JoobyR2dbcApp extends Jooby {
+
     public final String appName = System.getenv("APP_NAME");
     public final String appVersion = System.getenv("APP_VERSION");
 
@@ -35,6 +35,7 @@ public class JoobyR2dbcApp extends Jooby {
         install(server);
 
         use(ReactiveSupport.concurrent());
+        use(Reactor.reactor());
 
         get("/", ctx -> "Running Jooby with Netty and R2DBC\n");
 
@@ -60,12 +61,11 @@ public class JoobyR2dbcApp extends Jooby {
         get("/api/pg-sleep", ctx -> {
             int millis = ctx.query("millis").intValue(0);
             return db.issueSleepQuery(millis)
-                    .map(result -> "{}")
-                    .onErrorResume(e -> {
-                        System.out.println(e);
-                        return Mono.just(toErrorJson("pg-sleep", e));
-                    })
-                    .toFuture();
+                    .thenReturn("{}")
+                    .onErrorMap(e ->
+                            new StatusCodeException(StatusCode.SERVER_ERROR,
+                                    toErrorJson("pg-sleep", e))
+                    );
         });
 
         onStop(scheduler::shutdown);
