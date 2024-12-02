@@ -1,6 +1,8 @@
 env:
   - name: SERVER_PORT
     value: "{{ .Values.global.app.port }}"
+  - name: DATABASE_URL
+    value: "{{ .Values.global.backend.pgbouncer.host }}"
   - name: DATABASE_HOST_NAME
     value: "{{ .Values.global.backend.pgbouncer.hostName }}"
   - name: DATABASE_PORT

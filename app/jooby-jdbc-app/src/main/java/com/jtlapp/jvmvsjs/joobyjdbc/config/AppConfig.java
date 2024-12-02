@@ -13,7 +13,7 @@ public class AppConfig {
     private static final int ioThreadCount = Integer.parseInt(
             System.getProperty("jooby.jetty.ioThreadCount", "200"));
     private static final int workerThreadCount = Integer.parseInt(
-            System.getProperty("jooby.jetty.workerThreadCount", "200"));
+            System.getProperty("jooby.jetty.workerThreadCount", "206"));
 
     public final ServerConfig server =
             new ServerConfig("Jetty", ioThreadCount, workerThreadCount);

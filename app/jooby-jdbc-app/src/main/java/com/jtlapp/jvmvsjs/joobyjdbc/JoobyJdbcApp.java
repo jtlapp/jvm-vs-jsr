@@ -2,7 +2,8 @@ package com.jtlapp.jvmvsjs.joobyjdbc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtlapp.jvmvsjs.joobyjdbc.config.AppConfig;
-import com.jtlapp.jvmvsjs.jdbclib.Database;
+import com.jtlapp.jvmvsjs.hikarilib.Database;
+import com.zaxxer.hikari.HikariConfig;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
 import io.jooby.StatusCode;
@@ -18,16 +19,19 @@ public class JoobyJdbcApp extends Jooby {
     public final String appVersion = System.getenv("APP_VERSION");
 
     private final AppConfig appConfig;
-    private final Database db = createDatabase();
+    private final Database db;
 
     {
         var objectMapper = new ObjectMapper();
-        var server = new JettyServer();
 
+        // HikariCP uses JDBC under the hood.
+        var hikariConfig = createHikariConfig();
+        install(new HikariModule(hikariConfig));
         var dataSource = require(DataSource.class);
+        db = new Database(dataSource);
         appConfig = new AppConfig(dataSource);
-        install(new HikariModule());
 
+        var server = new JettyServer();
         appConfig.server.setOptions(server);
         install(server);
 
@@ -50,6 +54,7 @@ public class JoobyJdbcApp extends Jooby {
         get("/api/pg-sleep", ctx -> {
             int millis = ctx.query("millis").intValue(0);
             try {
+                // TODO: Do I need to close this connection, here and elsewhere?
                 var conn = db.openConnection();
                 Database.issueSleepQuery(conn, millis);
                 return "{}";
@@ -61,10 +66,12 @@ public class JoobyJdbcApp extends Jooby {
         });
     }
 
-    private Database createDatabase() {
-        return new Database(System.getenv("DATABASE_HOST_NAME"),
-                System.getenv("DATABASE_USERNAME"),
-                System.getenv("DATABASE_PASSWORD"));
+    private HikariConfig createHikariConfig() {
+        var config = new HikariConfig();
+        config.setJdbcUrl("jdbc:" + System.getenv("DATABASE_URL"));
+        config.setUsername(System.getenv("DATABASE_USERNAME"));
+        config.setPassword(System.getenv("DATABASE_PASSWORD"));
+        return config;
     }
 
     private String toErrorJson(String endpoint, Throwable e) {

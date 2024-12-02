@@ -1,9 +1,0 @@
-env:
-  - name: SERVER_PORT
-    value: "{{ .Values.global.app.port }}"
-  - name: DB_URL
-    value: "{{ .Values.global.backend.pgbouncer.host }}"
-  - name: DB_USER
-    value: "{{ .Values.global.backend.database.username }}"
-  - name: DB_PASSWORD
-    value: "{{ .Values.global.backend.database.password }}"
