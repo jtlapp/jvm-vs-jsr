@@ -4,13 +4,13 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
 
-class HikariConfig {
+class JdbcConfig {
 
     public final int maxPoolSize;
     public final int minIdleConnections;
     public final long connectionTimeout;
 
-    HikariConfig(DataSource dataSource) {
+    JdbcConfig(DataSource dataSource) {
         var hikariDS = (HikariDataSource) dataSource;
 
         maxPoolSize = hikariDS.getMaximumPoolSize();

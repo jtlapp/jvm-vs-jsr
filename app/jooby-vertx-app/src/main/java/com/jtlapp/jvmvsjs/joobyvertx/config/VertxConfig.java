@@ -1,11 +1,14 @@
 package com.jtlapp.jvmvsjs.joobyvertx.config;
 
+import com.jtlapp.jvmvsjs.javalib.AppProperties;
+
 public class VertxConfig {
     public final int maxPoolSize = Integer.parseInt(
-            System.getProperty("vertx.maxPoolSize", "20"));
+            AppProperties.get("vertx.maxPoolSize"));
 
     public final int maxWaitQueueSize = Integer.parseInt(
-            System.getProperty("vertx.maxWaitQueueSize", "1000"));
+            AppProperties.get("vertx.maxWaitQueueSize"));
+    
     public final int connectionTimeout = Integer.parseInt(
-            System.getProperty("vertx.connectionTimeout", "60000"));
+            AppProperties.get("vertx.connectionTimeout"));
 }

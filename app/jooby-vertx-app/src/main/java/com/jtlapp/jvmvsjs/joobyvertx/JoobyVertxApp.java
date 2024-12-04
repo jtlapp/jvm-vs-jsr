@@ -1,6 +1,7 @@
 package com.jtlapp.jvmvsjs.joobyvertx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jtlapp.jvmvsjs.javalib.AppProperties;
 import com.jtlapp.jvmvsjs.joobyvertx.config.AppConfig;
 import com.jtlapp.jvmvsjs.vertxlib.Database;
 import io.jooby.ExecutionMode;
@@ -24,6 +25,7 @@ public class JoobyVertxApp extends Jooby {
     private final Database db = createDatabase();
 
     {
+        AppProperties.init(JoobyVertxApp.class.getClassLoader());
         var scheduler = Executors.newScheduledThreadPool(1);
         var objectMapper = new ObjectMapper();
         var server = new NettyServer();

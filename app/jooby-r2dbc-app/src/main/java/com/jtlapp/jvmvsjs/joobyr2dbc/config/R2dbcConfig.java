@@ -1,10 +1,12 @@
 package com.jtlapp.jvmvsjs.joobyr2dbc.config;
 
+import com.jtlapp.jvmvsjs.javalib.AppProperties;
+
 public class R2dbcConfig {
     public final int maximumPoolSize = Integer.parseInt(
-            System.getProperty("hikari.maximumPoolSize", "10"));
+            AppProperties.get("jooby.hikari.maximumPoolSize"));
     public final int minimumIdle = Integer.parseInt(
-            System.getProperty("hikari.minimumIdle", String.valueOf(maximumPoolSize)));
+            AppProperties.get("jooby.hikari.minimumIdle"));
     public final int connectionTimeout = Integer.parseInt(
-            System.getProperty("jooby.r2dbc.connect-timeout-seconds", "1800"));
+            AppProperties.get("jooby.r2dbc.connect-timeout-seconds"));
 }

@@ -1,6 +1,7 @@
 package com.jtlapp.jvmvsjs.joobyr2dbc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jtlapp.jvmvsjs.javalib.AppProperties;
 import com.jtlapp.jvmvsjs.joobyr2dbc.config.AppConfig;
 import com.jtlapp.jvmvsjs.r2dbclib.Database;
 import io.jooby.*;
@@ -27,6 +28,7 @@ public class JoobyR2dbcApp extends Jooby {
     private final Database db = createDatabase();
 
     {
+        AppProperties.init(JoobyR2dbcApp.class.getClassLoader());
         var objectMapper = new ObjectMapper();
         var server = new NettyServer();
 

@@ -2,6 +2,7 @@ package com.jtlapp.jvmvsjs.joobyjdbc.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jtlapp.jvmvsjs.javalib.AppProperties;
 import com.jtlapp.jvmvsjs.joobylib.ServerConfig;
 
 import javax.sql.DataSource;
@@ -11,16 +12,16 @@ import javax.sql.DataSource;
  */
 public class AppConfig {
     private static final int ioThreadCount = Integer.parseInt(
-            System.getProperty("jooby.jetty.ioThreadCount", "200"));
+            AppProperties.get("jooby.jetty.ioThreadCount"));
     private static final int workerThreadCount = Integer.parseInt(
-            System.getProperty("jooby.jetty.workerThreadCount", "206"));
+            AppProperties.get("jooby.jetty.workerThreadCount"));
 
     public final ServerConfig server =
             new ServerConfig("Jetty", ioThreadCount, workerThreadCount);
-    public final HikariConfig dbclient;
+    public final JdbcConfig dbclient;
 
     public AppConfig(DataSource dataSource) {
-        dbclient = new HikariConfig(dataSource);
+        dbclient = new JdbcConfig(dataSource);
     }
 
     public JsonNode toJsonNode(ObjectMapper mapper) {

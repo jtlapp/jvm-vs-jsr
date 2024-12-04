@@ -1,9 +1,11 @@
 package com.jtlapp.jvmvsjs.joobyjdbc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jtlapp.jvmvsjs.javalib.AppProperties;
 import com.jtlapp.jvmvsjs.joobyjdbc.config.AppConfig;
 import com.jtlapp.jvmvsjs.hikarilib.Database;
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
 import io.jooby.StatusCode;
@@ -11,7 +13,6 @@ import io.jooby.exception.StatusCodeException;
 import io.jooby.hikari.HikariModule;
 import io.jooby.jetty.JettyServer;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 
 public class JoobyJdbcApp extends Jooby {
@@ -22,12 +23,12 @@ public class JoobyJdbcApp extends Jooby {
     private final Database db;
 
     {
+        AppProperties.init(JoobyJdbcApp.class.getClassLoader());
         var objectMapper = new ObjectMapper();
 
         // HikariCP uses JDBC under the hood.
-        var hikariConfig = createHikariConfig();
-        install(new HikariModule(hikariConfig));
-        var dataSource = require(DataSource.class);
+        var dataSource = createDataSource();
+        install(new HikariModule(dataSource));
         db = new Database(dataSource);
         appConfig = new AppConfig(dataSource);
 
@@ -66,12 +67,23 @@ public class JoobyJdbcApp extends Jooby {
         });
     }
 
-    private HikariConfig createHikariConfig() {
+    private HikariDataSource createDataSource() {
+        var maximumPoolSize = Integer.parseInt(
+                AppProperties.get("jooby.hikari.maximumPoolSize"));
+        var minimumIdle = Integer.parseInt(
+                AppProperties.get("jooby.hikari.minimumIdle"));
+        var connectionTimeoutMillis = Integer.parseInt(
+                AppProperties.get("jooby.hikari.connectionTimeout"));
+
         var config = new HikariConfig();
         config.setJdbcUrl("jdbc:" + System.getenv("DATABASE_URL"));
         config.setUsername(System.getenv("DATABASE_USERNAME"));
         config.setPassword(System.getenv("DATABASE_PASSWORD"));
-        return config;
+        config.setMaximumPoolSize(maximumPoolSize);
+        config.setMinimumIdle(minimumIdle);
+        config.setConnectionTimeout(connectionTimeoutMillis);
+
+        return new HikariDataSource(config);
     }
 
     private String toErrorJson(String endpoint, Throwable e) {
