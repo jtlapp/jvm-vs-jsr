@@ -134,7 +134,7 @@ func (br *BenchmarkRunner) performRateDetermination(iteration int, randomSeed in
 	var lowerBoundMetrics vegeta.Metrics
 	currentRequestRate := -1
 	nextRequestRate := requestRateUpperBound
-	var bestTrialID int
+	bestTrialID := 0
 	var metrics *vegeta.Metrics
 	startTime := time.Now()
 
@@ -175,6 +175,10 @@ func (br *BenchmarkRunner) performRateDetermination(iteration int, randomSeed in
 	}
 
 	totalDurationSeconds := int(time.Since(startTime).Seconds())
+
+	if bestTrialID == 0 {
+		return fmt.Errorf("something's not right: no successful trials")
+	}
 	err = br.resultsDB.UpdateRun(runID, totalDurationSeconds, bestTrialID)
 	if err != nil {
 		return fmt.Errorf("error updating multi-trial run: %v", err)

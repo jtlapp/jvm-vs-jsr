@@ -8,7 +8,7 @@ public class VertxConfig {
 
     public final int maxWaitQueueSize = Integer.parseInt(
             AppProperties.get("vertx.maxWaitQueueSize"));
-    
+
     public final int connectionTimeout = Integer.parseInt(
             AppProperties.get("vertx.connectionTimeout"));
 }
