@@ -54,8 +54,7 @@ public class ApiController {
 
     @GetMapping("/pg-sleep")
     public ResponseEntity<String> pgSleep(@RequestParam("millis") int millis) {
-        try {
-            var conn = db.openConnection();
+        try(var conn = db.openConnection()) {
             Database.issueSleepQuery(conn, millis);
             return ResponseEntity.ok("{}");
         }

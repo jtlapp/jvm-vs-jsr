@@ -54,9 +54,7 @@ public class JoobyJdbcApp extends Jooby {
 
         get("/api/pg-sleep", ctx -> {
             int millis = ctx.query("millis").intValue(0);
-            try {
-                // TODO: Do I need to close this connection, here and elsewhere?
-                var conn = db.openConnection();
+            try(var conn = db.openConnection()) {
                 Database.issueSleepQuery(conn, millis);
                 return "{}";
             }
