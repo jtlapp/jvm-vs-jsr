@@ -90,6 +90,9 @@ global:
     dockerImagePrefix: <your-docker-image-prefix>
 ```
 
+If your cluster does not automatically provision persistent volumes, you'll also need to create 
+a volume called `client-postgres-volume`.
+
 Note: I found cross-platform building using `buildx` too unreliable to use,
 perhaps because of the dependency on calling `docker buildx create --use`.
 The client image therefore builds only for `amd64`.
