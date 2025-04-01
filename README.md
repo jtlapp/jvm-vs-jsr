@@ -75,8 +75,8 @@ Install kubectl, helm, and helmfile, and configure kubectl for your cluster.
 
 Run `helmfile init` to further install the Helm "diff" and "secrets" plugins.
 
-Set the docker hostname image prefix in the following environment variable, including a trailing
-`/` if the prefix is non-empty. Set to the empty string if you're only using local images:
+Set the docker hostname image prefix in the following environment variable, excluding any trailing
++`/`:
 
 ```bash
 export DOCKER_IMAGE_PREFIX=<your-docker-image-prefix>
