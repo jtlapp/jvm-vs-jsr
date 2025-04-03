@@ -5,7 +5,11 @@ CHART_NAME=$1
 
 push_image() {
     local image=$1
-    docker push $DOCKER_IMAGE_PREFIX/$image
+    if kubectl config current-context | grep -q "kind"; then
+        kind load docker-image $DOCKER_IMAGE_PREFIX/$image
+    else
+        docker push $DOCKER_IMAGE_PREFIX/$image
+    fi
 }
 
 cd helm

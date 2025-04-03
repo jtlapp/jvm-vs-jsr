@@ -7,8 +7,8 @@ temp/
 
 benchmark
 
-# Chart secrets
-charts/values-secret.yaml
+charts/values-local.yaml
+client-pv/
 
 # Compiled class file
 *.class

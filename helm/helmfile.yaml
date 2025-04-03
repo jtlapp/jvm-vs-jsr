@@ -25,7 +25,7 @@ releases:
       clientGroup: "true"
     values:
       - charts/global-values.yaml
-      - charts/values-secret.yaml
+      - charts/values-local.yaml
 
   - name: prometheus
     chart: prometheus-community/prometheus
@@ -64,7 +64,7 @@ releases:
       appGroup: "true"
     values:
       - appVersion: "0.1.0"
-      - charts/values-secret.yaml
+      - charts/values-local.yaml
       - charts/global-values.yaml
       - env-vars/generic-env-vars.yaml.gotmpl
 
@@ -75,7 +75,7 @@ releases:
       appGroup: "true"
     values:
       - appVersion: "0.1.0"
-      - charts/values-secret.yaml
+      - charts/values-local.yaml
       - charts/global-values.yaml
       - env-vars/generic-env-vars.yaml.gotmpl
 
@@ -86,7 +86,7 @@ releases:
       appGroup: "true"
     values:
       - appVersion: "0.1.0"
-      - charts/values-secret.yaml
+      - charts/values-local.yaml
       - charts/global-values.yaml
       - env-vars/generic-env-vars.yaml.gotmpl
 
@@ -97,7 +97,7 @@ releases:
       appGroup: "true"
     values:
       - appVersion: "0.1.0"
-      - charts/values-secret.yaml
+      - charts/values-local.yaml
       - charts/global-values.yaml
 
   - name: spring-jdbc-kernel-app
@@ -107,7 +107,7 @@ releases:
       appGroup: "true"
     values:
       - appVersion: "0.1.0"
-      - charts/values-secret.yaml
+      - charts/values-local.yaml
       - charts/global-values.yaml
       - spring:
           threads:
@@ -122,7 +122,7 @@ releases:
       appGroup: "true"
     values:
       - appVersion: "0.1.0"
-      - charts/values-secret.yaml
+      - charts/values-local.yaml
       - charts/global-values.yaml
       - spring:
           threads:
@@ -138,5 +138,5 @@ releases:
     values:
       - appVersion: "0.1.0"
       - charts/global-values.yaml
-      - charts/values-secret.yaml
+      - charts/values-local.yaml
       - env-vars/spring-r2dbc-env-vars.yaml.gotmpl
