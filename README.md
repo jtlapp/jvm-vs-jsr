@@ -71,7 +71,7 @@ unimpeded by waiting on a third tier.
 
 ## Installation and Setup
 
-Install kubectl, helm, and helmfile, and configure kubectl for your cluster.
+Install kubectl, helm, helmfile, and kind, and configure kubectl for your cluster.
 
 Run `helmfile init` to further install the Helm "diff" plugins.
 
