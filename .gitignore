@@ -7,7 +7,6 @@ temp/
 
 benchmark
 
-charts/values-local.yaml
 client-pv/
 
 # Compiled class file

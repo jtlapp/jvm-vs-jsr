@@ -35,7 +35,7 @@
                                 <argument>--platform</argument>
                                 <argument>linux/amd64</argument>
                                 <argument>-t</argument>
-                                <argument>${env.DOCKER_IMAGE_PREFIX}/bench:latest</argument>
+                                <argument>jvm-vs-jsr/bench:latest</argument>
                                 <argument>.</argument>
                             </arguments>
                         </configuration>

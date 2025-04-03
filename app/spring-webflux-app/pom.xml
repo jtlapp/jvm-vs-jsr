@@ -63,7 +63,7 @@
                 <version>${jib.maven.plugin.version}</version>
                 <configuration>
                     <to>
-                        <image>${env.DOCKER_IMAGE_PREFIX}/${project.artifactId}</image>
+                        <image>jvm-vs-jsr/${project.artifactId}</image>
                     </to>
                     <container>
                         <mainClass>${main.class}</mainClass>

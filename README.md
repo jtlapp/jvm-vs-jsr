@@ -73,37 +73,7 @@ unimpeded by waiting on a third tier.
 
 Install kubectl, helm, and helmfile, and configure kubectl for your cluster.
 
-Run `helmfile init` to further install the Helm "diff" and "secrets" plugins.
-
-Set the docker hostname image prefix in the following environment variable, excluding any trailing
-+`/`:
-
-```bash
-export DOCKER_IMAGE_PREFIX=<your-docker-image-prefix>
-```
-
-And set it in `charts/values-local.yaml` (which is in `.gitignore`):
-
-```bash
-global:
-  app:
-    dockerImagePrefix: <your-docker-image-prefix>
-```
-
-If your cluster does not automatically provision persistent volumes, you'll also need to create 
-a volume called `client-postgres-volume`.
-
-Note: I found cross-platform building using `buildx` too unreliable to use,
-perhaps because of the dependency on calling `docker buildx create --use`.
-The client image therefore builds only for `amd64`.
-
-Label the three nodes as follows. You may need to run `kubectl get nodes` to list the node names.
-
-```bash
-kubectl label nodes <node-1-name> kubernetes.io/hostname=client --overwrite
-kubectl label nodes <node-2-name> kubernetes.io/hostname=app --overwrite
-kubectl label nodes <node-3-name> kubernetes.io/hostname=backend --overwrite
-```
+Run `helmfile init` to further install the Helm "diff" plugins.
 
 Add the Helm repos for Prometheus and Grafana:
 
@@ -113,9 +83,20 @@ helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 ```
 
+Create a Kind cluster with three worker nodes by running the following command. This will assign 
+the nodes hostnames of "client", "app", and "backend".
+
+```
+kind create cluster --config config/kind-config.yaml
+```
+
+This command creates a directory called `client-pv` in the current directory to hold the
+client's persistent volume. `client-pv` is in `.gitignore`.
+
 ## Building and Deploying
 
-Create your cluster and configure `kubectl` to use it. Then:
+Deploy the backend database and client for benchmarking the variety of apps. You can only 
+install one app at a time.
 
 ```bash
 mvn clean install
@@ -125,7 +106,13 @@ mvn clean install
 ```
 
 The `deploy` command deploys or redeploys. In the case of apps, it replaces the currently
-deployed app (if any) with the named app.
+deployed app (if any) with the named app. You can undeploy as follows:
+
+```bash
+./bin/undeploy backend-database
+./bin/undeploy client
+./bin/undeploy spring-jdbc-kernel-app # or another app
+```
 
 ## Running Benchmarks
 
@@ -143,50 +130,3 @@ When running a test scenario, it outputs the first response for each unique comb
 of status code, shared query name, and error message. For queries erroneously returning
 non-JSON, it also prints each unique combination of status code and response body. This
 output assists with debugging newly added applications.
-
-## Useful Commands
-
-```bash
-./bin/undeploy backend-database
-./bin/undeploy client
-./bin/undeploy spring-jdbc-kernel-app # or another app
-```
-
-## Using Minikube (Couldn't get to work)
-
-Do the following to set up benchmarks for Minikube. Mind you, Minikube doesn't let you specify 
-resource allocations per node.
-
-- If you've previously run minikube and have an existing cluster, you won't be able to set the 
-  number of CPUs that the cluster should use unless you first run `minikube delete`.
-- Start minikube indicating the number of CPUs you'd like it to use across all nodes. E.g. 
-  `minikube start --cpus 6 --insecure-registry "10.0.0.0/24"`. This restricts the docker VM to 
-  using this many CPU units.
-- Now have minikube create a docker image registry: `minikube addons enable registry`. Ignore 
-  the port that minikube reports.
-- In a dedicated shell, run `docker run --rm -it --network=host alpine ash -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:$(minikube ip):5000"
-` to establish the registry within the VM. This command blocks the terminal.
-- Use `localhost:5000` as your docker image prefix, according to the above instructions.
-- Run `mvn clean install` to build the images with this image prefix. (If you want to first 
-  remove all prior images, run `docker image prune -a`.)
-- Create three nodes by running `minikube node add` three times (e.g. `minikube node add && 
-  minikube node add && minikube node add`).
-- Label the three nodes other than the control-plane node per the above instructions.
-
-## Using Kind
-
-Do the following to perform benchmarks on a Kind cluster. Mind you, Kind doesn't let you specify
-resource allocations per node.
-
-- Create a Kind cluster with three worker nodes via `kind create cluster --config 
-  config/kind-config.yaml`. Note that this will create a directory called `client-pv` in the 
-  current  directory to hold the client's persistent volume. `client-pv/` is in `.gitignore`. 
-  This also labels the nodes for you, so you don't have to label them manually.
-- Following the above instructions, set the image prefix to any non-empty string.
-
-## TODO
-
-- Remove image prefix
-- Remove value-local.yaml
-- Hard-code scripts for Kind
-- 

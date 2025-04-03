@@ -5,11 +5,7 @@ CHART_NAME=$1
 
 push_image() {
     local image=$1
-    if kubectl config current-context | grep -q "kind"; then
-        kind load docker-image $DOCKER_IMAGE_PREFIX/$image
-    else
-        docker push $DOCKER_IMAGE_PREFIX/$image
-    fi
+    kind load docker-image "jvm-vs-jsr/$image"
 }
 
 cd helm
