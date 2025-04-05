@@ -4,6 +4,7 @@
 export DOCKER_NETWORK_NAME="benchmark-net"
 # DOCKER_IMAGE_PREFIX must agree with root pom property docker-image-prefix.
 export DOCKER_IMAGE_PREFIX="jvm-vs-jsr"
+export DOCKER_VOLUME_PREFIX=$DOCKER_IMAGE_PREFIX
 
 # Docker container names
 export BACKEND_DB_CONTAINER=backend-database
@@ -27,7 +28,7 @@ export RESULTS_DB_PORT=5433
 export RESULTS_DB_NAME=resultsdb
 export RESULTS_DB_USER=user
 export RESULTS_DB_PASSWORD=password
-export RESULTS_DB_VOLUME=client-postgres-data
+export RESULTS_DB_VOLUME=${DOCKER_VOLUME_PREFIX}-data
 
 # Application configuration
 export APP_PORT=8080

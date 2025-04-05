@@ -21,8 +21,8 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 
 public class JoobyR2dbcApp extends Jooby {
 
-    public final String appName = System.getenv("APP_NAME");
-    public final String appVersion = System.getenv("APP_VERSION");
+    public final String APP_NAME = System.getenv("APP_NAME");
+    public final String APP_VERSION = "0.1.0";
 
     private final AppConfig appConfig = new AppConfig();
     private final Database db = createDatabase();
@@ -42,8 +42,8 @@ public class JoobyR2dbcApp extends Jooby {
 
         get("/api/info", ctx -> {
             var jsonObj = objectMapper.createObjectNode()
-                    .put("appName", appName)
-                    .put("appVersion", appVersion)
+                    .put("appName", APP_NAME)
+                    .put("appVersion", APP_VERSION)
                     .set("appConfig", appConfig.toJsonNode(objectMapper));
             return CompletableFuture.completedFuture(jsonObj.toString());
         });

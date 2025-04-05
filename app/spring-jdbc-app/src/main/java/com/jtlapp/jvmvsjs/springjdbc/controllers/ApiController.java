@@ -15,8 +15,9 @@ import java.sql.SQLException;
 @RequestMapping("/api")
 public class ApiController {
 
-    static final String appName = System.getenv("APP_NAME");
-    static final String appVersion = System.getenv("APP_VERSION");
+    static final String APP_NAME = System.getenv("APP_NAME");
+    static final String APP_VERSION = "0.1.0";
+
     static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
@@ -29,8 +30,8 @@ public class ApiController {
     public ResponseEntity<String> info() {
         try {
             var jsonObj = objectMapper.createObjectNode()
-                    .put("appName", appName)
-                    .put("appVersion", appVersion)
+                    .put("appName", APP_NAME)
+                    .put("appVersion", APP_VERSION)
                     .set("appConfig", appConfig.toJsonNode(objectMapper));
             return ResponseEntity.ok(objectMapper.writeValueAsString(jsonObj));
         } catch (JsonProcessingException e) {

@@ -7,8 +7,6 @@ temp/
 
 benchmark
 
-client-pv/
-
 # Compiled class file
 *.class
 

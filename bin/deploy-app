@@ -23,7 +23,6 @@ case "$APP_NAME" in
     IMAGE_NAME="spring-jdbc-app:latest"
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
-      "-e APP_VERSION=0.1.0"
       "-e DATABASE_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}"
       "-e DATABASE_USERNAME=${BACKEND_DB_USER}"
       "-e DATABASE_PASSWORD=${BACKEND_DB_PASSWORD}"
@@ -34,7 +33,6 @@ case "$APP_NAME" in
     IMAGE_NAME="spring-jdbc-app:latest"
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
-      "-e APP_VERSION=0.1.0"
       "-e DATABASE_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}"
       "-e DATABASE_USERNAME=${BACKEND_DB_USER}"
       "-e DATABASE_PASSWORD=${BACKEND_DB_PASSWORD}"
@@ -45,7 +43,6 @@ case "$APP_NAME" in
     IMAGE_NAME="$APP_NAME:latest"
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
-      "-e APP_VERSION=0.1.0"
       "-e DATABASE_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}"
       "-e DATABASE_USERNAME=${BACKEND_DB_USER}"
       "-e DATABASE_PASSWORD=${BACKEND_DB_PASSWORD}"

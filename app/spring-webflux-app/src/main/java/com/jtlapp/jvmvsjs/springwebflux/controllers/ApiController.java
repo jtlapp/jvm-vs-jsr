@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api")
 public class ApiController {
 
-    static final String appName = System.getenv("APP_NAME");;
-    static final String appVersion = System.getenv("APP_VERSION");;
+    static final String APP_NAME = System.getenv("APP_NAME");;
+    static final String appVersion = "0.1.0";;
     static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
@@ -32,7 +32,7 @@ public class ApiController {
     @GetMapping("/info")
     public Mono<String> info() {
         var jsonObj = objectMapper.createObjectNode()
-                .put("appName", appName)
+                .put("appName", APP_NAME)
                 .put("appVersion", appVersion)
                 .set("appConfig", appConfig.toJsonNode(objectMapper));
         return Mono.just(jsonObj.toString());

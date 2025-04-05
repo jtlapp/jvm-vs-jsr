@@ -3,6 +3,9 @@ const numCPUs = require('os').cpus().length;
 const fastify = require('fastify');
 const { Pool } = require('pg');
 
+const APP_NAME = process.env.APP_NAME;
+const APP_VERSION = "0.1.0";
+
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const pool = new Pool({
@@ -40,8 +43,8 @@ if (cluster.isPrimary) {
 
   server.get('/api/app-info', async (request, reply) => {
     return {
-      appName: process.env.APP_NAME,
-      appVersion: process.env.APP_VERSION,
+      appName: APP_NAME,
+      appVersion: APP_VERSION,
       appConfig: {},
     };
   });
