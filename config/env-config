@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Docker configuration
+export DOCKER_NETWORK_NAME="benchmark-net"
+# DOCKER_IMAGE_PREFIX must agree with root pom property docker-image-prefix.
+export DOCKER_IMAGE_PREFIX="jvm-vs-jsr"
+
+# Docker container names
+export BACKEND_DB_CONTAINER=backend-database
+export RESULTS_DB_CONTAINER=results-database
+export PGBOUNCER_CONTAINER=pgbouncer
+export APP_CONTAINER=app-container
+export CLIENT_CONTAINER=client-container
+
+# Backend PostgreSQL configuration
+export BACKEND_DB_PORT=5432
+export BACKEND_DB_NAME=testdb
+export BACKEND_DB_USER=user
+export BACKEND_DB_PASSWORD=password
+
+# PgBouncer configuration
+export PGBOUNCER_PORT=6432
+export PGBOUNCER_HOST=pgbouncer
+
+# Client PostgreSQL configuration
+export RESULTS_DB_PORT=5433
+export RESULTS_DB_NAME=resultsdb
+export RESULTS_DB_USER=user
+export RESULTS_DB_PASSWORD=password
+export RESULTS_DB_VOLUME=client-postgres-data
+
+# Application configuration
+export APP_PORT=8080

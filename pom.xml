@@ -10,25 +10,26 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <docker-image-prefix>jvm-vs-jsr</docker-image-prefix>
 
         <spring.boot.version>3.3.4</spring.boot.version>
         <jooby.version>3.5.4</jooby.version>
-        <jetty.bom.version>12.0.15</jetty.bom.version>
+        <jetty-bom.version>12.0.15</jetty-bom.version>
 
         <postgresql.version>42.7.4</postgresql.version>
         <hikaricp.version>6.2.1</hikaricp.version>
-        <r2dbc.postgresql.version>1.0.5.RELEASE</r2dbc.postgresql.version>
-        <vertx.pg.client.version>4.5.10</vertx.pg.client.version>
+        <r2dbc-postgresql.version>1.0.5.RELEASE</r2dbc-postgresql.version>
+        <vertx-pg-client.version>4.5.10</vertx-pg-client.version>
 
         <gson.version>2.11.0</gson.version>
         <jackson.version>2.17.0</jackson.version>
-        <logback.classic.version>1.5.12</logback.classic.version>
+        <logback-classic.version>1.5.12</logback-classic.version>
 
-        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
-        <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
+        <maven.compiler-plugin.version>3.13.0</maven.compiler-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
-        <jib.maven.plugin.version>3.4.2</jib.maven.plugin.version>
-        <exec.maven.plugin.version>3.1.0</exec.maven.plugin.version>
+        <jib-maven-plugin.version>3.4.2</jib-maven-plugin.version>
+        <exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
     </properties>
 
     <modules>
@@ -95,12 +96,12 @@
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>r2dbc-postgresql</artifactId>
-                <version>${r2dbc.postgresql.version}</version>
+                <version>${r2dbc-postgresql.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-pg-client</artifactId>
-                <version>${vertx.pg.client.version}</version>
+                <version>${vertx-pg-client.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>
@@ -160,7 +161,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>${logback.classic.version}</version>
+                <version>${logback-classic.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

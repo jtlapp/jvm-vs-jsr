@@ -26,34 +26,6 @@ releases:
     values:
       - charts/global-values.yaml
 
-  - name: prometheus
-    chart: prometheus-community/prometheus
-    values:
-      - charts/values-prometheus.yaml
-    labels:
-      clientGroup: "true"
-
-  - name: grafana
-    chart: grafana/grafana
-    values:
-      - charts/values-grafana.yaml
-    labels:
-      clientGroup: "true"
-    hooks:
-      - events: ['presync']
-        command: 'kubectl'
-        args:
-          - create
-          - configmap
-          - node-metrics-dashboard
-          - --from-file=charts/client/dashboards/node-metrics-dashboard.json
-      - events: ['postuninstall']
-        command: 'kubectl'
-        args:
-          - delete
-          - configmap
-          - node-metrics-dashboard
-
   # application group
 
   - name: jooby-jdbc-app

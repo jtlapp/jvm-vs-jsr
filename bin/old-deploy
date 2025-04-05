@@ -3,31 +3,13 @@
 
 CHART_NAME=$1
 
-push_image() {
-    local image=$1
-    kind load docker-image "jvm-vs-jsr/$image"
-}
-
 cd helm
 
 if [ "$CHART_NAME" == "client" ]; then
 
-    push_image "bench"
+    kind load docker-image "bench"
     helmfile destroy --selector clientGroup=true -q
     helmfile apply --selector clientGroup=true --suppress-diff -q
-
-    echo "Waiting for pods to start..."
-    sleep 4
-
-    NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='ExternalIP')].address}")
-    NODE_PORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services grafana)
-    PASSWORD=$(kubectl get secret grafana -o jsonpath="{.data.admin-password}" | base64 --decode)
-
-    echo
-    echo "Grafana URL: http://$NODE_IP:$NODE_PORT"
-    echo "  Username: admin"
-    echo "  Password: $PASSWORD"
-    echo
 
 else
 
@@ -35,9 +17,9 @@ else
         echo "'spring-jdbc-app' is not a release name"
         exit 1
     elif [[ "$CHART_NAME" =~ "spring-jdbc" ]]; then
-        push_image "spring-jdbc-app"
+        kind load docker-image "spring-jdbc-app"
     elif [ "$CHART_NAME" != "backend-database" ]; then
-        push_image "$CHART_NAME"
+        kind load docker-image "$CHART_NAME"
     fi
 
     if [ "$CHART_NAME" == "backend-database" ]; then

@@ -1,0 +1,65 @@
+#!/bin/bash
+# Deploys an application container within the docker network
+
+set -e
+
+APP_NAME=$1
+
+if [ -z "$APP_NAME" ]; then
+  echo "Usage: $0 <app-name>"
+  exit 1
+fi
+
+# Stop and remove any existing app container
+echo "Removing any existing app container..."
+docker rm -f ${APP_CONTAINER} 2>/dev/null || true
+
+# Determine Docker image and environment variables based on app name
+IMAGE_NAME=""
+ENV_VARS=()
+
+case "$APP_NAME" in
+  "spring-jdbc-kernel-app")
+    IMAGE_NAME="spring-jdbc-app:latest"
+    ENV_VARS=(
+      "-e APP_NAME=$APP_NAME"
+      "-e APP_VERSION=0.1.0"
+      "-e DATABASE_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}"
+      "-e DATABASE_USERNAME=${BACKEND_DB_USER}"
+      "-e DATABASE_PASSWORD=${BACKEND_DB_PASSWORD}"
+      "-e SPRING_THREADS_VIRTUAL_ENABLED=false"
+    )
+    ;;
+  "spring-jdbc-virtual-app")
+    IMAGE_NAME="spring-jdbc-app:latest"
+    ENV_VARS=(
+      "-e APP_NAME=$APP_NAME"
+      "-e APP_VERSION=0.1.0"
+      "-e DATABASE_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}"
+      "-e DATABASE_USERNAME=${BACKEND_DB_USER}"
+      "-e DATABASE_PASSWORD=${BACKEND_DB_PASSWORD}"
+      "-e SPRING_THREADS_VIRTUAL_ENABLED=true"
+    )
+    ;;
+  *)
+    IMAGE_NAME="$APP_NAME:latest"
+    ENV_VARS=(
+      "-e APP_NAME=$APP_NAME"
+      "-e APP_VERSION=0.1.0"
+      "-e DATABASE_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}"
+      "-e DATABASE_USERNAME=${BACKEND_DB_USER}"
+      "-e DATABASE_PASSWORD=${BACKEND_DB_PASSWORD}"
+    )
+    ;;
+esac
+
+echo "Deploying app $APP_NAME..."
+
+docker run -d \
+  --name ${APP_CONTAINER} \
+  --network ${DOCKER_NETWORK_NAME} \
+  -p ${APP_PORT}:${APP_PORT} \
+  ${ENV_VARS[@]} \
+  ${DOCKER_IMAGE_PREFIX}/${IMAGE_NAME}
+
+echo "$APP_NAME successfully deployed"

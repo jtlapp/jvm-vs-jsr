@@ -16,7 +16,7 @@ spec:
         kubernetes.io/hostname: app
       containers:
         - name: {{ .Release.Name }}
-          image: {{ .Values.global.app.dockerImagePrefix }}/spring-jdbc-app:latest
+          image: spring-jdbc-app:latest
           imagePullPolicy: {{ .Values.global.app.imagePullPolicy }}
           ports:
             - containerPort: {{ .Values.global.app.port }}

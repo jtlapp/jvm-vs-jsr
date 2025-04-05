@@ -1,0 +1,22 @@
+#!/bin/bash
+# Deploys the client benchmark tool container
+
+set -e
+
+echo "Removing any existing client container..."
+docker rm -f ${CLIENT_CONTAINER} 2>/dev/null || true
+
+echo "Deploying benchmark tool..."
+docker run -d \
+  --name ${CLIENT_CONTAINER} \
+  --network ${DOCKER_NETWORK_NAME} \
+  -e RESULTS_DATABASE_URL="postgresql://${RESULTS_DB_CONTAINER}:${RESULTS_DB_PORT}/${RESULTS_DB_NAME}" \
+  -e RESULTS_DATABASE_USERNAME="${RESULTS_DB_USER}" \
+  -e RESULTS_DATABASE_PASSWORD="${RESULTS_DB_PASSWORD}" \
+  -e BASE_APP_URL="http://${APP_CONTAINER}:${APP_PORT}" \
+  -e BACKEND_DATABASE_URL="postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}" \
+  -e BACKEND_DATABASE_USERNAME="${BACKEND_DB_USER}" \
+  -e BACKEND_DATABASE_PASSWORD="${BACKEND_DB_PASSWORD}" \
+  ${DOCKER_IMAGE_PREFIX}/bench:latest
+
+echo "Benchmark tool successfully deployed."

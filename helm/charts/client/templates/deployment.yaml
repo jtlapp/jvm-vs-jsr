@@ -18,7 +18,7 @@ spec:
       containers:
 
         - name: client
-          image: {{ .Values.global.app.dockerImagePrefix }}/bench:latest
+          image: bench:latest
           imagePullPolicy: {{ .Values.global.app.imagePullPolicy }}
           env:
             - name: RESULTS_DATABASE_URL

@@ -64,27 +64,27 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>${jetty.bom.version}</version>
+            <version>${jetty-bom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>${jetty.bom.version}</version>
+            <version>${jetty-bom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>jetty-websocket-jetty-server</artifactId>
-            <version>${jetty.bom.version}</version>
+            <version>${jetty-bom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-http</artifactId>
-            <version>${jetty.bom.version}</version>
+            <version>${jetty-bom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>jetty-http2-server</artifactId>
-            <version>${jetty.bom.version}</version>
+            <version>${jetty-bom.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jtlapp.jvmvsjs</groupId>
@@ -111,8 +111,8 @@
         </resources>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
+                <artifactId>maven.compiler-plugin</artifactId>
+                <version>${maven.compiler-plugin.version}</version>
             </plugin>
             <!-- jooby:run -->
             <plugin>
@@ -126,10 +126,10 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>${jib.maven.plugin.version}</version>
+                <version>${jib-maven-plugin.version}</version>
                 <configuration>
                     <to>
-                        <image>jvm-vs-jsr/${project.artifactId}</image>
+                        <image>${docker-image-prefix}/${project.artifactId}</image>
                     </to>
                     <container>
                         <mainClass>${application.class}</mainClass>
