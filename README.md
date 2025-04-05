@@ -41,9 +41,9 @@ Quarkus and Micronaut perform with R2DBC reactive I/O.
 Here are the JavaScript Runtime combinations I'll be benchmarking:
 
 - Fastify
-  - Clustered Node.js + postgresjs
-  - Clustered Deno + postgresjs
-  - Clustered Bun + postgresjs
+  - Clustered Node.js + postgresjs (JavaScript)
+  - Clustered Deno + postgresjs (JavaScript)
+  - Clustered Bun + postgresjs (JavaScript)
 
 Here are the JVM combinations I'll be benchmarking:
 
@@ -117,7 +117,7 @@ deployed app (if any) with the named app. You can undeploy as follows:
 ## Running Benchmarks
 
 1. Exec into the client pod using bash: `kubectl exec -it <client-pod> -- bash`.
-2. Run `./bencjmark setup-results` to create the benchmark results database.
+2. Run `./benchmark setup-results` to create the benchmark results database.
 3. Run `./benchmark setup-backend -scenario <scenario>` to set up the scenario of the given name.
    Only required if the scenario uses backend Postgres tables.
 4. 
