@@ -7,6 +7,13 @@ APP_NAME=$1
 
 if [ -z "$APP_NAME" ]; then
   echo "Usage: $0 <app-name>"
+  echo "Available apps:"
+  echo "  - jooby-jdbc-app"
+  echo "  - jooby-r2dbc-app"
+  echo "  - jooby-vertx-app"
+  echo "  - spring-jdbc-kernel-app"
+  echo "  - spring-jdbc-virtual-app"
+  echo "  - spring-webflux-app"
   exit 1
 fi
 
@@ -17,15 +24,17 @@ docker rm -f ${APP_CONTAINER} 2>/dev/null || true
 # Determine Docker image and environment variables based on app name
 IMAGE_NAME=""
 ENV_VARS=()
+PGBOUNCER_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}
 
 case "$APP_NAME" in
   "spring-jdbc-kernel-app")
     IMAGE_NAME="spring-jdbc-app:latest"
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
-      "-e DATABASE_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}"
-      "-e DATABASE_USERNAME=${BACKEND_DB_USER}"
-      "-e DATABASE_PASSWORD=${BACKEND_DB_PASSWORD}"
+      "-e SERVER_PORT=$APP_PORT"
+      "-e SPRING_DATASOURCE_URL=jdbc:${PGBOUNCER_URL}"
+      "-e SPRING_DATASOURCE_USERNAME=${BACKEND_DB_USER}"
+      "-e SPRING_DATASOURCE_PASSWORD=${BACKEND_DB_PASSWORD}"
       "-e SPRING_THREADS_VIRTUAL_ENABLED=false"
     )
     ;;
@@ -33,17 +42,32 @@ case "$APP_NAME" in
     IMAGE_NAME="spring-jdbc-app:latest"
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
-      "-e DATABASE_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}"
-      "-e DATABASE_USERNAME=${BACKEND_DB_USER}"
-      "-e DATABASE_PASSWORD=${BACKEND_DB_PASSWORD}"
+      "-e SERVER_PORT=$APP_PORT"
+      "-e SPRING_DATASOURCE_URL=jdbc:${PGBOUNCER_URL}"
+      "-e SPRING_DATASOURCE_USERNAME=${BACKEND_DB_USER}"
+      "-e SPRING_DATASOURCE_PASSWORD=${BACKEND_DB_PASSWORD}"
       "-e SPRING_THREADS_VIRTUAL_ENABLED=true"
+    )
+    ;;
+  "spring-webflux-app")
+    IMAGE_NAME="spring-webflux-app:latest"
+    ENV_VARS=(
+      "-e APP_NAME=$APP_NAME"
+      "-e SERVER_PORT=$APP_PORT"
+      "-e SPRING_R2DBC_URL=r2dbc:${PGBOUNCER_URL}"
+      "-e SPRING_R2DBC_USERNAME=${BACKEND_DB_USER}"
+      "-e SPRING_R2DBC_PASSWORD=${BACKEND_DB_PASSWORD}"
     )
     ;;
   *)
     IMAGE_NAME="$APP_NAME:latest"
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
-      "-e DATABASE_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}"
+      "-e SERVER_PORT=$APP_PORT"
+      "-e DATABASE_URL=${PGBOUNCER_URL}"
+      "-e DATABASE_HOST_NAME=${PGBOUNCER_HOST}"
+      "-e DATABASE_PORT=${BACKEND_DB_PORT}"
+      "-e DATABASE_NAME=${BACKEND_DB_NAME}"
       "-e DATABASE_USERNAME=${BACKEND_DB_USER}"
       "-e DATABASE_PASSWORD=${BACKEND_DB_PASSWORD}"
     )

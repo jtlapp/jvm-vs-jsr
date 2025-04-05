@@ -44,7 +44,6 @@
         <module>lib/tomcat-lib</module>
         <module>lib/r2dbc-lib</module>
         <module>lib/vertx-lib</module>
-        <module>app/spring-async-app</module>
         <module>app/spring-jdbc-app</module>
         <module>app/spring-webflux-app</module>
         <module>lib/jooby-lib</module>

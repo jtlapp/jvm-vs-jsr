@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class AppProperties {
-    private static Properties properties = new Properties();
+    private static final Properties properties = new Properties();
 
     public static void init(ClassLoader classLoader) {
         try (InputStream inputStream =

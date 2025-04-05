@@ -24,15 +24,17 @@ public class JoobyR2dbcApp extends Jooby {
     public final String APP_NAME = System.getenv("APP_NAME");
     public final String APP_VERSION = "0.1.0";
 
-    private final AppConfig appConfig = new AppConfig();
-    private final Database db = createDatabase();
+    private final AppConfig appConfig;
+    private final Database db;
 
     {
-        AppProperties.init(JoobyR2dbcApp.class.getClassLoader());
         var objectMapper = new ObjectMapper();
         var server = new NettyServer();
 
+        AppProperties.init(JoobyR2dbcApp.class.getClassLoader());
+        appConfig = new AppConfig();
         appConfig.server.setOptions(server);
+        db = createDatabase();
         install(server);
 
         use(ReactiveSupport.concurrent());
