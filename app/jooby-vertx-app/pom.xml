@@ -53,8 +53,8 @@
         </resources>
         <plugins>
             <plugin>
-                <artifactId>maven.compiler-plugin</artifactId>
-                <version>${maven.compiler-plugin.version}</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgs>
                         <compilerArg>
