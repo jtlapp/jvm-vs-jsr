@@ -2,6 +2,7 @@
 
 # Docker configuration
 export DOCKER_NETWORK_NAME="benchmark-net"
+export DOCKER_HOST="localhost"
 # DOCKER_IMAGE_PREFIX must agree with root pom property docker-image-prefix.
 export DOCKER_IMAGE_PREFIX="jvm-vs-jsr"
 export DOCKER_VOLUME_PREFIX=$DOCKER_IMAGE_PREFIX

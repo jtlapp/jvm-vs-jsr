@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	baseAppUrlEnvVar = "BASE_APP_URL"
+	dockerHostEnvVar = "DOCKER_HOST"
+	appPortEnvVar    = "APP_PORT"
 	maxReservedPorts = 4
 )
 
@@ -23,13 +24,21 @@ type PlatformConfig struct {
 
 func GetPlatformConfig() (*PlatformConfig, error) {
 
-	baseAppUrl := os.Getenv(baseAppUrlEnvVar)
-	if baseAppUrl == "" {
-		err := fmt.Errorf("%s environment variable is required", baseAppUrlEnvVar)
+	dockerHost := os.Getenv(dockerHostEnvVar)
+	if dockerHost == "" {
+		err := fmt.Errorf("%s environment variable is required", dockerHostEnvVar)
 		if err != nil {
 			return nil, err
 		}
 	}
+	appPort := os.Getenv(appPortEnvVar)
+	if appPort == "" {
+		err := fmt.Errorf("%s environment variable is required", appPortEnvVar)
+		if err != nil {
+			return nil, err
+		}
+	}
+	baseAppUrl := fmt.Sprintf("http://%s:%s", dockerHost, appPort)
 
 	appInfo, err := GetAppInfo(baseAppUrl)
 	if err != nil {
