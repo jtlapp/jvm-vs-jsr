@@ -17,11 +17,12 @@ if [ -z "$APP_NAME" ]; then
   exit 1
 fi
 
-# Stop and remove any existing app container
 echo "Removing any existing app container..."
+
 docker rm -f ${APP_CONTAINER} 2>/dev/null || true
 
-# Determine Docker image and environment variables based on app name
+echo "Deploying app $APP_NAME..."
+
 IMAGE_NAME=""
 ENV_VARS=()
 PGBOUNCER_URL=postgresql://${PGBOUNCER_HOST}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}
@@ -73,8 +74,6 @@ case "$APP_NAME" in
     )
     ;;
 esac
-
-echo "Deploying app $APP_NAME..."
 
 docker run -d \
   --name ${APP_CONTAINER} \
