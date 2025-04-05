@@ -8,10 +8,20 @@
     <packaging>pom</packaging>
 
     <properties>
+        <!-- configuration -->
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <docker-image-prefix>jvm-vs-jsr</docker-image-prefix>
+        <docker-architecture>arm64</docker-architecture>
 
+        <!-- plugin versions -->
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
+        <jib-maven-plugin.version>3.4.5</jib-maven-plugin.version>
+        <exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
+
+        <!-- dependency versions -->
         <spring.boot.version>3.3.4</spring.boot.version>
         <jooby.version>3.5.4</jooby.version>
         <jetty-bom.version>12.0.15</jetty-bom.version>
@@ -24,12 +34,6 @@
         <gson.version>2.11.0</gson.version>
         <jackson.version>2.17.0</jackson.version>
         <logback-classic.version>1.5.12</logback-classic.version>
-
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-        <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
-        <jib-maven-plugin.version>3.4.2</jib-maven-plugin.version>
-        <exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
     </properties>
 
     <modules>

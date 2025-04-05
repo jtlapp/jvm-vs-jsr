@@ -69,29 +69,30 @@ unreasonable to implement I/O in Node.js without async/await.
 For each combination, I'll also be implemented a thread sleep to measure raw concurrency
 unimpeded by waiting on a third tier.
 
-## Installation and Setup
+## Tooling Installation
 
-Install kubectl, helm, helmfile, and kind, and configure kubectl for your cluster.
+- Go
+- Java
+- Kotlin
 
-Run `helmfile init` to further install the Helm "diff" plugins.
-
-Add the Helm repos for Prometheus and Grafana:
-
-```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
-```
-
-Create a Kind cluster with three worker nodes by running the following command. This will assign 
-the nodes hostnames of "client", "app", and "backend".
-
-```
-kind create cluster --config config/kind-config.yaml
-```
 
 This command creates a directory called `client-pv` in the current directory to hold the
 client's persistent volume. `client-pv` is in `.gitignore`.
+
+## Configuration
+
+The configuration is largely provided by environment variables, with `config/env-config` 
+setting them to default values. Run this script or a modified copy of the script before running 
+any of the `bin/` scripts and before running the benchmark tool. 
+
+If you decide to change the default docker image prefix, in addition to changing the 
+`DOCKER_IMAGE_PREFIX` environment variable, you'll need to assign the prefix via
+`-Ddocker-image-prefix=<prefix>` when you build the applications.
+
+By default, the applications build for AMD64, but you can use `-Ddocker-architecture=arm64` to 
+build for Apple Silicon.
+
+TODO: Look again into using environment variables in the POM.
 
 ## Building and Deploying
 
