@@ -4,6 +4,7 @@ const { Pool } = require('pg');
 
 const APP_NAME = process.env.APP_NAME;
 const APP_VERSION = '0.1.0';
+const SERVER_PORT = process.env.SERVER_PORT;
 
 const NUM_WORKERS = parseInt(process.env.NUM_WORKERS) || 1;
 
@@ -29,17 +30,20 @@ if (cluster.isPrimary) {
     cluster.fork();
   });
 } else {
-  const server = fastify({
-    logger: {
-      transport: {
-        target: 'pino-pretty',
-      },
-      level: 'error',
-    },
-  });
+  const server = fastify({});
 
   server.get('/', async (request, reply) => {
     return 'Node.js + Fastify + pg package';
+  });
+
+  server.get("/api/info", async (request, reply) => {
+    return {
+      appName: APP_NAME,
+      appVersion: APP_VERSION,
+      appConfig: {
+        numWorkers: NUM_WORKERS
+      }
+    };
   });
 
   server.get('/api/app-info', async (request, reply) => {
@@ -67,7 +71,7 @@ if (cluster.isPrimary) {
 
   const start = async () => {
     try {
-      await server.listen({ port: 3000, host: '0.0.0.0' });
+      await server.listen({ port: SERVER_PORT, host: '0.0.0.0' });
       console.log(`Worker ${process.pid} started and listening`);
     } catch (err) {
       server.log.error(err);

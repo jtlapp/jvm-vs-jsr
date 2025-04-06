@@ -11,6 +11,7 @@ if [ -z "$APP_NAME" ]; then
   echo "  - jooby-jdbc-app"
   echo "  - jooby-r2dbc-app"
   echo "  - jooby-vertx-app"
+  echo "  - nodejs-fastify"
   echo "  - spring-jdbc-kernel-app"
   echo "  - spring-jdbc-virtual-app"
   echo "  - spring-webflux-app"
@@ -65,6 +66,7 @@ case "$APP_NAME" in
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
       "-e SERVER_PORT=$APP_PORT"
+      "-e NUM_WORKERS=$NUM_JSR_WORKERS"
       "-e DATABASE_URL=${PGBOUNCER_URL}"
       "-e DATABASE_HOST_NAME=${PGBOUNCER_CONTAINER}"
       "-e DATABASE_PORT=${PGBOUNCER_PORT}"

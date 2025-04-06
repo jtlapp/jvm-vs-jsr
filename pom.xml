@@ -40,18 +40,19 @@
 
     <modules>
         <module>bench</module>
+        <module>lib/hikari-lib</module>
         <module>lib/java-lib</module>
         <module>lib/jdbc-lib</module>
-        <module>lib/hikari-lib</module>
+        <module>lib/jooby-lib</module>
         <module>lib/tomcat-lib</module>
         <module>lib/r2dbc-lib</module>
         <module>lib/vertx-lib</module>
-        <module>app/spring-jdbc-app</module>
-        <module>app/spring-webflux-app</module>
-        <module>lib/jooby-lib</module>
         <module>app/jooby-jdbc-app</module>
         <module>app/jooby-r2dbc-app</module>
         <module>app/jooby-vertx-app</module>
+        <module>app/nodejs-fastify</module>
+        <module>app/spring-jdbc-app</module>
+        <module>app/spring-webflux-app</module>
     </modules>
 
     <build>
