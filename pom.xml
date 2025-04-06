@@ -50,9 +50,10 @@
         <module>app/jooby-jdbc-app</module>
         <module>app/jooby-r2dbc-app</module>
         <module>app/jooby-vertx-app</module>
-        <module>app/nodejs-fastify</module>
         <module>app/spring-jdbc-app</module>
         <module>app/spring-webflux-app</module>
+        <module>app/deno-fastify</module>
+        <module>app/nodejs-fastify</module>
     </modules>
 
     <build>

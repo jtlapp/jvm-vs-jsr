@@ -11,6 +11,7 @@ if [ -z "$APP_NAME" ]; then
   echo "  - jooby-jdbc-app"
   echo "  - jooby-r2dbc-app"
   echo "  - jooby-vertx-app"
+  echo "  - deno-fastify"
   echo "  - nodejs-fastify"
   echo "  - spring-jdbc-kernel-app"
   echo "  - spring-jdbc-virtual-app"
