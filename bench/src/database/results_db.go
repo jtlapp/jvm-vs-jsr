@@ -55,10 +55,8 @@ const schemaSQL = `
 		"statusCodes" JSONB NOT NULL,
 		"errorMessages" VARCHAR,
 		"availablePorts" INTEGER NOT NULL,
-		"fileDescriptors" INTEGER NOT NULL,
 		"remainingPortsActive" INTEGER NOT NULL,
-		"remainingPortsWaiting" INTEGER NOT NULL,
-		"remainingFDsInUse" INTEGER NOT NULL
+		"remainingPortsWaiting" INTEGER NOT NULL
     );
 
 	ALTER TABLE runs 
@@ -212,13 +210,11 @@ func (rdb *ResultsDB) SaveTrial(
 			"statusCodes",
 			"errorMessages",
 			"availablePorts",
-			"fileDescriptors",
 			"remainingPortsActive",
-			"remainingPortsWaiting",
-			"remainingFDsInUse"
+			"remainingPortsWaiting"
 		) VALUES (
 			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-			$11, $12, $13, $14, $15, $16, $17, $18
+			$11, $12, $13, $14, $15, $16
 		)
 		RETURNING id`
 
@@ -238,10 +234,8 @@ func (rdb *ResultsDB) SaveTrial(
 		trialInfo.StatusCodes,                  // $12
 		trialInfo.ErrorMessages,                // $13
 		resources.TotalAvailablePorts,          // $14
-		resources.TotalFileDescriptors,         // $15
-		resources.EstablishedPortsCount,        // $16
-		resources.TimeWaitPortsCount,           // $17
-		resources.FDsInUseCount,                // $18
+		resources.EstablishedPortsCount,        // $15
+		resources.TimeWaitPortsCount,           // $16
 	).Scan(&trialID)
 
 	if err != nil {

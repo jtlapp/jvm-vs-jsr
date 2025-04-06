@@ -2,31 +2,9 @@ package platform
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
-	"syscall"
 )
-
-func GetFDsInUseCountOnMac() uint {
-	cmd := exec.Command("lsof", "-p", fmt.Sprintf("%d", os.Getpid()))
-	out, err := cmd.Output()
-	if err != nil {
-		// lsof might return error code 1 if process exists but has no open files
-		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 1 {
-			return 0
-		}
-		panic(err)
-	}
-
-	// Count lines in output, subtract 1 for header
-	lines := strings.Split(string(out), "\n")
-	count := len(lines) - 1
-	if count < 0 {
-		count = 0
-	}
-	return uint(count)
-}
 
 func GetPortsInUseCountsOnMac() (timeWaitCount, establishedCount uint) {
 	cmd := exec.Command("netstat", "-n", "-p", "tcp")
@@ -69,12 +47,4 @@ func GetPortRangeSizeOnMac() uint {
 		panic(err)
 	}
 	return uint(highPort - lowPort)
-}
-
-func GetTotalFileDescriptorsOnMac() uint {
-	var rlimit syscall.Rlimit
-	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rlimit); err != nil {
-		panic(err)
-	}
-	return uint(rlimit.Cur)
 }

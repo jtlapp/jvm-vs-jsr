@@ -4,16 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"syscall"
 )
-
-func GetFDsInUseCountOnLinux() uint {
-	inUseFDs, err := os.ReadDir("/proc/self/fd")
-	if err != nil {
-		panic(err)
-	}
-	return uint(len(inUseFDs))
-}
 
 func GetPortsInUseCountsOnLinux() (timeWaitCount, establishedCount uint) {
 	data, err := os.ReadFile("/proc/net/tcp")
@@ -52,12 +43,4 @@ func GetPortRangeSizeOnLinux() uint {
 		panic(err)
 	}
 	return uint(highPort - lowPort)
-}
-
-func GetTotalFileDescriptorsOnLinux() uint {
-	var rlimit syscall.Rlimit
-	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rlimit); err != nil {
-		panic(err)
-	}
-	return uint(rlimit.Cur)
 }

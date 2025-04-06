@@ -132,15 +132,19 @@ TODO: Look again into using environment variables in the POM.
 
 ## Building and Deploying
 
-TODO: Not about creating persistent docker volume.
+TODO: Note about creating persistent docker volume.
 
 Deploy the backend database and client for benchmarking the variety of apps. You can only 
 install one app at a time.
 
 ```bash
 mvn clean install
-./bin/deploy backend-database
-./bin/deploy client
+./bin/setup-network # creates the docker network with backend
+cd bench/src
+./benchmark setup-results # creates the benchmark results database
+```
+
+```bash
 ./bin/deploy spring-jdbc-kernel-app # or another app
 ```
 
@@ -148,9 +152,8 @@ The `deploy` command deploys or redeploys. In the case of apps, it replaces the 
 deployed app (if any) with the named app. You can undeploy as follows:
 
 ```bash
-./bin/undeploy backend-database
-./bin/undeploy client
-./bin/undeploy spring-jdbc-kernel-app # or another app
+./bin/teardown app # undeploy just the app
+./bin/teardown all # remove all container and the docker network, but not the results volume
 ```
 
 ## Running Benchmarks

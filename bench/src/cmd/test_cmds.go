@@ -81,21 +81,17 @@ var TryRate = cli.NewCommand(
 var ShowStatus = cli.NewCommand(
 	"status",
 	"",
-	"Prints the active ports, waiting ports, and file descriptors in use.",
+	"Shows the number of the active and waiting ports.",
 	nil,
 	func(commandConfig config.CommandConfig) error {
 		resources := util.NewResourceStatus()
-		establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
-			resources.GetPercentages()
+		establishedPortsPercent, timeWaitPortsPercent := resources.GetPercentages()
 		fmt.Printf("  active ports: %d of %d (%d%%)\n",
 			resources.EstablishedPortsCount, resources.TotalAvailablePorts,
 			uint(establishedPortsPercent+.5))
 		fmt.Printf("  waiting ports: %d of %d (%d%%)\n",
 			resources.TimeWaitPortsCount, resources.TotalAvailablePorts,
 			uint(timeWaitPortsPercent+.5))
-		fmt.Printf("  FDs in use: %d of %d (%d%%)\n",
-			resources.FDsInUseCount, resources.TotalFileDescriptors,
-			uint(fdsInUsePercent+.5))
 		return nil
 	})
 

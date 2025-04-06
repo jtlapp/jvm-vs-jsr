@@ -3,27 +3,10 @@ package platform
 // These methods are untested.
 
 import (
-	"fmt"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 )
-
-func GetFDsInUseCountOnWindows() uint {
-	cmd := exec.Command("powershell", "-Command",
-		fmt.Sprintf("(Get-Process -Id %d).Handles", os.Getpid()))
-	out, err := cmd.Output()
-	if err != nil {
-		panic(err)
-	}
-
-	count, err := strconv.Atoi(strings.TrimSpace(string(out)))
-	if err != nil {
-		panic(err)
-	}
-	return uint(count)
-}
 
 func GetPortsInUseCountsOnWindows() (timeWaitCount, establishedCount uint) {
 	cmd := exec.Command("netstat", "-n", "-p", "TCP")
@@ -71,12 +54,4 @@ func GetPortRangeSizeOnWindows() uint {
 		}
 	}
 	return uint(numPorts)
-}
-func GetTotalFileDescriptorsOnWindows() uint {
-	// TODO: Consider delting FD checks
-
-	// Windows doesn't have a direct equivalent to file descriptor limits
-	// Instead, we can return the maximum number of handles per process
-	// This is a fixed value in Windows (typically ~16 million)
-	return 16777216 // 2^24, typical Windows handle limit
 }

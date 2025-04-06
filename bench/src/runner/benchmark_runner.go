@@ -269,8 +269,7 @@ func printRunMetrics(metrics *vegeta.Metrics) {
 
 func printTestStatus(metrics *vegeta.Metrics) {
 	resourceStatus := util.NewResourceStatus()
-	establishedPortsPercent, timeWaitPortsPercent, fdsInUsePercent :=
-		resourceStatus.GetPercentages()
+	establishedPortsPercent, timeWaitPortsPercent := resourceStatus.GetPercentages()
 
 	statusMessage := "100% successful"
 	errorMessages := "(none)"
@@ -280,13 +279,12 @@ func printTestStatus(metrics *vegeta.Metrics) {
 	}
 
 	util.Logf(
-		"  %s (%.1f req/s): issued %.1f req/s, %d%% ports active, %d%% ports waiting, %d%% FDs, errors: %s",
+		"  %s (%.1f req/s): issued %.1f req/s, %d%% ports active, %d%% ports waiting, errors: %s",
 		statusMessage,
 		metrics.Throughput,
 		metrics.Rate,
 		uint(establishedPortsPercent+.5),
 		uint(timeWaitPortsPercent+.5),
-		uint(fdsInUsePercent+.5),
 		errorMessages,
 	)
 }

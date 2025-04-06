@@ -11,30 +11,24 @@ import (
 
 type ResourceStatus struct {
 	TotalAvailablePorts   uint
-	TotalFileDescriptors  uint
-	FDsInUseCount         uint
 	TimeWaitPortsCount    uint
 	EstablishedPortsCount uint
 }
 
 var portRangeSize = getPortRangeSize()
-var totalFileDescriptors = getTotalFileDescriptors()
 
 func NewResourceStatus() ResourceStatus {
 	timeWaitPortsCount, establishedPortsCount := getPortsInUseCounts()
 	return ResourceStatus{
 		TotalAvailablePorts:   portRangeSize,
-		TotalFileDescriptors:  totalFileDescriptors,
-		FDsInUseCount:         getFDsInUseCount(),
 		TimeWaitPortsCount:    timeWaitPortsCount,
 		EstablishedPortsCount: establishedPortsCount,
 	}
 }
 
-func (rs *ResourceStatus) GetPercentages() (float64, float64, float64) {
+func (rs *ResourceStatus) GetPercentages() (float64, float64) {
 	return float64(rs.EstablishedPortsCount) * 100 / float64(rs.TotalAvailablePorts),
-		float64(rs.TimeWaitPortsCount) * 100 / float64(rs.TotalAvailablePorts),
-		float64(rs.FDsInUseCount) * 100 / float64(rs.TotalFileDescriptors)
+		float64(rs.TimeWaitPortsCount) * 100 / float64(rs.TotalAvailablePorts)
 }
 
 func PortsAreReady(maxReservedPorts uint) (bool, error) {
@@ -53,17 +47,6 @@ func WaitForPortsToTimeout() {
 	for timeWaitPortsCount > 0 {
 		time.Sleep(time.Second)
 		timeWaitPortsCount, _ = getPortsInUseCounts()
-	}
-}
-
-func getFDsInUseCount() uint {
-	switch runtime.GOOS {
-	case "darwin":
-		return platform.GetFDsInUseCountOnMac()
-	case "windows":
-		return platform.GetFDsInUseCountOnWindows()
-	default:
-		return platform.GetFDsInUseCountOnLinux()
 	}
 }
 
@@ -86,16 +69,5 @@ func getPortRangeSize() uint {
 		return platform.GetPortRangeSizeOnWindows()
 	default:
 		return platform.GetPortRangeSizeOnLinux()
-	}
-}
-
-func getTotalFileDescriptors() uint {
-	switch runtime.GOOS {
-	case "darwin":
-		return platform.GetTotalFileDescriptorsOnMac()
-	case "windows":
-		return platform.GetTotalFileDescriptorsOnWindows()
-	default:
-		return platform.GetTotalFileDescriptorsOnLinux()
 	}
 }
