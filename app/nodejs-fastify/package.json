@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-pg",
+  "name": "nodejs-fastify",
   "version": "0.1.0",
   "description": "API server for Node.js using Fastify and pg package",
   "main": "src/app.js",
