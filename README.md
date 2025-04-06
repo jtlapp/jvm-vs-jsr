@@ -212,7 +212,7 @@ To remove all containers, including the app container, and the docker network to
 ```
 
 The above command does not remove the volume holding the results database. To remove this volume 
-(and discard its data), you'll need to do so via docker directly.
+(discarding its data), you'll need to do so via docker directly.
 
 ## Designing Benchmarks
 
