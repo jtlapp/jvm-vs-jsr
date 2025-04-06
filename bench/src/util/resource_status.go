@@ -2,10 +2,11 @@ package util
 
 import (
 	"fmt"
-	"os"
-	"strings"
-	"syscall"
+	"runtime"
 	"time"
+
+	"jvm-vs-jsr.jtlapp.com/benchmark/config"
+	"jvm-vs-jsr.jtlapp.com/benchmark/platform"
 )
 
 type ResourceStatus struct {
@@ -39,8 +40,9 @@ func (rs *ResourceStatus) GetPercentages() (float64, float64, float64) {
 func PortsAreReady(maxReservedPorts uint) (bool, error) {
 	timeWaitPortsCount, establishedPortsCount := getPortsInUseCounts()
 	if establishedPortsCount > maxReservedPorts {
-		return false, fmt.Errorf("expected at most %d active ports but found %d",
-			maxReservedPorts, establishedPortsCount)
+		return false, fmt.Errorf(
+			"expected at most %d active ports but found %d (boost %s if this is okay)",
+			maxReservedPorts, establishedPortsCount, config.MaxReservedPortsEnvVar)
 	}
 	return timeWaitPortsCount == 0, nil
 }
@@ -54,56 +56,45 @@ func WaitForPortsToTimeout() {
 }
 
 func getFDsInUseCount() uint {
-	inUseFDs, err := os.ReadDir("/proc/self/fd")
-	if err != nil {
-		panic(err)
+	switch runtime.GOOS {
+	case "darwin":
+		return platform.GetFDsInUseCountOnMac()
+	case "windows":
+		return platform.GetFDsInUseCountOnWindows()
+	default:
+		return platform.GetFDsInUseCountOnLinux()
 	}
-	return uint(len(inUseFDs))
 }
 
 func getPortsInUseCounts() (timeWaitCount, establishedCount uint) {
-	data, err := os.ReadFile("/proc/net/tcp")
-	if err != nil {
-		panic(err)
+	switch runtime.GOOS {
+	case "darwin":
+		return platform.GetPortsInUseCountsOnMac()
+	case "windows":
+		return platform.GetPortsInUseCountsOnWindows()
+	default:
+		return platform.GetPortsInUseCountsOnLinux()
 	}
-
-	// Skip header line
-	lines := strings.Split(string(data), "\n")[1:]
-
-	// Column 4 contains the connection state in hex
-	for _, line := range lines {
-		fields := strings.Fields(line)
-		if len(fields) >= 4 {
-			state := fields[3]
-			switch state {
-			case "06":
-				timeWaitCount++
-			case "01":
-				establishedCount++
-			}
-		}
-	}
-	return timeWaitCount, establishedCount
 }
 
 func getPortRangeSize() uint {
-	data, err := os.ReadFile("/proc/sys/net/ipv4/ip_local_port_range")
-	if err != nil {
-		panic(err)
+	switch runtime.GOOS {
+	case "darwin":
+		return platform.GetPortRangeSizeOnMac()
+	case "windows":
+		return platform.GetPortRangeSizeOnWindows()
+	default:
+		return platform.GetPortRangeSizeOnLinux()
 	}
-
-	var lowPort, highPort int
-	_, err = fmt.Sscanf(string(data), "%d %d", &lowPort, &highPort)
-	if err != nil {
-		panic(err)
-	}
-	return uint(highPort - lowPort)
 }
 
 func getTotalFileDescriptors() uint {
-	var rlimit syscall.Rlimit
-	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rlimit); err != nil {
-		panic(err)
+	switch runtime.GOOS {
+	case "darwin":
+		return platform.GetTotalFileDescriptorsOnMac()
+	case "windows":
+		return platform.GetTotalFileDescriptorsOnWindows()
+	default:
+		return platform.GetTotalFileDescriptorsOnLinux()
 	}
-	return uint(rlimit.Cur)
 }

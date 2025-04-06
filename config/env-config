@@ -1,13 +1,20 @@
 #!/bin/bash
 
+# Benchmark configuration
+
+export CONTAINER_HOST="localhost"
+# Upper limit on number of ports expected to be open at start of test.
+export MAX_RESERVED_PORTS="23"
+
 # Docker configuration
+
 export DOCKER_NETWORK_NAME="benchmark-net"
-export DOCKER_HOST="localhost"
-# DOCKER_IMAGE_PREFIX must agree with root pom property docker-image-prefix.
+# The following must agree with root pom.xml property docker-image-prefix.
 export DOCKER_IMAGE_PREFIX="jvm-vs-jsr"
 export DOCKER_VOLUME_PREFIX=$DOCKER_IMAGE_PREFIX
 
 # Docker container names
+
 export BACKEND_DB_CONTAINER=backend-database
 export RESULTS_DB_CONTAINER=results-database
 export PGBOUNCER_CONTAINER=pgbouncer
@@ -15,16 +22,19 @@ export APP_CONTAINER=app-container
 export CLIENT_CONTAINER=client-container
 
 # Backend PostgreSQL configuration
+
 export BACKEND_DB_PORT=5432
 export BACKEND_DB_NAME=testdb
 export BACKEND_DB_USER=user
 export BACKEND_DB_PASSWORD=password
 
 # PgBouncer configuration
+
 export PGBOUNCER_PORT=6432
 export PGBOUNCER_HOST=${PGBOUNCER_CONTAINER}
 
 # Client PostgreSQL configuration
+
 export RESULTS_DB_PORT=5433
 export RESULTS_DB_NAME=resultsdb
 export RESULTS_DB_USER=user
@@ -32,4 +42,5 @@ export RESULTS_DB_PASSWORD=password
 export RESULTS_DB_VOLUME=${DOCKER_VOLUME_PREFIX}-data
 
 # Application configuration
+
 export APP_PORT=8080

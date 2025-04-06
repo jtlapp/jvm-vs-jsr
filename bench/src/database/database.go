@@ -2,15 +2,18 @@ package database
 
 import (
 	"context"
-	"os"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 )
 
 type DatabaseConfig struct {
-	UrlEnvVar      string
-	UsernameEnvVar string
-	PasswordEnvVar string
+	HostEnvVar         string
+	PortEnvVar         string
+	DatabaseNameEnvVar string
+	UsernameEnvVar     string
+	PasswordEnvVar     string
 }
 
 type Database struct {
@@ -23,14 +26,37 @@ func NewDatabase(config *DatabaseConfig) *Database {
 }
 
 func (db *Database) GetPool() (*pgxpool.Pool, error) {
+	host, err := config.GetEnvVar(db.config.HostEnvVar)
+	if err != nil {
+		return nil, err
+	}
+	port, err := config.GetEnvVar(db.config.PortEnvVar)
+	if err != nil {
+		return nil, err
+	}
+	databaseName, err := config.GetEnvVar(db.config.DatabaseNameEnvVar)
+	if err != nil {
+		return nil, err
+	}
+	username, err := config.GetEnvVar(db.config.UsernameEnvVar)
+	if err != nil {
+		return nil, err
+	}
+	password, err := config.GetEnvVar(db.config.PasswordEnvVar)
+	if err != nil {
+		return nil, err
+	}
+
+	url := fmt.Sprintf("postgresql://%s:%s/%s", host, port, databaseName)
+
 	if db.pool == nil {
-		connConfig, err := pgxpool.ParseConfig(os.Getenv(db.config.UrlEnvVar))
+		connConfig, err := pgxpool.ParseConfig(url)
 		if err != nil {
 			return nil, err
 		}
 
-		connConfig.ConnConfig.User = os.Getenv(db.config.UsernameEnvVar)
-		connConfig.ConnConfig.Password = os.Getenv(db.config.PasswordEnvVar)
+		connConfig.ConnConfig.User = username
+		connConfig.ConnConfig.Password = password
 
 		pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
 		db.pool = pool

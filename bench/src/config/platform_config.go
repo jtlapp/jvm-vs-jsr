@@ -2,15 +2,8 @@ package config
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 	"sort"
-)
-
-const (
-	dockerHostEnvVar = "DOCKER_HOST"
-	appPortEnvVar    = "APP_PORT"
-	maxReservedPorts = 4
 )
 
 type PlatformConfig struct {
@@ -24,22 +17,20 @@ type PlatformConfig struct {
 
 func GetPlatformConfig() (*PlatformConfig, error) {
 
-	dockerHost := os.Getenv(dockerHostEnvVar)
-	if dockerHost == "" {
-		err := fmt.Errorf("%s environment variable is required", dockerHostEnvVar)
-		if err != nil {
-			return nil, err
-		}
+	dockerHost, err := GetEnvVar(DockerHostEnvVar)
+	if err != nil {
+		return nil, err
 	}
-	appPort := os.Getenv(appPortEnvVar)
-	if appPort == "" {
-		err := fmt.Errorf("%s environment variable is required", appPortEnvVar)
-		if err != nil {
-			return nil, err
-		}
+	appPort, err := GetEnvVar(AppPortEnvVar)
+	if err != nil {
+		return nil, err
 	}
-	baseAppUrl := fmt.Sprintf("http://%s:%s", dockerHost, appPort)
+	maxReservedPorts, err := GetEnvVarAsUint(MaxReservedPortsEnvVar)
+	if err != nil {
+		return nil, err
+	}
 
+	baseAppUrl := fmt.Sprintf("http://%s:%s", dockerHost, appPort)
 	appInfo, err := GetAppInfo(baseAppUrl)
 	if err != nil {
 		return nil, err
