@@ -25,7 +25,6 @@ export BACKEND_DB_PASSWORD=password
 # PgBouncer configuration
 
 export PGBOUNCER_PORT=6432
-export PGBOUNCER_HOST=${PGBOUNCER_CONTAINER}
 
 # Client PostgreSQL configuration
 
