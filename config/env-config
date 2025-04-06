@@ -13,7 +13,6 @@ export BACKEND_DB_CONTAINER=backend-database
 export RESULTS_DB_CONTAINER=results-database
 export PGBOUNCER_CONTAINER=pgbouncer
 export APP_CONTAINER=app-container
-export CLIENT_CONTAINER=client-container
 
 # Backend PostgreSQL configuration
 

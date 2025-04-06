@@ -8,7 +8,6 @@ COMPONENT=$1
 if [ -z "$COMPONENT" ]; then
   echo "Usage: $0 [all|client|app]"
   echo "  all     - Remove all containers and network"
-  echo "  client  - Remove client benchmark tool"
   echo "  app     - Remove application container"
   exit 1
 fi
@@ -16,14 +15,10 @@ fi
 case "$COMPONENT" in
   "all")
     echo "Removing all containers..."
-    docker rm -f ${CLIENT_CONTAINER} ${APP_CONTAINER} ${PGBOUNCER_CONTAINER} ${BACKEND_DB_CONTAINER} ${RESULTS_DB_CONTAINER} 2>/dev/null || true
+    docker rm -f ${APP_CONTAINER} ${PGBOUNCER_CONTAINER} ${BACKEND_DB_CONTAINER} ${RESULTS_DB_CONTAINER} 2>/dev/null || true
 
     echo "Removing Docker network..."
     docker network rm ${DOCKER_NETWORK_NAME} 2>/dev/null || true
-    ;;
-  "client")
-    echo "Removing client benchmark tool..."
-    docker rm -f ${CLIENT_CONTAINER} 2>/dev/null || true
     ;;
   "app")
     echo "Removing application..."
