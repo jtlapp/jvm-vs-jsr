@@ -54,7 +54,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgs>
                         <compilerArg>
@@ -70,7 +69,6 @@
             <plugin>
                 <groupId>io.jooby</groupId>
                 <artifactId>jooby-maven-plugin</artifactId>
-                <version>${jooby.version}</version>
                 <configuration>
                     <mainClass>${application.class}</mainClass>
                 </configuration>
@@ -78,7 +76,6 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>${jib-maven-plugin.version}</version>
                 <configuration>
                     <from>
                         <platforms>

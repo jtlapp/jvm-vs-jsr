@@ -1,10 +1,11 @@
 const cluster = require('cluster');
-const numCPUs = require('os').cpus().length;
 const fastify = require('fastify');
 const { Pool } = require('pg');
 
 const APP_NAME = process.env.APP_NAME;
-const APP_VERSION = "0.1.0";
+const APP_VERSION = '0.1.0';
+
+const NUM_WORKERS = parseInt(process.env.NUM_WORKERS) || 1;
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -19,7 +20,7 @@ const pool = new Pool({
 if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`);
 
-  for (let i = 0; i < numCPUs; i++) {
+  for (let i = 0; i < NUM_WORKERS; i++) {
     cluster.fork();
   }
 

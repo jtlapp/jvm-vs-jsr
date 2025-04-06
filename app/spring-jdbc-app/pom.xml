@@ -13,7 +13,6 @@
     <artifactId>spring-jdbc-app</artifactId>
 
     <properties>
-        <spring.boot.maven.plugin.version>3.3.1</spring.boot.maven.plugin.version>
         <main.class>com.jtlapp.jvmvsjs.springjdbc.SpringJdbcApp</main.class>
     </properties>
 
@@ -57,7 +56,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.maven.plugin.version}</version>
                 <configuration>
                     <mainClass>${main.class}</mainClass>
                 </configuration>
@@ -72,7 +70,6 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>${jib-maven-plugin.version}</version>
                 <configuration>
                     <from>
                         <platforms>
