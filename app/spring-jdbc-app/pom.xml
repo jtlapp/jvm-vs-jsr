@@ -71,17 +71,6 @@
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
                 <configuration>
-                    <from>
-                        <platforms>
-                            <platform>
-                                <architecture>${docker-architecture}</architecture>
-                                <os>linux</os>
-                            </platform>
-                        </platforms>
-                    </from>
-                    <to>
-                        <image>${docker-image-prefix}/${project.artifactId}</image>
-                    </to>
                     <container>
                         <mainClass>${main.class}</mainClass>
                     </container>
