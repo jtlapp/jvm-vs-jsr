@@ -33,7 +33,7 @@ public class JoobyVertxApp extends Jooby {
         AppProperties.init(JoobyVertxApp.class.getClassLoader());
         appConfig = new AppConfig();
         appConfig.server.setOptions(server);
-        db = createDatabase();
+        db = appConfig.createDatabase();
         install(server);
 
         use(ReactiveSupport.concurrent());
@@ -70,26 +70,6 @@ public class JoobyVertxApp extends Jooby {
         }).setNonBlocking(true);
 
         onStop(scheduler::shutdown);
-    }
-
-    private Database createDatabase() {
-        PgConnectOptions connectOptions = new PgConnectOptions()
-                .setHost(System.getenv("DATABASE_HOST_NAME"))
-                .setPort(Integer.parseInt(System.getenv("DATABASE_PORT")))
-                .setDatabase(System.getenv("DATABASE_NAME"))
-                .setUser(System.getenv("DATABASE_USERNAME"))
-                .setPassword(System.getenv("DATABASE_PASSWORD"))
-                .setConnectTimeout(appConfig.dbclient.connectionTimeout)
-                // leave prepared statement caching to pgbouncer
-                .setPreparedStatementCacheMaxSize(0)
-                // pgbouncer is a layer 7 proxy
-                .setUseLayer7Proxy(true);
-
-        PoolOptions poolOptions = new PoolOptions()
-                .setMaxSize(appConfig.dbclient.maxPoolSize)
-                .setMaxWaitQueueSize(appConfig.dbclient.maxWaitQueueSize);
-
-        return new Database(Pool.pool(connectOptions, poolOptions));
     }
 
     private String toErrorJson(String endpoint, Throwable e) {

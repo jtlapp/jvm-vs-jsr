@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.springjdbc.controllers;
+package com.jtlapp.jvmvsjs.springjdbc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.springwebflux.controllers;
+package com.jtlapp.jvmvsjs.springwebflux;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

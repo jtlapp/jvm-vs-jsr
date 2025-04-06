@@ -28,7 +28,7 @@ public class JoobyJdbcApp extends Jooby {
         var objectMapper = new ObjectMapper();
 
         // HikariCP uses JDBC under the hood.
-        var dataSource = createDataSource();
+        var dataSource = AppConfig.createDataSource();
         install(new HikariModule(dataSource));
         db = new Database(dataSource);
         appConfig = new AppConfig(dataSource);
@@ -64,25 +64,6 @@ public class JoobyJdbcApp extends Jooby {
                         toErrorJson("pg-sleep", e));
             }
         });
-    }
-
-    private HikariDataSource createDataSource() {
-        var maximumPoolSize = Integer.parseInt(
-                AppProperties.get("jooby.hikari.maximumPoolSize"));
-        var minimumIdle = Integer.parseInt(
-                AppProperties.get("jooby.hikari.minimumIdle"));
-        var connectionTimeoutMillis = Integer.parseInt(
-                AppProperties.get("jooby.hikari.connectionTimeout"));
-
-        var config = new HikariConfig();
-        config.setJdbcUrl("jdbc:" + System.getenv("DATABASE_URL"));
-        config.setUsername(System.getenv("DATABASE_USERNAME"));
-        config.setPassword(System.getenv("DATABASE_PASSWORD"));
-        config.setMaximumPoolSize(maximumPoolSize);
-        config.setMinimumIdle(minimumIdle);
-        config.setConnectionTimeout(connectionTimeoutMillis);
-
-        return new HikariDataSource(config);
     }
 
     private String toErrorJson(String endpoint, Throwable e) {

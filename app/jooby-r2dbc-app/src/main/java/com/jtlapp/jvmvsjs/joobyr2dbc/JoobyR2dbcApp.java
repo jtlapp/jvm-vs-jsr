@@ -34,7 +34,7 @@ public class JoobyR2dbcApp extends Jooby {
         AppProperties.init(JoobyR2dbcApp.class.getClassLoader());
         appConfig = new AppConfig();
         appConfig.server.setOptions(server);
-        db = createDatabase();
+        db = appConfig.createDatabase();
         install(server);
 
         use(ReactiveSupport.concurrent());
@@ -69,22 +69,6 @@ public class JoobyR2dbcApp extends Jooby {
                                     toErrorJson("pg-sleep", e))
                     );
         });
-    }
-
-    private Database createDatabase() {
-        var connFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder()
-                .option(DRIVER, "postgresql")
-                .option(HOST, System.getenv("DATABASE_HOST_NAME"))
-                .option(PORT, Integer.parseInt(System.getenv("DATABASE_PORT")))
-                .option(DATABASE, System.getenv("DATABASE_NAME"))
-                .option(USER, System.getenv("DATABASE_USERNAME"))
-                .option(PASSWORD, System.getenv("DATABASE_PASSWORD"))
-                .option(CONNECT_TIMEOUT,
-                        Duration.ofSeconds(appConfig.dbclient.connectionTimeout))
-                .build());
-
-        var client = DatabaseClient.create(connFactory);
-        return new Database(client);
     }
 
     private String toErrorJson(String endpoint, Throwable e) {

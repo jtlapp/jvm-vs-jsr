@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.springwebflux.controllers;
+package com.jtlapp.jvmvsjs.springwebflux;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtlapp.jvmvsjs.r2dbclib.Database;
