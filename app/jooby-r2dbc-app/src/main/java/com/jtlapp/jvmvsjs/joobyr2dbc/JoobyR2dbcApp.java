@@ -8,16 +8,10 @@ import io.jooby.*;
 import io.jooby.exception.StatusCodeException;
 import io.jooby.netty.NettyServer;
 import io.jooby.reactor.Reactor;
-import io.r2dbc.spi.ConnectionFactories;
-import io.r2dbc.spi.ConnectionFactoryOptions;
-import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-
-import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 
 public class JoobyR2dbcApp extends Jooby {
 

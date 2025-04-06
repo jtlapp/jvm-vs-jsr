@@ -9,9 +9,6 @@ import io.jooby.Jooby;
 import io.jooby.ReactiveSupport;
 import io.jooby.StatusCode;
 import io.jooby.netty.NettyServer;
-import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.sqlclient.Pool;
-import io.vertx.sqlclient.PoolOptions;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;

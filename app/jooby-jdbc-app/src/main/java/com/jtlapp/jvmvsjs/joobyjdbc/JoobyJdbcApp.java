@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtlapp.jvmvsjs.javalib.AppProperties;
 import com.jtlapp.jvmvsjs.joobyjdbc.config.AppConfig;
 import com.jtlapp.jvmvsjs.hikarilib.Database;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import io.jooby.ExecutionMode;
 import io.jooby.Jooby;
 import io.jooby.StatusCode;
