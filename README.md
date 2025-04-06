@@ -1,6 +1,6 @@
 # jvm-vs-jsr
 
-Benchmarks comparing JVM and JS Runtime concurrency frameworks.
+Benchmarks comparing JVM and JS Runtime concurrency frameworks
 
 **CURRENTLY UNDER DEVELOPMENT**
 
@@ -15,20 +15,22 @@ platforms (e.g. Node.js). Only PostgreSQL queries are examined.
 When Node.js first came out, people were astonished that it could provide better throughput than
 Java for I/O-bound operations. Numerous reactive frameworks have since been created to rectify the
 issue (Java), but I had trouble finding apples-to-apples comparisons of how well these frameworks
-perform relative to Node.js. TechEmpower [provides benchmarks](https://www.techempower.
-com/benchmarks),
-but I found it difficult to understand the commonalities and differences between any two
-implementations. The present repo is an effort to get a definitive sense of how throughput compares
-on these platforms for I/O-bound work, specifically PostgreSQL queries.
+perform relative to Node.js and to each other. TechEmpower [provides benchmarks](
+https://www.techempower.com/benchmarks), but the implementations are so dramatically different
+that I didn't understand how to compare them. The present repo is an effort to get a definitive
+sense of how throughput compares on these platforms for I/O-bound work, specifically PostgreSQL
+queries.
 
-I'll be collecting throughput metrics for non-blocking APIs and for APIs that hit a backend
-Postgres database. I'll be considering the
-database clients JDBC (including HikariCP), R2DBC, and the Vert.x PG client.
+The benchmark is performed all on a single machine via docker containers. The benchmark client 
+hits an app container, which hits a pgBouncer container, which hits a Postgres container. I 
+proxied Postgres with pgBouncer to allow Postgres to accept as many concurrent connections as the 
+client can make, to reduce the effect of Postgres itself on app concurrency. I'll be benchmarking
+the database clients JDBC (including HikariCP), R2DBC, and the Vert.x PG.
 
 I ended up writing an unexpected amount of Go client code for this project, but there are no
-unit tests because I'm not planning to maintain the repo long term.
+unit tests because at present I'm not planning to maintain the repo long term.
 
-## The Plan
+## The Comparisons
 
 The first goal is to compare bare-metal Java solutions to bare-metal JavaScript runtime
 solutions to learn the best possible throughput available. Fastify seems like a
@@ -128,41 +130,103 @@ If you decide to change the default docker image prefix, in addition to changing
 By default, the applications build for AMD64, but you can use `-Ddocker-architecture=arm64` to 
 build for Apple Silicon.
 
+You may need to tweak `BENCH_MAX_RESERVED_PORTS` for your machine. The benchmark makes heavy use 
+of ports and so checks to make sure the ports are ready before each test. One of the checks 
+verifies that the number of established ports (ports having active connections) is at most
+`BENCH_MAX_RESERVED_PORTS`. You'll want to set this to as low a number as you can for maximum 
+confidence that the machine is ready to perform a benchmark. To see the current number of 
+established ports, set this variable to 0 and run `bench/src/benchmark`. The tool with terminate 
+with an error telling you the number of ports currently in use.
+
 TODO: Look again into using environment variables in the POM.
 
-## Building and Deploying
+TODO: Either mention need to kill benchmark to abort, or add interrupt support.
 
-TODO: Note about creating persistent docker volume.
+## Building
 
-Deploy the backend database and client for benchmarking the variety of apps. You can only 
-install one app at a time.
+To build everything, including the `benchmark` tool, run the following from the repo root:
 
 ```bash
 mvn clean install
-./bin/setup-network # creates the docker network with backend
-cd bench/src
-./benchmark setup-results # creates the benchmark results database
 ```
+
+To only rebuild the `benchmark` tool:
+
+```bash
+cd bench/src
+make
+```
+
+To only rebuild one app:
+
+```bash
+mvn clean install -pl app/<app-directory> -am
+```
+
+## Deploying
+
+After building, to deploy the docker network of containers for use with benchmarking, run the 
+following script:
+
+```bash
+./bin/setup-network
+```
+
+This creates containers for pgBouncer, the backend database, and the results database. 
+`config/env-config` specifies the names of these containers. The results database uses a 
+persistent volume whose name is also given in `env-config`. The results database keeps a record 
+of all benchmark runs and its data persists until you delete the volume via docker.
+
+Upon first creating the persistent volume, set up the results database as follows. You won't 
+need to run this command again until you replace the persistent volume:
+
+```bash
+./bench/src/benchmark setup-results # creates the benchmark results database
+```
+
+To run a benchmark for an app, you have to first deploy that app. Only one app can be deployed 
+at a time. The script for deploying an app undeploys any already-existing app before deploying 
+the requested app:
 
 ```bash
 ./bin/deploy spring-jdbc-kernel-app # or another app
 ```
 
-The `deploy` command deploys or redeploys. In the case of apps, it replaces the currently
-deployed app (if any) with the named app. You can undeploy as follows:
+Run `./bin/deploy` with no arguments to see the available apps. These apps roughly correspond to 
+the names of the directories within `app/`, but each of these directories defines a server that 
+can be variously configured, so rely on `./bin/deploy` (no args) for the named configurations.
+
+## Teardown
+
+To remove the container for just the current app, whatever app is running, do the following 
+(`app` here is a literal, not the name of the app):
 
 ```bash
-./bin/teardown app # undeploy just the app
-./bin/teardown all # remove all container and the docker network, but not the results volume
+./bin/teardown app
 ```
+
+To remove all containers, including the app container, and the docker network too, run this:
+
+```bash
+./bin/teardown all
+```
+
+The above command does not remove the volume holding the results database. To remove this volume 
+(and discard its data), you'll need to do so via docker directly.
+
+## Designing Benchmarks
+
+TODO: discuss common config params
 
 ## Running Benchmarks
 
-1. Exec into the client pod using bash: `kubectl exec -it <client-pod> -- bash`.
-2. Run `./benchmark setup-results` to create the benchmark results database.
+TODO:
+
+Run benchmarks via the `benchmark` tool, which is in `bench/src`. You'll likely want to `cd` to 
+this directory for convenience.
+
 3. Run `./benchmark setup-backend -scenario <scenario>` to set up the scenario of the given name.
    Only required if the scenario uses backend Postgres tables.
-4. 
 5. TODO: introduce try, run, and loop
 6. Run `./benchmark run -scenario <scenario> -rate <requests-per-sec> -duration <seconds>`.
 
