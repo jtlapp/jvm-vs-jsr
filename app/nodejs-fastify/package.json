@@ -2,12 +2,13 @@
   "name": "nodejs-pg",
   "version": "0.1.0",
   "description": "API server for Node.js using Fastify and pg package",
-  "main": "server.js",
+  "main": "src/app.js",
+  "type": "module",
   "dependencies": {
     "fastify": "^5.1.0",
     "pg": "^8.13.1"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node src/app.js"
   }
 }

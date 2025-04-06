@@ -6,4 +6,4 @@ COPY . .
 RUN npm install
 
 EXPOSE ${APP_PORT}
-CMD ["node", "server.js"]
+CMD ["node", "src/app.js"]
