@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Benchmark configuration
-
-export CONTAINER_HOST="localhost"
-# Upper limit on number of ports expected to be open at start of test.
-export MAX_RESERVED_PORTS="23"
-
 # Docker configuration
 
 export DOCKER_NETWORK_NAME="benchmark-net"
@@ -44,3 +38,11 @@ export RESULTS_DB_VOLUME=${DOCKER_VOLUME_PREFIX}-data
 # Application configuration
 
 export APP_PORT=8080
+
+# Benchmark configuration
+
+export BENCH_BASE_APP_URL=http://localhost:${APP_PORT}
+export BENCH_BACKEND_DB_URL=postgresql://localhost:${BACKEND_DB_PORT}/${BACKEND_DB_NAME}
+export BENCH_RESULTS_DB_URL=postgresql://localhost:${RESULTS_DB_PORT}/${RESULTS_DB_NAME}
+# Upper limit on number of ports expected to be open at start of test.
+export BENCH_MAX_RESERVED_PORTS="30"

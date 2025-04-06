@@ -2,18 +2,15 @@ package database
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"jvm-vs-jsr.jtlapp.com/benchmark/config"
 )
 
 type DatabaseConfig struct {
-	HostEnvVar         string
-	PortEnvVar         string
-	DatabaseNameEnvVar string
-	UsernameEnvVar     string
-	PasswordEnvVar     string
+	HostUrlEnvVar  string
+	UsernameEnvVar string
+	PasswordEnvVar string
 }
 
 type Database struct {
@@ -26,15 +23,7 @@ func NewDatabase(config *DatabaseConfig) *Database {
 }
 
 func (db *Database) GetPool() (*pgxpool.Pool, error) {
-	host, err := config.GetEnvVar(db.config.HostEnvVar)
-	if err != nil {
-		return nil, err
-	}
-	port, err := config.GetEnvVar(db.config.PortEnvVar)
-	if err != nil {
-		return nil, err
-	}
-	databaseName, err := config.GetEnvVar(db.config.DatabaseNameEnvVar)
+	hostUrl, err := config.GetEnvVar(db.config.HostUrlEnvVar)
 	if err != nil {
 		return nil, err
 	}
@@ -47,10 +36,8 @@ func (db *Database) GetPool() (*pgxpool.Pool, error) {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("postgresql://%s:%s/%s", host, port, databaseName)
-
 	if db.pool == nil {
-		connConfig, err := pgxpool.ParseConfig(url)
+		connConfig, err := pgxpool.ParseConfig(hostUrl)
 		if err != nil {
 			return nil, err
 		}

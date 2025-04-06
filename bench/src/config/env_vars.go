@@ -6,18 +6,14 @@ import (
 )
 
 const (
-	AppPortEnvVar             = "APP_PORT"
-	BackendDatabaseNameEnvVar = "BACKEND_DB_NAME"
-	BackendUsernameEnvVar     = "BACKEND_DATABASE_USERNAME"
-	BackendPasswordEnvVar     = "BACKEND_DATABASE_PASSWORD"
-	DockerHostEnvVar          = "CONTAINER_HOST"
-	HostEnvVar                = "CONTAINER_HOST"
-	MaxReservedPortsEnvVar    = "MAX_RESERVED_PORTS"
-	PgBouncerPortEnvVar       = "PGBOUNCER_PORT"
-	ResultsPortEnvVar         = "RESULTS_DB_PORT"
-	ResultsDatabaseNameEnvVar = "RESULTS_DB_NAME"
-	ResultsUsernameEnvVar     = "RESULTS_DB_USER"
-	ResultsPasswordEnvVar     = "RESULTS_DB_PASSWORD"
+	BaseAppUrlEnvVar         = "BENCH_BASE_APP_URL"
+	BackendDatabaseUrlEnvVar = "BENCH_BACKEND_DB_URL"
+	BackendUsernameEnvVar    = "BACKEND_DATABASE_USERNAME"
+	BackendPasswordEnvVar    = "BACKEND_DATABASE_PASSWORD"
+	MaxReservedPortsEnvVar   = "BENCH_MAX_RESERVED_PORTS"
+	ResultsDatabaseUrlEnvVar = "BENCH_RESULTS_DB_URL"
+	ResultsUsernameEnvVar    = "RESULTS_DB_USER"
+	ResultsPasswordEnvVar    = "RESULTS_DB_PASSWORD"
 )
 
 func GetEnvVar(varName string) (string, error) {

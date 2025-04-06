@@ -77,11 +77,9 @@ type ResultsDB struct {
 
 func NewResultsDatabase() *ResultsDB {
 	var databaseConfig = DatabaseConfig{
-		HostEnvVar:         config.HostEnvVar,
-		PortEnvVar:         config.ResultsPortEnvVar,
-		DatabaseNameEnvVar: config.ResultsDatabaseNameEnvVar,
-		UsernameEnvVar:     config.ResultsUsernameEnvVar,
-		PasswordEnvVar:     config.ResultsPasswordEnvVar,
+		HostUrlEnvVar:  config.ResultsDatabaseUrlEnvVar,
+		UsernameEnvVar: config.ResultsUsernameEnvVar,
+		PasswordEnvVar: config.ResultsPasswordEnvVar,
 	}
 	return &ResultsDB{*NewDatabase(&databaseConfig)}
 }

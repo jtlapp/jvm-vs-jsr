@@ -39,6 +39,7 @@ func (rs *ResourceStatus) GetPercentages() (float64, float64, float64) {
 
 func PortsAreReady(maxReservedPorts uint) (bool, error) {
 	timeWaitPortsCount, establishedPortsCount := getPortsInUseCounts()
+	fmt.Printf("  Ports in use: %d (established) + %d (time wait)\n", establishedPortsCount, timeWaitPortsCount)
 	if establishedPortsCount > maxReservedPorts {
 		return false, fmt.Errorf(
 			"expected at most %d active ports but found %d (boost %s if this is okay)",

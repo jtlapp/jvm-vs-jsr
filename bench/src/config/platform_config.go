@@ -17,20 +17,14 @@ type PlatformConfig struct {
 
 func GetPlatformConfig() (*PlatformConfig, error) {
 
-	dockerHost, err := GetEnvVar(DockerHostEnvVar)
-	if err != nil {
-		return nil, err
-	}
-	appPort, err := GetEnvVar(AppPortEnvVar)
-	if err != nil {
-		return nil, err
-	}
 	maxReservedPorts, err := GetEnvVarAsUint(MaxReservedPortsEnvVar)
 	if err != nil {
 		return nil, err
 	}
-
-	baseAppUrl := fmt.Sprintf("http://%s:%s", dockerHost, appPort)
+	baseAppUrl, err := GetEnvVar(BaseAppUrlEnvVar)
+	if err != nil {
+		return nil, err
+	}
 	appInfo, err := GetAppInfo(baseAppUrl)
 	if err != nil {
 		return nil, err

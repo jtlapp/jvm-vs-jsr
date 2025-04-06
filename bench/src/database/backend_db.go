@@ -10,11 +10,9 @@ type BackendDB struct {
 
 func NewBackendDatabase() *BackendDB {
 	var databaseConfig = DatabaseConfig{
-		HostEnvVar:         config.HostEnvVar,
-		PortEnvVar:         config.PgBouncerPortEnvVar,
-		DatabaseNameEnvVar: config.BackendDatabaseNameEnvVar,
-		UsernameEnvVar:     config.BackendUsernameEnvVar,
-		PasswordEnvVar:     config.BackendPasswordEnvVar,
+		HostUrlEnvVar:  config.BackendDatabaseUrlEnvVar,
+		UsernameEnvVar: config.BackendUsernameEnvVar,
+		PasswordEnvVar: config.BackendPasswordEnvVar,
 	}
 	return &BackendDB{*NewDatabase(&databaseConfig)}
 }
