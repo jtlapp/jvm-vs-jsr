@@ -1,9 +1,0 @@
-env:
-  - name: SERVER_PORT
-    value: "{{ .Values.global.app.port }}"
-  - name: SPRING_R2DBC_URL
-    value: "r2dbc:{{ .Values.global.backend.pgbouncer.host }}"
-  - name: SPRING_R2DBC_USERNAME
-    value: "{{ .Values.global.backend.database.username }}"
-  - name: SPRING_R2DBC_PASSWORD
-    value: "{{ .Values.global.backend.database.password }}"
