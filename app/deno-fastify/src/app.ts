@@ -3,8 +3,6 @@ import { createConnectionPool, NUM_WORKERS, SERVER_PORT } from "./config.ts";
 
 class App {
   async run() {
-    // Deno doesn't use the same cluster module as Node.js
-    // We'll use Deno.Worker instead for multi-threading
     if (Deno.env.get("DENO_WORKER") !== "true") {
       await this.startPrimaryThread();
     } else {
@@ -36,22 +34,17 @@ class App {
       });
     }
 
-    // Keep the primary process running
     await new Promise(() => {});
   }
 
   async startWorkerThread() {
-    const pool = createConnectionPool();
-    
-    // Import Fastify for Deno
     const Fastify = await import("npm:fastify@5.1.0");
     const fastify = Fastify.default();
     
-    // Install the endpoints
-    installEndpoints(pool, fastify);
+    const sql = createConnectionPool();
+    installEndpoints(sql, fastify);
 
     try {
-      // Start the server
       await fastify.listen({ port: SERVER_PORT, host: "0.0.0.0" });
       console.log(`Worker ${Deno.pid} started and listening on port ${SERVER_PORT}`);
     } catch (err) {
@@ -61,5 +54,4 @@ class App {
   }
 }
 
-// Run the application
 await new App().run();

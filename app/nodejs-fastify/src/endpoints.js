@@ -2,9 +2,9 @@ import { APP_NAME, APP_VERSION, NUM_WORKERS } from './config.js';
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export function installEndpoints(pool, server) {
+export function installEndpoints(sql, server) {
   server.get('/', async (request, reply) => {
-    return 'Node.js + Fastify + pg package';
+    return 'Node.js + Fastify';
   });
 
   server.get('/api/info', async (request, reply) => {
@@ -28,7 +28,7 @@ export function installEndpoints(pool, server) {
     const millis = parseInt(request.query.millis || '0');
     const seconds = millis / 1000;
 
-    await pool.query('SELECT pg_sleep($1)', [seconds]);
+    await sql`SELECT pg_sleep(${seconds})`;
     return '{}';
   });
 }

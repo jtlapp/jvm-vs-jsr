@@ -26,9 +26,9 @@ class App {
   }
 
   async startWorkerThread() {
-    const pool = createConnectionPool();
+    const sql = createConnectionPool();
     const server = fastify();
-    installEndpoints(pool, server);
+    installEndpoints(sql, server);
 
     try {
       await server.listen({ port: SERVER_PORT, host: '0.0.0.0' });

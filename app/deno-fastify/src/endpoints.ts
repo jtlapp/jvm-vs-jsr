@@ -1,9 +1,12 @@
-import { APP_NAME, APP_VERSION, NUM_WORKERS } from "./config.ts";
-import { Pool } from "https://deno.land/x/postgres@v0.17.0/mod.ts";
+import { APP_NAME, APP_VERSION, NUM_WORKERS } from './config.ts';
+import postgres from 'https://deno.land/x/postgresjs@v3.4.5/mod.js';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export function installEndpoints(pool: Pool, server: any) {
+export function installEndpoints(
+  sql: ReturnType<typeof postgres>,
+  server: any
+) {
   server.get('/', async (request: any, reply: any) => {
     return 'Deno + Fastify + postgres';
   });
@@ -29,12 +32,7 @@ export function installEndpoints(pool: Pool, server: any) {
     const millis = parseInt(request.query.millis || '0');
     const seconds = millis / 1000;
 
-    const client = await pool.connect();
-    try {
-      await client.queryObject('SELECT pg_sleep($1)', [seconds]);
-      return '{}';
-    } finally {
-      client.release();
-    }
+    await sql`SELECT pg_sleep(${seconds})`;
+    return '{}';
   });
 }
