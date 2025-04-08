@@ -8,14 +8,14 @@ APP_NAME=$1
 if [ -z "$APP_NAME" ]; then
   echo "Usage: $0 <app-name>"
   echo "Available apps:"
-  echo "  - jooby-jdbc-app"
-  echo "  - jooby-r2dbc-app"
-  echo "  - jooby-vertx-app"
+  echo "  - jooby-jdbc"
+  echo "  - jooby-r2dbc"
+  echo "  - jooby-vertx"
   echo "  - deno-fastify"
   echo "  - nodejs-fastify"
-  echo "  - spring-jdbc-kernel-app"
-  echo "  - spring-jdbc-virtual-app"
-  echo "  - spring-webflux-app"
+  echo "  - spring-jdbc-kernel"
+  echo "  - spring-jdbc-virtual"
+  echo "  - spring-webflux"
   exit 1
 fi
 
@@ -30,8 +30,8 @@ ENV_VARS=()
 PGBOUNCER_URL=postgresql://${PGBOUNCER_CONTAINER}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}
 
 case "$APP_NAME" in
-  "spring-jdbc-kernel-app")
-    IMAGE_NAME="spring-jdbc-app:latest"
+  "spring-jdbc-kernel")
+    IMAGE_NAME="spring-jdbc:latest"
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
       "-e SERVER_PORT=$APP_PORT"
@@ -41,8 +41,8 @@ case "$APP_NAME" in
       "-e SPRING_THREADS_VIRTUAL_ENABLED=false"
     )
     ;;
-  "spring-jdbc-virtual-app")
-    IMAGE_NAME="spring-jdbc-app:latest"
+  "spring-jdbc-virtual")
+    IMAGE_NAME="spring-jdbc:latest"
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
       "-e SERVER_PORT=$APP_PORT"
@@ -52,8 +52,8 @@ case "$APP_NAME" in
       "-e SPRING_THREADS_VIRTUAL_ENABLED=true"
     )
     ;;
-  "spring-webflux-app")
-    IMAGE_NAME="spring-webflux-app:latest"
+  "spring-webflux")
+    IMAGE_NAME="spring-webflux:latest"
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
       "-e SERVER_PORT=$APP_PORT"

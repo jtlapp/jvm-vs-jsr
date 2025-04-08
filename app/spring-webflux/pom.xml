@@ -10,10 +10,11 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spring-jdbc-app</artifactId>
+    <artifactId>spring-webflux</artifactId>
 
     <properties>
-        <main.class>com.jtlapp.jvmvsjs.springjdbc.SpringJdbcApp</main.class>
+        <spring-boot-maven-plugin.version>3.3.1</spring-boot-maven-plugin.version>
+        <main.class>com.jtlapp.jvmvsjs.springwebflux.SpringWebfluxApp</main.class>
     </properties>
 
     <dependencies>
@@ -23,19 +24,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
             <groupId>com.jtlapp.jvmvsjs</groupId>
@@ -43,11 +36,7 @@
         </dependency>
         <dependency>
             <groupId>com.jtlapp.jvmvsjs</groupId>
-            <artifactId>tomcat-lib</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.jtlapp.jvmvsjs</groupId>
-            <artifactId>jdbc-lib</artifactId>
+            <artifactId>r2dbc-lib</artifactId>
         </dependency>
     </dependencies>
 

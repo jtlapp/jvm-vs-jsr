@@ -189,12 +189,13 @@ at a time. The script for deploying an app undeploys any already-existing app be
 the requested app:
 
 ```bash
-./bin/deploy spring-jdbc-kernel-app # or another app
+./bin/deploy-app spring-jdbc-kernel # or another app
 ```
 
-Run `./bin/deploy` with no arguments to see the available apps. These apps roughly correspond to 
-the names of the directories within `app/`, but each of these directories defines a server that 
-can be variously configured, so rely on `./bin/deploy` (no args) for the named configurations.
+Run `./bin/deploy-app` with no arguments to see the available apps. These apps roughly 
+correspond to the names of the directories within `app/`, but each of these directories defines
+a server that can be variously configured, so rely on `./bin/deploy-app` (no args) for the named
+configurations.
 
 ## Teardown
 
