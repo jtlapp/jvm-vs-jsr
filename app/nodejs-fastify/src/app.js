@@ -5,7 +5,7 @@ import { installEndpoints } from './endpoints.js';
 
 class App {
   async run() {
-    if (cluster.isPrimary) {
+    if (NUM_WORKERS > 1 && cluster.isPrimary) {
       await this.startPrimaryThread();
     } else {
       await this.startWorkerThread();
@@ -31,7 +31,7 @@ class App {
     installEndpoints(sql, server);
 
     try {
-      await server.listen({ port: SERVER_PORT, host: '0.0.0.0' });
+      server.listen({ port: SERVER_PORT, host: '0.0.0.0' });
       console.log(`Worker ${process.pid} started and listening`);
     } catch (err) {
       server.log.error(err);

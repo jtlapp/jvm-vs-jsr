@@ -236,3 +236,8 @@ When running a test scenario, it outputs the first response for each unique comb
 of status code, shared query name, and error message. For queries erroneously returning
 non-JSON, it also prints each unique combination of status code and response body. This
 output assists with debugging newly added applications.
+
+## Errata
+
+- Deno does not support clustering, so a fair comparison can't be made with Node.js clustering.
+- 
