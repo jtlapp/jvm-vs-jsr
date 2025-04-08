@@ -37,6 +37,7 @@ export RESULTS_DB_VOLUME=${DOCKER_VOLUME_PREFIX}-data
 
 export APP_PORT=8080
 export NUM_JSR_WORKERS=1
+export MAX_DB_CONNECTIONS=500
 
 # Benchmark configuration
 

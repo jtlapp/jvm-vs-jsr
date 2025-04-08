@@ -15,14 +15,14 @@ fi
 case "$COMPONENT" in
   "all")
     echo "Removing all containers..."
-    docker rm -f ${APP_CONTAINER} ${PGBOUNCER_CONTAINER} ${BACKEND_DB_CONTAINER} ${RESULTS_DB_CONTAINER} 2>/dev/null || true
+    docker rm -f $APP_CONTAINER $PGBOUNCER_CONTAINER $BACKEND_DB_CONTAINER $RESULTS_DB_CONTAINER 2>/dev/null || true
 
     echo "Removing Docker network..."
-    docker network rm ${DOCKER_NETWORK_NAME} 2>/dev/null || true
+    docker network rm $DOCKER_NETWORK_NAME 2>/dev/null || true
     ;;
   "app")
     echo "Removing application..."
-    docker rm -f ${APP_CONTAINER} 2>/dev/null || true
+    docker rm -f $APP_CONTAINER 2>/dev/null || true
     ;;
   *)
     echo "Unknown command: $COMPONENT"

@@ -240,4 +240,6 @@ output assists with debugging newly added applications.
 ## Errata
 
 - Deno does not support clustering, so a fair comparison can't be made with Node.js clustering.
+- Node.js with clusters greatly outperforms Deno without clusters:
+  https://www.reddit.com/r/node/comments/13oqbvi/i_have_done_a_full_benchmark_of_a_post_rest_api/
 - 

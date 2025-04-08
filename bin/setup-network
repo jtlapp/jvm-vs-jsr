@@ -3,21 +3,21 @@
 
 set -e
 
-if ! docker network inspect ${DOCKER_NETWORK_NAME} &>/dev/null; then
-  echo "Creating docker network '${DOCKER_NETWORK_NAME}'..."
-  docker network create ${DOCKER_NETWORK_NAME}
+if ! docker network inspect $DOCKER_NETWORK_NAME &>/dev/null; then
+  echo "Creating docker network '$DOCKER_NETWORK_NAME'..."
+  docker network create $DOCKER_NETWORK_NAME
 else
-  echo "Network '${DOCKER_NETWORK_NAME}' already exists."
+  echo "Network '$DOCKER_NETWORK_NAME' already exists."
 fi
 
 echo "Deploying backend database..."
 
 docker run -d \
-  --name ${BACKEND_DB_CONTAINER} \
-  --network ${DOCKER_NETWORK_NAME} \
-  -e POSTGRES_DB=${BACKEND_DB_NAME} \
-  -e POSTGRES_USER=${BACKEND_DB_USER} \
-  -e POSTGRES_PASSWORD=${BACKEND_DB_PASSWORD} \
+  --name $BACKEND_DB_CONTAINER \
+  --network $DOCKER_NETWORK_NAME \
+  -e POSTGRES_DB=$BACKEND_DB_NAME \
+  -e POSTGRES_USER=$BACKEND_DB_USER \
+  -e POSTGRES_PASSWORD=$BACKEND_DB_PASSWORD \
   -p ${BACKEND_DB_PORT}:5432 \
   postgres:15
 
@@ -27,11 +27,11 @@ TEMP_DIR=$(mktemp -d)
 
 cat > ${TEMP_DIR}/pgbouncer.ini << EOF
 [databases]
-${BACKEND_DB_NAME} = host=${BACKEND_DB_CONTAINER} port=${BACKEND_DB_PORT} user=${BACKEND_DB_USER} password=${BACKEND_DB_PASSWORD}
+$BACKEND_DB_NAME = host=$BACKEND_DB_CONTAINER port=$BACKEND_DB_PORT user=$BACKEND_DB_USER password=$BACKEND_DB_PASSWORD
 
 [pgbouncer]
 listen_addr = 0.0.0.0
-listen_port = ${PGBOUNCER_PORT}
+listen_port = $PGBOUNCER_PORT
 auth_type = md5
 auth_file = /etc/pgbouncer/userlist.txt
 
@@ -48,8 +48,8 @@ cat > ${TEMP_DIR}/userlist.txt << EOF
 EOF
 
 docker run -d \
-  --name ${PGBOUNCER_CONTAINER} \
-  --network ${DOCKER_NETWORK_NAME} \
+  --name $PGBOUNCER_CONTAINER \
+  --network $DOCKER_NETWORK_NAME \
   -v ${TEMP_DIR}/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini \
   -v ${TEMP_DIR}/userlist.txt:/etc/pgbouncer/userlist.txt \
   -p ${PGBOUNCER_PORT}:${PGBOUNCER_PORT} \
@@ -58,11 +58,11 @@ docker run -d \
 echo "Deploying results database..."
 
 docker run -d \
-  --name ${RESULTS_DB_CONTAINER} \
-  --network ${DOCKER_NETWORK_NAME} \
-  -e POSTGRES_DB=${RESULTS_DB_NAME} \
-  -e POSTGRES_USER=${RESULTS_DB_USER} \
-  -e POSTGRES_PASSWORD=${RESULTS_DB_PASSWORD} \
+  --name $RESULTS_DB_CONTAINER \
+  --network $DOCKER_NETWORK_NAME \
+  -e POSTGRES_DB=$RESULTS_DB_NAME \
+  -e POSTGRES_USER=$RESULTS_DB_USER \
+  -e POSTGRES_PASSWORD=$RESULTS_DB_PASSWORD \
   -p ${RESULTS_DB_PORT}:5432 \
   -v ${RESULTS_DB_VOLUME}:/var/lib/postgresql/data \
   postgres:15
