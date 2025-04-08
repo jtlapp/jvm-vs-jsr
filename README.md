@@ -40,15 +40,10 @@ Express.js-like fashion. I also want to compare these results to Spring Boot, wh
 necessary baseline for comparing the performance of Java frameworks. I'll then look at how
 Quarkus and Micronaut perform with R2DBC reactive I/O.
 
-Here are the JavaScript Runtime combinations I'll be benchmarking:
+Here are the combinations I'll be benchmarking:
 
 - Fastify
-  - Clustered Node.js + postgresjs (JavaScript)
-  - Clustered Deno + postgresjs (JavaScript)
-  - Clustered Bun + postgresjs (JavaScript)
-
-Here are the JVM combinations I'll be benchmarking:
-
+  - Clustered Node.js (JavaScript)
 - Jooby
   - JDBC with kernel threads (Java)
   - JDBC with virtual threads (Java)
