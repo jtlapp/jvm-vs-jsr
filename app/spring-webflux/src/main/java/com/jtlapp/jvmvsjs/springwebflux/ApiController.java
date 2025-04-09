@@ -2,7 +2,7 @@ package com.jtlapp.jvmvsjs.springwebflux;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtlapp.jvmvsjs.r2dbclib.Database;
-import com.jtlapp.jvmvsjs.springwebflux.config.AppConfig;
+import com.jtlapp.jvmvsjs.webfluxlib.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

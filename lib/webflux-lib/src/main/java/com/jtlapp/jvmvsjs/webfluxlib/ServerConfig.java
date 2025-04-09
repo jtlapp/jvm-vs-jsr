@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.springwebflux.config;
+package com.jtlapp.jvmvsjs.webfluxlib;
 
 import com.jtlapp.jvmvsjs.javalib.CommonServerConfig;
 import org.springframework.beans.factory.annotation.Value;

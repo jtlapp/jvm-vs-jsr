@@ -1,8 +1,7 @@
-package com.jtlapp.jvmvsjs.springwebflux.config;
+package com.jtlapp.jvmvsjs.webfluxlib;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jtlapp.jvmvsjs.javalib.CommonServerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

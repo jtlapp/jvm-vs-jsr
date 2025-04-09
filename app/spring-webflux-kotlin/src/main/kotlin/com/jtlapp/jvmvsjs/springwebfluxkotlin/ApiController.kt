@@ -3,7 +3,7 @@ package com.jtlapp.jvmvsjs.springwebfluxkotlin
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.jtlapp.jvmvsjs.r2dbclib.Database
-import com.jtlapp.jvmvsjs.springwebfluxkotlin.config.AppConfig
+import com.jtlapp.jvmvsjs.webfluxlib.AppConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext

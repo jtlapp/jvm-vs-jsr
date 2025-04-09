@@ -50,6 +50,7 @@
         <module>lib/tomcat-lib</module>
         <module>lib/r2dbc-lib</module>
         <module>lib/vertx-lib</module>
+        <module>lib/webflux-lib</module>
         <module>app/jooby-jdbc</module>
         <module>app/jooby-r2dbc</module>
         <module>app/jooby-vertx</module>
@@ -270,6 +271,11 @@
             <dependency>
                 <groupId>com.jtlapp.jvmvsjs</groupId>
                 <artifactId>vertx-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jtlapp.jvmvsjs</groupId>
+                <artifactId>webflux-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -1,4 +1,4 @@
-package com.jtlapp.jvmvsjs.springwebflux.config;
+package com.jtlapp.jvmvsjs.webfluxlib;
 
 import com.jtlapp.jvmvsjs.r2dbclib.Database;
 import io.r2dbc.spi.ConnectionFactory;
