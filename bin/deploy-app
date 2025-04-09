@@ -31,17 +31,6 @@ ENV_VARS=()
 PGBOUNCER_URL=postgresql://${PGBOUNCER_CONTAINER}:${PGBOUNCER_PORT}/${BACKEND_DB_NAME}
 
 case "$APP_NAME" in
-  spring-jdbc-kernel)
-    IMAGE_NAME="spring-jdbc:latest"
-    ENV_VARS=(
-      "-e APP_NAME=$APP_NAME"
-      "-e SERVER_PORT=$APP_PORT"
-      "-e SPRING_DATASOURCE_URL=jdbc:$PGBOUNCER_URL"
-      "-e SPRING_DATASOURCE_USERNAME=$BACKEND_DB_USER"
-      "-e SPRING_DATASOURCE_PASSWORD=$BACKEND_DB_PASSWORD"
-      "-e SPRING_THREADS_VIRTUAL_ENABLED=false"
-    )
-    ;;
   spring-jdbc-kernel|spring-jdbc-virtual)
     IMAGE_NAME="spring-jdbc:latest"
     VIRTUAL_ENABLED="false"
