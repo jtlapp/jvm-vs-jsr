@@ -42,15 +42,19 @@ case "$APP_NAME" in
       "-e SPRING_THREADS_VIRTUAL_ENABLED=false"
     )
     ;;
-  spring-jdbc-virtual)
+  spring-jdbc-kernel|spring-jdbc-virtual)
     IMAGE_NAME="spring-jdbc:latest"
+    VIRTUAL_ENABLED="false"
+    if [[ "$APP_NAME" == *"virtual" ]]; then
+      VIRTUAL_ENABLED="true"
+    fi
     ENV_VARS=(
       "-e APP_NAME=$APP_NAME"
       "-e SERVER_PORT=$APP_PORT"
       "-e SPRING_DATASOURCE_URL=jdbc:$PGBOUNCER_URL"
       "-e SPRING_DATASOURCE_USERNAME=$BACKEND_DB_USER"
       "-e SPRING_DATASOURCE_PASSWORD=$BACKEND_DB_PASSWORD"
-      "-e SPRING_THREADS_VIRTUAL_ENABLED=true"
+      "-e SPRING_THREADS_VIRTUAL_ENABLED=$VIRTUAL_ENABLED"
     )
     ;;
   spring-webflux|spring-webflux-kotlin)
